@@ -65,24 +65,33 @@
             font-weight: 600;
         }
 
+        /* Seção de Configuração - Melhorada */
         .config-section {
-            background: #fff3cd;
-            padding: 20px;
-            border: 2px solid #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 25px;
+            border: 3px solid #f39c12;
             border-radius: 15px;
             margin: 20px;
             display: none;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
         .config-section.show {
             display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .config-title {
-            color: #856404;
+            color: #d35400;
             font-weight: bold;
             margin-bottom: 15px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
+            text-align: center;
         }
 
         .config-form {
@@ -99,17 +108,53 @@
 
         .config-input label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #856404;
+            color: #d35400;
+            font-size: 1rem;
         }
 
         .config-input input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #ffc107;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border: 2px solid #f39c12;
+            border-radius: 12px;
             font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .config-input input:focus {
+            outline: none;
+            border-color: #e67e22;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        /* Status e Notificações */
+        .status-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .quick-add {
@@ -169,6 +214,13 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-primary {
@@ -176,7 +228,7 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
         }
@@ -184,6 +236,11 @@
         .btn-success {
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
         }
 
         .btn-export {
@@ -197,11 +254,28 @@
         }
 
         .btn-config {
-            background: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
             font-size: 0.9rem;
-            padding: 10px 15px;
+            padding: 12px 20px;
+        }
+
+        /* Loading State */
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .form-actions {
@@ -212,6 +286,117 @@
             flex-wrap: wrap;
         }
 
+        /* Botões Intuitivos Melhorados */
+        .date-buttons, .time-buttons, .location-buttons, 
+        .price-buttons, .payment-buttons, .payment-to-buttons, .obs-buttons,
+        .people-buttons, .baggage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-date, .btn-time, .btn-location, 
+        .btn-price, .btn-payment, .btn-payment-to, .btn-obs,
+        .btn-people, .btn-baggage {
+            padding: 10px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            color: #495057;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .btn-date:hover, .btn-time:hover, 
+        .btn-location:hover, .btn-price:hover, .btn-payment:hover, 
+        .btn-payment-to:hover, .btn-obs:hover,
+        .btn-people:hover, .btn-baggage:hover {
+            border-color: #3498db;
+            background: #e7f3ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-date.active, .btn-time.active, 
+        .btn-location.active, .btn-price.active, .btn-payment.active, 
+        .btn-payment-to.active, .btn-obs.active,
+        .btn-people.active, .btn-baggage.active {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-people {
+            min-width: 50px;
+            font-size: 1.1rem;
+            border-color: #9b59b6;
+            color: #9b59b6;
+        }
+
+        .btn-people:hover, .btn-people.active {
+            background: #9b59b6;
+            color: white;
+            border-color: #8e44ad;
+        }
+
+        .btn-baggage {
+            min-width: 50px;
+            font-size: 1.1rem;
+            border-color: #e67e22;
+            color: #e67e22;
+        }
+
+        .btn-baggage:hover, .btn-baggage.active {
+            background: #e67e22;
+            color: white;
+            border-color: #d35400;
+        }
+
+        .btn-location {
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .origem-btn {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .destino-btn {
+            border-left: 4px solid #27ae60;
+        }
+
+        .btn-payment {
+            min-width: 130px;
+            font-size: 1rem;
+        }
+
+        .btn-payment-to {
+            min-width: 140px;
+            font-size: 1rem;
+        }
+
+        .btn-price {
+            font-weight: 700;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-price:hover, .btn-price.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-obs {
+            font-size: 0.85rem;
+            background: #f8f9fa;
+        }
+
+        /* Resumo e Dashboard */
         .summary-section {
             padding: 30px;
             background: #f8f9fa;
@@ -231,10 +416,15 @@
             text-align: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
         }
 
         .summary-number {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 8px;
@@ -279,6 +469,7 @@
             opacity: 0.9;
         }
 
+        /* Tabela e Serviços */
         .services-section {
             padding: 30px;
         }
@@ -422,11 +613,6 @@
             color: #2c3e50;
         }
 
-        .route-info {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-
         .value-highlight {
             font-weight: 700;
             color: #27ae60;
@@ -461,129 +647,11 @@
             color: #155724;
         }
 
-        /* Botões Intuitivos */
-        .date-buttons, .time-buttons, .location-buttons, 
-        .price-buttons, .payment-buttons, .payment-to-buttons, .obs-buttons,
-        .people-buttons, .baggage-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-date, .btn-time, .btn-location, 
-        .btn-price, .btn-payment, .btn-payment-to, .btn-obs,
-        .btn-people, .btn-baggage {
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            background: white;
-            color: #495057;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .btn-date:hover, .btn-time:hover, 
-        .btn-location:hover, .btn-price:hover, .btn-payment:hover, 
-        .btn-payment-to:hover, .btn-obs:hover,
-        .btn-people:hover, .btn-baggage:hover {
-            border-color: #3498db;
-            background: #e7f3ff;
-            transform: translateY(-1px);
-        }
-
-        .btn-date.active, .btn-time.active, 
-        .btn-location.active, .btn-price.active, .btn-payment.active, 
-        .btn-payment-to.active, .btn-obs.active,
-        .btn-people.active, .btn-baggage.active {
-            background: #3498db;
-            color: white;
-            border-color: #2980b9;
-        }
-
-        .btn-people {
-            min-width: 45px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-color: #9b59b6;
-            color: #9b59b6;
-        }
-
-        .btn-people:hover {
-            background: #9b59b6;
-            color: white;
-        }
-
-        .btn-people.active {
-            background: #9b59b6;
-            border-color: #8e44ad;
-        }
-
-        .btn-baggage {
-            min-width: 45px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-color: #e67e22;
-            color: #e67e22;
-        }
-
-        .btn-baggage:hover {
-            background: #e67e22;
-            color: white;
-        }
-
-        .btn-baggage.active {
-            background: #e67e22;
-            border-color: #d35400;
-        }
-
-        .btn-location {
-            min-width: 140px;
-            text-align: center;
-        }
-
-        .origem-btn {
-            border-left: 4px solid #e74c3c;
-        }
-
-        .destino-btn {
-            border-left: 4px solid #27ae60;
-        }
-
-        .btn-payment {
-            min-width: 120px;
-            font-size: 1rem;
-        }
-
-        .btn-payment-to {
-            min-width: 130px;
-            font-size: 1rem;
-        }
-
-        .btn-price {
-            font-weight: 600;
-            color: #27ae60;
-            border-color: #27ae60;
-        }
-
-        .btn-price:hover {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-obs {
-            font-size: 0.85rem;
-            background: #f8f9fa;
-        }
-
-        /* Google Maps Autocomplete */
+        /* Google Maps e Phone Input */
         .pac-container {
             z-index: 9999;
         }
 
-        /* International Tel Input */
         .phone-container {
             position: relative;
         }
@@ -608,6 +676,7 @@
             padding-left: 60px;
         }
 
+        /* Responsividade */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -638,6 +707,14 @@
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .config-form {
+                flex-direction: column;
+            }
+
+            .config-input {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
@@ -653,22 +730,24 @@
             </div>
         </div>
 
-        <!-- Seção de Configuração -->
+        <!-- Seção de Configuração Melhorada -->
         <div class="config-section" id="configSection">
             <div class="config-title">🔗 Configuração do Google Sheets</div>
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" placeholder="https://script.google.com/macros/s/AKfycbz7iAp6O1NDWIYO88_69BerNSBGxHiPN71qWf3CKvU7Olkw_YLJP_tEZ0yu0EolWB60/exec">
+                    <input type="url" id="webappUrl" placeholder="https://script.google.com/macros/s/...">
                 </div>
-
-                <button type="button" class="btn btn-success" onclick="testConnection()">
+                <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
                 </button>
                 <button type="button" class="btn btn-export" onclick="toggleConfig()">
                     🔒 Fechar
                 </button>
             </div>
+            
+            <!-- Mensagem de Status -->
+            <div id="connectionStatus" class="status-message"></div>
         </div>
 
         <div class="quick-add">
@@ -680,6 +759,7 @@
                         <label for="nomeCliente">Nome do Cliente *</label>
                         <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
                     </div>
+                    
                     <div class="form-group">
                         <label for="numeroPessoas">Número de Pessoas *</label>
                         <div class="people-buttons">
@@ -694,6 +774,7 @@
                         </div>
                         <input type="number" id="numeroPessoas" min="1" max="20" required style="display: none;">
                     </div>
+                    
                     <div class="form-group">
                         <label for="numeroBagagens">Número de Bagagens</label>
                         <div class="baggage-buttons">
@@ -707,14 +788,16 @@
                         </div>
                         <input type="number" id="numeroBagagens" min="0" max="20" value="0" style="display: none;">
                     </div>
+                    
                     <div class="form-group">
                         <label for="data">Data do Transfer *</label>
                         <div class="date-buttons">
                             <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
                             <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
-                            <input type="date" id="data" required>
                         </div>
+                        <input type="date" id="data" required>
                     </div>
+                    
                     <div class="form-group">
                         <label for="horaPickup">Hora de Pick-up *</label>
                         <div class="time-buttons">
@@ -724,7 +807,6 @@
                             <button type="button" class="btn-time" onclick="setTime('09:00')">09:00</button>
                             <button type="button" class="btn-time" onclick="setTime('10:00')">10:00</button>
                             <button type="button" class="btn-time" onclick="setTime('11:00')">11:00</button>
-                            <input type="time" id="horaPickup" required>
                         </div>
                         <div class="time-buttons" style="margin-top: 10px;">
                             <button type="button" class="btn-time" onclick="setTime('12:00')">12:00</button>
@@ -742,17 +824,21 @@
                             <button type="button" class="btn-time" onclick="setTime('22:00')">22:00</button>
                             <button type="button" class="btn-time" onclick="setTime('23:00')">23:00</button>
                         </div>
+                        <input type="time" id="horaPickup" required>
                     </div>
+                    
                     <div class="form-group">
                         <label for="contacto">Contacto do Cliente *</label>
                         <div class="phone-container">
                             <input type="tel" id="contacto" required placeholder="Digite o número...">
                         </div>
                     </div>
+                    
                     <div class="form-group">
                         <label for="numeroVoo">Número do Voo</label>
                         <input type="text" id="numeroVoo" placeholder="Ex: TP1234">
                     </div>
+                    
                     <div class="form-group">
                         <label for="origem">Local de Origem *</label>
                         <div class="location-buttons">
@@ -765,6 +851,7 @@
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
                     </div>
+                    
                     <div class="form-group">
                         <label for="destino">Local de Destino *</label>
                         <div class="location-buttons">
@@ -777,68 +864,72 @@
                         </div>
                         <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
                     </div>
-                    <div class="form-group">
-                        <label for="valorTotal">Valor do Serviço (€) *</label>
-                        <div class="price-buttons">
-                            <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
-                            <button type="button" class="btn-price" onclick="setPrice(35)">€35</button>
-                            <button type="button" class="btn-price" onclick="setPrice(45)">€45</button>
-                            <button type="button" class="btn-price" onclick="setPrice(60)">€60</button>
-                            <button type="button" class="btn-price" onclick="setPrice(75)">€75</button>
-                            <button type="button" class="btn-price" onclick="setPrice(100)">€100</button>
-                        </div>
-                        <input type="number" id="valorTotal" step="0.01" required placeholder="Ou digite valor...">
-                    </div>
-                    <div class="form-group">
-                        <label for="modoPagamento">Forma de Pagamento *</label>
-                        <div class="payment-buttons">
-                            <button type="button" class="btn-payment" onclick="setPayment('Dinheiro')">
-                                💵 Dinheiro
-                            </button>
-                            <button type="button" class="btn-payment" onclick="setPayment('Cartão')">
-                                💳 Cartão
-                            </button>
-                            <button type="button" class="btn-payment" onclick="setPayment('Transferência')">
-                                🏦 Transferência
-                            </button>
-                        </div>
-                        <select id="modoPagamento" required style="display: none;">
-                            <option value="">Selecionar...</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão">Cartão</option>
-                            <option value="Transferência">Transferência Bancária</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="pagoParaQuem">Pago Para *</label>
-                        <div class="payment-to-buttons">
-                            <button type="button" class="btn-payment-to" onclick="setPaymentTo('Recepção')">
-                                🏨 Recepção
-                            </button>
-                            <button type="button" class="btn-payment-to" onclick="setPaymentTo('Motorista')">
-                                🚐 Motorista
-                            </button>
-                        </div>
-                        <select id="pagoParaQuem" required style="display: none;">
-                            <option value="">Selecionar...</option>
-                            <option value="Recepção">Recepção</option>
-                            <option value="Motorista">Motorista</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="observacoes">Observações</label>
-                        <div class="obs-buttons">
-                            <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">Bagagem Extra</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">Urgente</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
-                        </div>
-<textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                    
+<div class="form-group">
+                       <label for="valorTotal">Valor do Serviço (€) *</label>
+                       <div class="price-buttons">
+                           <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
+                           <button type="button" class="btn-price" onclick="setPrice(35)">€35</button>
+                           <button type="button" class="btn-price" onclick="setPrice(45)">€45</button>
+                           <button type="button" class="btn-price" onclick="setPrice(60)">€60</button>
+                           <button type="button" class="btn-price" onclick="setPrice(75)">€75</button>
+                           <button type="button" class="btn-price" onclick="setPrice(100)">€100</button>
+                       </div>
+                       <input type="number" id="valorTotal" step="0.01" required placeholder="Ou digite valor...">
+                   </div>
+                   
+                   <div class="form-group">
+                       <label for="modoPagamento">Forma de Pagamento *</label>
+                       <div class="payment-buttons">
+                           <button type="button" class="btn-payment" onclick="setPayment('Dinheiro')">
+                               💵 Dinheiro
+                           </button>
+                           <button type="button" class="btn-payment" onclick="setPayment('Cartão')">
+                               💳 Cartão
+                           </button>
+                           <button type="button" class="btn-payment" onclick="setPayment('Transferência')">
+                               🏦 Transferência
+                           </button>
+                       </div>
+                       <select id="modoPagamento" required style="display: none;">
+                           <option value="">Selecionar...</option>
+                           <option value="Dinheiro">Dinheiro</option>
+                           <option value="Cartão">Cartão</option>
+                           <option value="Transferência">Transferência Bancária</option>
+                       </select>
+                   </div>
+                   
+                   <div class="form-group">
+                       <label for="pagoParaQuem">Pago Para *</label>
+                       <div class="payment-to-buttons">
+                           <button type="button" class="btn-payment-to" onclick="setPaymentTo('Recepção')">
+                               🏨 Recepção
+                           </button>
+                           <button type="button" class="btn-payment-to" onclick="setPaymentTo('Motorista')">
+                               🚐 Motorista
+                           </button>
+                       </div>
+                       <select id="pagoParaQuem" required style="display: none;">
+                           <option value="">Selecionar...</option>
+                           <option value="Recepção">Recepção</option>
+                           <option value="Motorista">Motorista</option>
+                       </select>
+                   </div>
+                   
+                   <div class="form-group">
+                       <label for="observacoes">Observações</label>
+                       <div class="obs-buttons">
+                           <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">Bagagem Extra</button>
+                           <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">Urgente</button>
+                           <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
+                           <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
+                       </div>
+                       <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
                    </div>
                </div>
 
                <div class="form-actions">
-                   <button type="submit" class="btn btn-primary">✅ Solicitar Transfer</button>
+                   <button type="submit" class="btn btn-primary" id="submitBtn">✅ Solicitar Transfer</button>
                    <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
                    <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
                    <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">
@@ -954,6 +1045,7 @@
         let services = [];
         let editingId = null;
         let phoneInput = null;
+        let isConnected = false;
 
         // Função para mostrar/ocultar configurações
         function toggleConfig() {
@@ -961,96 +1053,87 @@
             configSection.classList.toggle('show');
         }
 
+        // Função para mostrar status de conexão
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Função para adicionar loading state aos botões
+        function setButtonLoading(buttonId, loading = true) {
+            const button = document.getElementById(buttonId);
+            if (loading) {
+                button.disabled = true;
+                button.classList.add('loading');
+                button.textContent = '';
+            } else {
+                button.disabled = false;
+                button.classList.remove('loading');
+                // Restore original text based on button
+                if (buttonId === 'testBtn') {
+                    button.textContent = '🔗 Testar Conexão';
+                } else if (buttonId === 'submitBtn') {
+                    button.textContent = '✅ Solicitar Transfer';
+                }
+            }
+        }
+
         // Inicializar campo telefone com detecção de país
         function initializePhoneInput() {
             const phoneInputElement = document.getElementById('contacto');
             
-            phoneInput = window.intlTelInput(phoneInputElement, {
-                initialCountry: "pt", // Portugal como padrão
-                preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
-                separateDialCode: true,
-                autoHideDialCode: false,
-                nationalMode: false,
-                formatOnDisplay: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-            });
+            if (window.intlTelInput) {
+                phoneInput = window.intlTelInput(phoneInputElement, {
+                    initialCountry: "pt",
+                    preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
+                    separateDialCode: true,
+                    autoHideDialCode: false,
+                    nationalMode: false,
+                    formatOnDisplay: true,
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+                });
 
-            // Detectar país automaticamente quando o usuário digita
-            phoneInputElement.addEventListener('input', function() {
-                const number = phoneInputElement.value;
-                
-                // Se começar com +, tentar detectar o país
-                if (number.startsWith('+')) {
-                    const countryCode = detectCountryFromNumber(number);
-                    if (countryCode) {
-                        phoneInput.setCountry(countryCode);
+                phoneInputElement.addEventListener('input', function() {
+                    const number = phoneInputElement.value;
+                    if (number.startsWith('+')) {
+                        const countryCode = detectCountryFromNumber(number);
+                        if (countryCode) {
+                            phoneInput.setCountry(countryCode);
+                        }
                     }
-                }
-            });
+                });
 
-            // Formatar o número automaticamente
-            phoneInputElement.addEventListener('blur', function() {
-                if (phoneInput.isValidNumber()) {
-                    phoneInputElement.value = phoneInput.getNumber();
-                }
-            });
+                phoneInputElement.addEventListener('blur', function() {
+                    if (phoneInput.isValidNumber()) {
+                        phoneInputElement.value = phoneInput.getNumber();
+                    }
+                });
+            }
         }
 
-        // Detectar país baseado no código do número
         function detectCountryFromNumber(number) {
             const countryCodesMap = {
-                '+351': 'pt', // Portugal
-                '+34': 'es',  // Espanha
-                '+33': 'fr',  // França
-                '+49': 'de',  // Alemanha
-                '+55': 'br',  // Brasil
-                '+1': 'us',   // EUA/Canadá
-                '+44': 'gb',  // Reino Unido
-                '+39': 'it',  // Itália
-                '+31': 'nl',  // Holanda
-                '+32': 'be',  // Bélgica
-                '+41': 'ch',  // Suíça
-                '+43': 'at',  // Áustria
-                '+45': 'dk',  // Dinamarca
-                '+46': 'se',  // Suécia
-                '+47': 'no',  // Noruega
-                '+358': 'fi', // Finlândia
-                '+420': 'cz', // República Checa
-                '+48': 'pl',  // Polônia
-                '+7': 'ru',   // Rússia
-                '+86': 'cn',  // China
-                '+81': 'jp',  // Japão
-                '+82': 'kr',  // Coreia do Sul
-                '+61': 'au',  // Austrália
-                '+64': 'nz',  // Nova Zelândia
-                '+27': 'za',  // África do Sul
-                '+52': 'mx',  // México
-                '+54': 'ar',  // Argentina
-                '+56': 'cl',  // Chile
-                '+57': 'co',  // Colômbia
-                '+58': 've',  // Venezuela
-                '+90': 'tr',  // Turquia
-                '+91': 'in',  // Índia
-                '+60': 'my',  // Malásia
-                '+65': 'sg',  // Singapura
-                '+66': 'th',  // Tailândia
-                '+84': 'vn',  // Vietnã
-                '+63': 'ph',  // Filipinas
-                '+62': 'id'   // Indonésia
+                '+351': 'pt', '+34': 'es', '+33': 'fr', '+49': 'de', '+55': 'br',
+                '+1': 'us', '+44': 'gb', '+39': 'it', '+31': 'nl', '+32': 'be',
+                '+41': 'ch', '+43': 'at', '+45': 'dk', '+46': 'se', '+47': 'no'
             };
 
-            // Tentar match com códigos de 2 a 4 dígitos
             for (let i = 4; i >= 2; i--) {
                 const code = number.substring(0, i);
                 if (countryCodesMap[code]) {
                     return countryCodesMap[code];
                 }
             }
-            
             return null;
         }
 
-        // Obter número formatado do telefone
         function getFormattedPhoneNumber() {
             if (phoneInput && phoneInput.isValidNumber()) {
                 return phoneInput.getNumber();
@@ -1060,16 +1143,12 @@
 
         function setPeople(number) {
             document.getElementById('numeroPessoas').value = number;
-            
-            // Remover classe active de todos os botões de pessoas
             document.querySelectorAll('.btn-people').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setBaggage(number) {
             document.getElementById('numeroBagagens').value = number;
-            
-            // Remover classe active de todos os botões de bagagem
             document.querySelectorAll('.btn-baggage').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
@@ -1078,7 +1157,6 @@
             const dateInput = document.getElementById('data');
             const today = new Date();
             
-            // Remover classe active de todos os botões de data
             document.querySelectorAll('.btn-date').forEach(btn => btn.classList.remove('active'));
             
             if (option === 'today') {
@@ -1094,48 +1172,36 @@
 
         function setTime(time) {
             document.getElementById('horaPickup').value = time;
-            
-            // Remover classe active de todos os botões de hora
             document.querySelectorAll('.btn-time').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setOrigin(location) {
             document.getElementById('origem').value = location;
-            
-            // Remover classe active de todos os botões de origem
             document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setDestination(location) {
             document.getElementById('destino').value = location;
-            
-            // Remover classe active de todos os botões de destino
             document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setPrice(price) {
             document.getElementById('valorTotal').value = price;
-            
-            // Remover classe active de todos os botões de preço
             document.querySelectorAll('.btn-price').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setPayment(method) {
             document.getElementById('modoPagamento').value = method;
-            
-            // Remover classe active de todos os botões de pagamento
             document.querySelectorAll('.btn-payment').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function setPaymentTo(recipient) {
             document.getElementById('pagoParaQuem').value = recipient;
-            
-            // Remover classe active de todos os botões
             document.querySelectorAll('.btn-payment-to').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
@@ -1156,67 +1222,59 @@
             }, 1000);
         }
 
-        // Carregar dados
-        function loadData() {
-            const savedData = localStorage.getItem('partnershipTransferData');
-            const savedUrl = localStorage.getItem('webappUrl');
-            
-            if (savedData) {
-                services = JSON.parse(savedData);
-                renderTable();
-                updateSummary();
-            }
-            
-            if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
-            }
-        }
-
-        // Salvar dados
-        function saveData() {
-            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
-        }
-
-        // Salvar URL do webapp
-        function saveWebappUrl() {
-            const url = document.getElementById('webappUrl').value;
-            if (url) {
-                localStorage.setItem('webappUrl', url);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-            }
-        }
-
-        // Testar conexão com Google Sheets
+        // Testar conexão com Google Sheets - CORRIGIDO
         async function testConnection() {
-            const url = document.getElementById('webappUrl').value;
+            const url = document.getElementById('webappUrl').value.trim();
             
             if (!url) {
-                alert('Por favor, insira a URL do Google Apps Script!');
+                showStatus('Por favor, insira a URL do Google Apps Script!', 'error');
+                return;
+            }
+
+            if (!url.includes('script.google.com')) {
+                showStatus('URL inválida! Use uma URL do Google Apps Script.', 'error');
                 return;
             }
             
+            setButtonLoading('testBtn', true);
+            
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    alert('✅ Conexão funcionando! Sistema integrado com Google Sheets.');
+                    isConnected = true;
+                    showStatus('✅ Conexão funcionando! Sistema integrado com Google Sheets.', 'success');
                     saveWebappUrl();
-                    toggleConfig();
+                    document.getElementById('syncBtn').style.display = 'inline-block';
+                    
+                    // Auto close config after 2 seconds
+                    setTimeout(() => {
+                        toggleConfig();
+                    }, 2000);
                 } else {
-                    alert('❌ Erro na conexão. Verifique a URL e as configurações.');
+                    showStatus('❌ Erro na conexão: ' + (result.message || 'Verificar configurações'), 'error');
+                    isConnected = false;
                 }
             } catch (error) {
-                alert('❌ Erro ao conectar: ' + error.message);
+                console.error('Erro de conexão:', error);
+                showStatus('❌ Erro ao conectar: Verifique a URL e configurações do CORS', 'error');
+                isConnected = false;
+            } finally {
+                setButtonLoading('testBtn', false);
             }
         }
 
-        // Enviar dados para Google Sheets
+        // Enviar dados para Google Sheets - MELHORADO
         async function sendToSheets(serviceData) {
-            const url = document.getElementById('webappUrl').value || localStorage.getItem('webappUrl');
+            const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl');
             
             if (!url) {
+                console.log('URL não configurada');
                 return false;
             }
             
@@ -1226,10 +1284,13 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(serviceData)
+                    body: JSON.stringify(serviceData),
+                    mode: 'cors'
                 });
                 
                 const result = await response.json();
+                console.log('Resposta do Sheets:', result);
+                
                 return result.status === 'success';
             } catch (error) {
                 console.error('Erro ao enviar para Google Sheets:', error);
@@ -1237,35 +1298,86 @@
             }
         }
 
-        // Sincronizar todos os dados existentes
+        // Sincronizar todos os dados - MELHORADO
         async function syncToSheets() {
-            const url = document.getElementById('webappUrl').value || localStorage.getItem('webappUrl');
+            const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl');
             
             if (!url) {
-                alert('Configure a URL do Google Apps Script primeiro!');
+                showStatus('Configure a URL do Google Apps Script primeiro!', 'error');
                 return;
             }
             
             if (services.length === 0) {
-                alert('Não há dados para sincronizar!');
+                showStatus('Não há dados para sincronizar!', 'warning');
                 return;
             }
             
+            setButtonLoading('syncBtn', true);
             let successCount = 0;
-            let totalCount = services.length;
             
-            for (const service of services) {
-                const success = await sendToSheets(service);
-                if (success) successCount++;
+            try {
+                for (const service of services) {
+                    const success = await sendToSheets(service);
+                    if (success) successCount++;
+                    
+                    // Pequena pausa entre requisições
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
                 
-                // Pequena pausa entre as requisições
-                await new Promise(resolve => setTimeout(resolve, 100));
+                showStatus(`Sincronização concluída! ${successCount}/${services.length} registros enviados.`, 'success');
+            } catch (error) {
+                showStatus('Erro durante sincronização: ' + error.message, 'error');
+            } finally {
+                setButtonLoading('syncBtn', false);
             }
-            
-            alert(`Sincronização concluída!\n✅ ${successCount} de ${totalCount} registros enviados com sucesso.`);
         }
 
-        // Renderizar tabela
+        // Salvar URL do webapp
+        function saveWebappUrl() {
+            const url = document.getElementById('webappUrl').value.trim();
+            if (url) {
+                localStorage.setItem('webappUrl', url);
+                document.getElementById('syncBtn').style.display = 'inline-block';
+                isConnected = true;
+            }
+        }
+
+        // Carregar dados - MELHORADO
+        function loadData() {
+            const savedData = localStorage.getItem('partnershipTransferData');
+            const savedUrl = localStorage.getItem('webappUrl');
+            
+            if (savedData) {
+                try {
+                    services = JSON.parse(savedData);
+                    console.log(`${services.length} transfers carregados do localStorage`);
+                    renderTable();
+                    updateSummary();
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    services = [];
+                }
+            }
+            
+            if (savedUrl) {
+                document.getElementById('webappUrl').value = savedUrl;
+                document.getElementById('syncBtn').style.display = 'inline-block';
+                isConnected = true;
+            }
+        }
+
+        // Salvar dados
+        function saveData() {
+            try {
+                localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+                console.log('Dados salvos no localStorage');
+            } catch (error) {
+                console.error('Erro ao salvar dados:', error);
+                showStatus('Erro ao salvar dados localmente', 'error');
+            }
+        }
+
+        // Renderizar tabela - OTIMIZADA
         function renderTable() {
             const tbody = document.getElementById('servicesTableBody');
             tbody.innerHTML = '';
@@ -1282,7 +1394,14 @@
                 return;
             }
 
-            services.forEach(service => {
+            // Ordenar por data mais recente primeiro
+            const sortedServices = services.sort((a, b) => {
+                const dateA = new Date(a.data + ' ' + a.horaPickup);
+                const dateB = new Date(b.data + ' ' + b.horaPickup);
+                return dateB - dateA;
+            });
+
+            sortedServices.forEach(service => {
                 const row = document.createElement('tr');
                 const paymentClass = service.modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
                                    service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
@@ -1303,9 +1422,7 @@
                             🧳 ${service.numeroBagagens}
                         </span>
                     </td>
-                    <td>
-                        <div><strong>${formatDate(service.data)}</strong></div>
-                    </td>
+                    <td><strong>${formatDate(service.data)}</strong></td>
                     <td>
                         <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
                             ${service.horaPickup}
@@ -1346,10 +1463,10 @@
             const confirmed = services.filter(s => s.status === 'Confirmado').length;
             const completed = services.filter(s => s.status === 'Finalizado').length;
 
-            const totalRevenue = services.reduce((sum, s) => sum + s.valorTotal, 0);
-            const pendingRevenue = services.filter(s => s.status === 'Solicitado').reduce((sum, s) => sum + s.valorTotal, 0);
-            const confirmedRevenue = services.filter(s => s.status === 'Confirmado').reduce((sum, s) => sum + s.valorTotal, 0);
-            const completedRevenue = services.filter(s => s.status === 'Finalizado').reduce((sum, s) => sum + s.valorTotal, 0);
+            const totalRevenue = services.reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const pendingRevenue = services.filter(s => s.status === 'Solicitado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const confirmedRevenue = services.filter(s => s.status === 'Confirmado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const completedRevenue = services.filter(s => s.status === 'Finalizado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
 
             document.getElementById('totalServices').textContent = total;
             document.getElementById('pendingServices').textContent = pending;
@@ -1362,7 +1479,6 @@
             document.getElementById('completedRevenue').textContent = `€${completedRevenue.toFixed(2)}`;
         }
 
-        // Formatar data
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('pt-PT', {
@@ -1372,133 +1488,326 @@
             });
         }
 
-        // Submeter formulário
+        // Submeter formulário - CORRIGIDO
         document.getElementById('transferForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            // Validar campos obrigatórios
+            if (!validateForm()) {
+                return;
+            }
+
+            setButtonLoading('submitBtn', true);
+
             const formData = {
-                nomeCliente: document.getElementById('nomeCliente').value,
+                nomeCliente: document.getElementById('nomeCliente').value.trim(),
                 numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
                 data: document.getElementById('data').value,
                 contacto: getFormattedPhoneNumber(),
-                numeroVoo: document.getElementById('numeroVoo').value,
-                origem: document.getElementById('origem').value,
-                destino: document.getElementById('destino').value,
+                numeroVoo: document.getElementById('numeroVoo').value.trim(),
+                origem: document.getElementById('origem').value.trim(),
+                destino: document.getElementById('destino').value.trim(),
                 horaPickup: document.getElementById('horaPickup').value,
                 valorTotal: parseFloat(document.getElementById('valorTotal').value),
                 modoPagamento: document.getElementById('modoPagamento').value,
                 pagoParaQuem: document.getElementById('pagoParaQuem').value,
-                observacoes: document.getElementById('observacoes').value,
+                observacoes: document.getElementById('observacoes').value.trim(),
                 status: 'Solicitado'
             };
 
-            if (editingId) {
-                const index = services.findIndex(s => s.id === editingId);
-                services[index] = { ...services[index], ...formData };
-                editingId = null;
-                
-                // Enviar atualização para Google Sheets
-                sendToSheets(services[index]);
-            } else {
-                const newId = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
-                const newService = {
-                    id: newId,
-                    ...formData,
-                    created: new Date().toISOString()
-                };
-                
-                services.push(newService);
-                
-                // Enviar para Google Sheets automaticamente
-                const sheetSuccess = await sendToSheets(newService);
-                if (sheetSuccess) {
-                    alert('✅ Transfer adicionado e enviado para Google Sheets com sucesso!');
+            try {
+                if (editingId) {
+                    // Atualizar serviço existente
+                    const index = services.findIndex(s => s.id === editingId);
+                    if (index !== -1) {
+                        services[index] = { ...services[index], ...formData };
+                        
+                        if (isConnected) {
+                            await sendToSheets(services[index]);
+                        }
+                        
+                        showStatus('Transfer atualizado com sucesso!', 'success');
+                    }
+                    editingId = null;
                 } else {
-                    alert('⚠️ Transfer adicionado localmente. Para sincronizar com Google Sheets, configure a URL no botão ⚙️ Configurar.');
+                    // Novo serviço
+                    const newId = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
+                    const newService = {
+                        id: newId,
+                        ...formData,
+                        created: new Date().toISOString()
+                    };
+                    
+                    services.push(newService);
+                    
+                    // Tentar enviar para Google Sheets
+                    if (isConnected) {
+                        const sheetSuccess = await sendToSheets(newService);
+                        if (sheetSuccess) {
+                            showStatus('✅ Transfer adicionado e enviado para Google Sheets!', 'success');
+                        } else {
+                            showStatus('⚠️ Transfer adicionado localmente. Erro ao enviar para Sheets.', 'warning');
+                        }
+                    } else {
+                        showStatus('Transfer adicionado localmente. Configure o Google Sheets para sincronizar.', 'warning');
+                    }
                 }
-            }
 
-            saveData();
-            renderTable();
-            updateSummary();
-            clearForm();
-            
-            // Scroll para a tabela
-            document.querySelector('.services-section').scrollIntoView({ behavior: 'smooth' });
+                saveData();
+                renderTable();
+                updateSummary();
+                clearForm();
+                
+                // Scroll suave para a tabela
+                document.querySelector('.services-section').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+            } catch (error) {
+                console.error('Erro ao processar transfer:', error);
+                showStatus('Erro ao processar transfer: ' + error.message, 'error');
+            } finally {
+                setButtonLoading('submitBtn', false);
+            }
         });
 
-        // Limpar formulário
-        function clearForm() {
-            document.getElementById('transferForm').reset();
-            editingId = null;
-            document.querySelector('.btn-primary').textContent = '✅ Solicitar Transfer';
-            
-            // Remover classes active
-            document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to').forEach(btn => btn.classList.remove('active'));
-        }
+// Validar formulário
+       function validateForm() {
+           const requiredFields = [
+               'nomeCliente', 'numeroPessoas', 'data', 'contacto', 
+               'origem', 'destino', 'horaPickup', 'valorTotal', 
+               'modoPagamento', 'pagoParaQuem'
+           ];
 
-        // Editar serviço
-        function editService(id) {
-            const service = services.find(s => s.id === id);
-            if (service) {
-                document.getElementById('nomeCliente').value = service.nomeCliente;
-                document.getElementById('numeroPessoas').value = service.numeroPessoas;
-                document.getElementById('numeroBagagens').value = service.numeroBagagens;
-                document.getElementById('data').value = service.data;
-                
-                // Definir número de telefone
-                if (phoneInput) {
-                    phoneInput.setNumber(service.contacto);
-                } else {
-                    document.getElementById('contacto').value = service.contacto;
-                }
-                
-                document.getElementById('numeroVoo').value = service.numeroVoo || '';
-                document.getElementById('origem').value = service.origem;
-                document.getElementById('destino').value = service.destino;
-                document.getElementById('horaPickup').value = service.horaPickup;
-                document.getElementById('valorTotal').value = service.valorTotal;
-                document.getElementById('modoPagamento').value = service.modoPagamento;
-                document.getElementById('pagoParaQuem').value = service.pagoParaQuem;
-                document.getElementById('observacoes').value = service.observacoes || '';
-                
-                editingId = id;
-                document.querySelector('.btn-primary').textContent = '✏️ Atualizar Transfer';
-                
-                document.querySelector('.quick-add').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
+           for (let field of requiredFields) {
+               const element = document.getElementById(field);
+               if (!element.value || element.value.trim() === '') {
+                   element.focus();
+                   showStatus(`Campo obrigatório não preenchido: ${getFieldLabel(field)}`, 'error');
+                   return false;
+               }
+           }
 
-        // Alterar status
-        async function changeStatus(id) {
-            const service = services.find(s => s.id === id);
-            if (service) {
-                const statuses = ['Solicitado', 'Confirmado', 'Finalizado', 'Cancelado'];
-                const currentIndex = statuses.indexOf(service.status);
-                const nextIndex = (currentIndex + 1) % statuses.length;
-                
-                service.status = statuses[nextIndex];
-                saveData();
-                renderTable();
-                updateSummary();
-                
-                // Enviar atualização para Google Sheets
-                await sendToSheets(service);
-            }
-        }
+           // Validar valor
+           const valor = parseFloat(document.getElementById('valorTotal').value);
+           if (isNaN(valor) || valor <= 0) {
+               document.getElementById('valorTotal').focus();
+               showStatus('Valor deve ser um número positivo', 'error');
+               return false;
+           }
 
-        // Deletar serviço
-        function deleteService(id) {
-            if (confirm('Tem certeza que deseja deletar este serviço?')) {
-                services = services.filter(s => s.id !== id);
-                saveData();
-                renderTable();
-                updateSummary();
-            }
-        }
+           // Validar número de pessoas
+           const pessoas = parseInt(document.getElementById('numeroPessoas').value);
+           if (isNaN(pessoas) || pessoas < 1) {
+               showStatus('Número de pessoas deve ser pelo menos 1', 'error');
+               return false;
+           }
 
-        // Filtrar tabela
+           return true;
+       }
+
+       function getFieldLabel(fieldId) {
+           const labels = {
+               'nomeCliente': 'Nome do Cliente',
+               'numeroPessoas': 'Número de Pessoas',
+               'data': 'Data do Transfer',
+               'contacto': 'Contacto do Cliente',
+               'origem': 'Local de Origem',
+               'destino': 'Local de Destino',
+               'horaPickup': 'Hora de Pick-up',
+               'valorTotal': 'Valor do Serviço',
+               'modoPagamento': 'Forma de Pagamento',
+               'pagoParaQuem': 'Pago Para'
+           };
+           return labels[fieldId] || fieldId;
+       }
+
+       // Limpar formulário - CORRIGIDO
+       function clearForm() {
+           try {
+               // Reset do formulário
+               document.getElementById('transferForm').reset();
+               
+               // Limpar campos específicos
+               document.getElementById('numeroPessoas').value = '';
+               document.getElementById('numeroBagagens').value = '0';
+               document.getElementById('modoPagamento').value = '';
+               document.getElementById('pagoParaQuem').value = '';
+               document.getElementById('observacoes').value = '';
+               
+               // Limpar seleções ativas
+               document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to, .btn-obs').forEach(btn => {
+                   btn.classList.remove('active');
+               });
+               
+               // Reset botão de submit
+               editingId = null;
+               document.getElementById('submitBtn').textContent = '✅ Solicitar Transfer';
+               
+               // Reset campos de telefone se existir
+               if (phoneInput) {
+                   phoneInput.setNumber('');
+               }
+               
+               // Definir data de hoje novamente
+               document.getElementById('data').valueAsDate = new Date();
+               
+               console.log('Formulário limpo com sucesso');
+               showStatus('Formulário limpo!', 'success');
+               
+           } catch (error) {
+               console.error('Erro ao limpar formulário:', error);
+               showStatus('Erro ao limpar formulário', 'error');
+           }
+       }
+
+       // Editar serviço
+       function editService(id) {
+           const service = services.find(s => s.id === id);
+           if (!service) {
+               showStatus('Serviço não encontrado', 'error');
+               return;
+           }
+
+           try {
+               // Preencher formulário
+               document.getElementById('nomeCliente').value = service.nomeCliente;
+               document.getElementById('numeroPessoas').value = service.numeroPessoas;
+               document.getElementById('numeroBagagens').value = service.numeroBagagens;
+               document.getElementById('data').value = service.data;
+               document.getElementById('numeroVoo').value = service.numeroVoo || '';
+               document.getElementById('origem').value = service.origem;
+               document.getElementById('destino').value = service.destino;
+               document.getElementById('horaPickup').value = service.horaPickup;
+               document.getElementById('valorTotal').value = service.valorTotal;
+               document.getElementById('modoPagamento').value = service.modoPagamento;
+               document.getElementById('pagoParaQuem').value = service.pagoParaQuem;
+               document.getElementById('observacoes').value = service.observacoes || '';
+               
+               // Configurar telefone
+               if (phoneInput) {
+                   phoneInput.setNumber(service.contacto);
+               } else {
+                   document.getElementById('contacto').value = service.contacto;
+               }
+               
+               // Atualizar botões ativos
+               updateActiveButtons(service);
+               
+               editingId = id;
+               document.getElementById('submitBtn').textContent = '✏️ Atualizar Transfer';
+               
+               // Scroll para o formulário
+               document.querySelector('.quick-add').scrollIntoView({ 
+                   behavior: 'smooth',
+                   block: 'start'
+               });
+               
+               showStatus('Editando transfer #' + id, 'success');
+               
+           } catch (error) {
+               console.error('Erro ao editar serviço:', error);
+               showStatus('Erro ao carregar dados para edição', 'error');
+           }
+       }
+
+       function updateActiveButtons(service) {
+           // Ativar botão de pessoas
+           document.querySelectorAll('.btn-people').forEach(btn => {
+               if (btn.textContent.includes(service.numeroPessoas.toString())) {
+                   btn.classList.add('active');
+               }
+           });
+           
+           // Ativar botão de bagagens
+           document.querySelectorAll('.btn-baggage').forEach(btn => {
+               if (btn.textContent.includes(service.numeroBagagens.toString())) {
+                   btn.classList.add('active');
+               }
+           });
+           
+           // Ativar botão de preço
+           document.querySelectorAll('.btn-price').forEach(btn => {
+               if (btn.textContent.includes(service.valorTotal.toString())) {
+                   btn.classList.add('active');
+               }
+           });
+           
+           // Ativar botão de pagamento
+           document.querySelectorAll('.btn-payment').forEach(btn => {
+               if (btn.textContent.toLowerCase().includes(service.modoPagamento.toLowerCase())) {
+                   btn.classList.add('active');
+               }
+           });
+           
+           // Ativar botão de pago para
+           document.querySelectorAll('.btn-payment-to').forEach(btn => {
+               if (btn.textContent.toLowerCase().includes(service.pagoParaQuem.toLowerCase())) {
+                   btn.classList.add('active');
+               }
+           });
+       }
+
+       // Alterar status
+       async function changeStatus(id) {
+           const service = services.find(s => s.id === id);
+           if (!service) {
+               showStatus('Serviço não encontrado', 'error');
+               return;
+           }
+
+           const statuses = ['Solicitado', 'Confirmado', 'Finalizado', 'Cancelado'];
+           const currentIndex = statuses.indexOf(service.status);
+           const nextIndex = (currentIndex + 1) % statuses.length;
+           
+           service.status = statuses[nextIndex];
+           
+           try {
+               saveData();
+               renderTable();
+               updateSummary();
+               
+               if (isConnected) {
+                   await sendToSheets(service);
+                   showStatus(`Status alterado para: ${service.status}`, 'success');
+               } else {
+                   showStatus(`Status alterado para: ${service.status} (apenas local)`, 'warning');
+               }
+               
+           } catch (error) {
+               console.error('Erro ao alterar status:', error);
+               showStatus('Erro ao alterar status', 'error');
+           }
+       }
+
+       // Deletar serviço
+       function deleteService(id) {
+           if (!confirm('Tem certeza que deseja deletar este serviço?')) {
+               return;
+           }
+
+           try {
+               const originalLength = services.length;
+               services = services.filter(s => s.id !== id);
+               
+               if (services.length < originalLength) {
+                   saveData();
+                   renderTable();
+                   updateSummary();
+                   showStatus('Transfer deletado com sucesso', 'success');
+               } else {
+                   showStatus('Transfer não encontrado', 'error');
+               }
+               
+           } catch (error) {
+               console.error('Erro ao deletar serviço:', error);
+               showStatus('Erro ao deletar transfer', 'error');
+           }
+       }
+
+       // Filtrar tabela
         function filterTable() {
             const statusFilter = document.getElementById('filterStatus').value;
             const dataFilter = document.getElementById('filterData').value;
@@ -1507,15 +1816,19 @@
             const tbody = document.getElementById('servicesTableBody');
             const rows = tbody.getElementsByTagName('tr');
 
+            let visibleCount = 0;
+
             for (let row of rows) {
                 if (row.cells.length < 14) continue; // Skip empty state row
                 
                 let showRow = true;
 
+                // Filtro por status
                 if (statusFilter && !row.textContent.includes(statusFilter)) {
                     showRow = false;
                 }
 
+                // Filtro por data
                 if (dataFilter) {
                     const rowDate = row.cells[4].textContent;
                     const filterDate = formatDate(dataFilter);
@@ -1524,101 +1837,213 @@
                     }
                 }
 
+                // Filtro por cliente
                 if (clientFilter && !row.cells[1].textContent.toLowerCase().includes(clientFilter)) {
                     showRow = false;
                 }
 
                 row.style.display = showRow ? '' : 'none';
+                if (showRow) visibleCount++;
+            }
+
+            // Atualizar contador de resultados
+            updateFilterResults(visibleCount);
+        }
+
+        function updateFilterResults(count) {
+            let existingCounter = document.getElementById('filterCounter');
+            if (!existingCounter) {
+                existingCounter = document.createElement('div');
+                existingCounter.id = 'filterCounter';
+                existingCounter.style.cssText = 'text-align: center; padding: 10px; color: #7f8c8d; font-style: italic;';
+                document.querySelector('.services-table').insertBefore(existingCounter, document.querySelector('table'));
+            }
+            
+            if (count === services.length) {
+                existingCounter.textContent = '';
+            } else {
+                existingCounter.textContent = `Mostrando ${count} de ${services.length} transfers`;
             }
         }
 
-        // Exportar CSV
+        // Exportar CSV - MELHORADO
         function exportToCSV() {
             if (services.length === 0) {
-                alert('Não há dados para exportar!');
+                showStatus('Não há dados para exportar!', 'warning');
                 return;
             }
 
-            const headers = ['ID', 'Cliente', 'Pessoas', 'Bagagens', 'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor', 'Pagamento', 'Pago Para', 'Status', 'Observações'];
-            
-            let csvContent = headers.join(',') + '\n';
-            
-            services.forEach(service => {
-                const row = [
-                    service.id,
-                    `"${service.nomeCliente}"`,
-                    service.numeroPessoas,
-                    service.numeroBagagens,
-                    service.data,
-                    service.contacto,
-                    service.numeroVoo || '',
-                    `"${service.origem}"`,
-                    `"${service.destino}"`,
-                    service.horaPickup,
-                    service.valorTotal,
-                    `"${service.modoPagamento}"`,
-                    `"${service.pagoParaQuem}"`,
-                    service.status,
-                    `"${service.observacoes || ''}"`
+            try {
+                const headers = [
+                    'ID', 'Cliente', 'Pessoas', 'Bagagens', 'Data', 'Contacto', 
+                    'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor', 
+                    'Pagamento', 'Pago Para', 'Status', 'Observações', 'Data Criação'
                 ];
-                csvContent += row.join(',') + '\n';
-            });
+                
+                let csvContent = headers.join(',') + '\n';
+                
+                services.forEach(service => {
+                    const row = [
+                        service.id,
+                        `"${service.nomeCliente}"`,
+                        service.numeroPessoas,
+                        service.numeroBagagens,
+                        service.data,
+                        `"${service.contacto}"`,
+                        `"${service.numeroVoo || ''}"`,
+                        `"${service.origem}"`,
+                        `"${service.destino}"`,
+                        service.horaPickup,
+                        service.valorTotal,
+                        `"${service.modoPagamento}"`,
+                        `"${service.pagoParaQuem}"`,
+                        service.status,
+                        `"${service.observacoes || ''}"`,
+                        `"${service.created || ''}"`
+                    ];
+                    csvContent += row.join(',') + '\n';
+                });
 
-const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-           const link = document.createElement('a');
-           const url = URL.createObjectURL(blob);
-           link.setAttribute('href', url);
-           link.setAttribute('download', `transfers_lioz_hub_${new Date().toISOString().split('T')[0]}.csv`);
-           link.style.visibility = 'hidden';
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
-       }
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `transfers_lioz_hub_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus(`${services.length} transfers exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao exportar CSV:', error);
+                showStatus('Erro ao exportar dados', 'error');
+            }
+        }
 
-       // Inicializar aplicação
-       document.addEventListener('DOMContentLoaded', function() {
-           loadData();
-           
-           // Definir data de hoje como padrão
-           document.getElementById('data').valueAsDate = new Date();
-           
-           // Inicializar Google Maps Autocomplete
-           initializeAutocomplete();
-           
-           // Inicializar campo de telefone
-           setTimeout(initializePhoneInput, 500);
-       });
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('Inicializando Sistema de Transfers...');
+                
+                // Carregar dados salvos
+                loadData();
+                
+                // Definir data de hoje como padrão
+                document.getElementById('data').valueAsDate = new Date();
+                
+                // Inicializar Google Maps Autocomplete
+                initializeAutocomplete();
+                
+                // Inicializar campo de telefone após um delay
+                setTimeout(initializePhoneInput, 1000);
+                
+                // Verificar se há URL salva
+                const savedUrl = localStorage.getItem('webappUrl');
+                if (savedUrl) {
+                    isConnected = true;
+                    document.getElementById('syncBtn').style.display = 'inline-block';
+                }
+                
+                console.log('Sistema inicializado com sucesso');
+                
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showStatus('Erro ao inicializar sistema', 'error');
+            }
+        });
 
-       // Inicializar Google Maps Autocomplete
-       function initializeAutocomplete() {
-           if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-               // Autocomplete para origem
-               const origemInput = document.getElementById('origem');
-               const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
-                   types: ['establishment', 'geocode'],
-                   componentRestrictions: { country: 'pt' }
-               });
+        // Inicializar Google Maps Autocomplete
+        function initializeAutocomplete() {
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                try {
+                    // Autocomplete para origem
+                    const origemInput = document.getElementById('origem');
+                    const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
 
-               // Autocomplete para destino
-               const destinoInput = document.getElementById('destino');
-               const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-                   types: ['establishment', 'geocode'],
-                   componentRestrictions: { country: 'pt' }
-               });
+                    // Autocomplete para destino
+                    const destinoInput = document.getElementById('destino');
+                    const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
 
-               // Eventos para limpar botões quando digitado manualmente
-               origemInput.addEventListener('input', function() {
-                   document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
-               });
+                    // Eventos para limpar botões quando digitado manualmente
+                    origemInput.addEventListener('input', function() {
+                        document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
+                    });
 
-               destinoInput.addEventListener('input', function() {
-                   document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
-               });
-           } else {
-               // Tentar novamente após 1 segundo se Google Maps não estiver carregado
-               setTimeout(initializeAutocomplete, 1000);
-           }
-       }
-   </script>
+                    destinoInput.addEventListener('input', function() {
+                        document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
+                    });
+                    
+                    console.log('Google Maps Autocomplete inicializado');
+                    
+                } catch (error) {
+                    console.error('Erro ao inicializar Google Maps:', error);
+                }
+            } else {
+                // Tentar novamente após 2 segundos se Google Maps não estiver carregado
+                setTimeout(initializeAutocomplete, 2000);
+            }
+        }
+
+        // Prevenir envio do formulário ao pressionar Enter nos botões
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.type === 'button') {
+                e.preventDefault();
+            }
+        });
+
+        // Adicionar eventos de teclado para melhor UX
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Enter para submeter formulário
+            if (e.ctrlKey && e.key === 'Enter') {
+                const submitBtn = document.getElementById('submitBtn');
+                if (!submitBtn.disabled) {
+                    submitBtn.click();
+                }
+            }
+            
+            // Escape para limpar formulário
+            if (e.key === 'Escape') {
+                clearForm();
+            }
+        });
+
+        // Auto-save no localStorage a cada mudança
+        let autoSaveTimeout;
+        function scheduleAutoSave() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                saveData();
+            }, 1000);
+        }
+
+        // Adicionar listener para mudanças nos dados
+        window.addEventListener('beforeunload', function(e) {
+            saveData();
+        });
+
+        // Função para debug/teste
+        function debugInfo() {
+            console.log('=== DEBUG INFO ===');
+            console.log('Services:', services.length);
+            console.log('Connected:', isConnected);
+            console.log('Editing ID:', editingId);
+            console.log('Phone Input:', phoneInput);
+            console.log('Saved URL:', localStorage.getItem('webappUrl'));
+            console.log('==================');
+        }
+
+        // Expor função de debug globalmente
+        window.debugInfo = debugInfo;
+
+        console.log('Sistema de Transfers carregado! Digite debugInfo() no console para informações de debug.');
+    </script>
 </body>
 </html>
