@@ -7,6 +7,7 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+
     <style>
         * {
             margin: 0;
@@ -64,7 +65,54 @@
             font-weight: 600;
         }
 
-.quick-add {
+        .config-section {
+            background: #fff3cd;
+            padding: 20px;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            margin: 20px;
+            display: none;
+        }
+
+        .config-section.show {
+            display: block;
+        }
+
+        .config-title {
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .config-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .config-input {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .config-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .config-input input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .quick-add {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 30px;
             border-bottom: 3px solid #3498db;
@@ -148,6 +196,14 @@
             color: white;
         }
 
+        .btn-config {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            padding: 10px 15px;
+        }
+
         .form-actions {
             display: flex;
             gap: 15px;
@@ -156,7 +212,7 @@
             flex-wrap: wrap;
         }
 
-.summary-section {
+        .summary-section {
             padding: 30px;
             background: #f8f9fa;
         }
@@ -405,7 +461,7 @@
             color: #155724;
         }
 
-/* Botões Intuitivos */
+        /* Botões Intuitivos */
         .date-buttons, .time-buttons, .location-buttons, 
         .price-buttons, .payment-buttons, .payment-to-buttons, .obs-buttons,
         .people-buttons, .baggage-buttons {
@@ -585,9 +641,9 @@
         }
     </style>
 </head>
-<body>
 
-<div class="container">
+<body>
+    <div class="container">
         <div class="header">
             <h1>🤝 Sistema de Parceria</h1>
             <p>Gestão de Transfers - Colaboração Empresarial</p>
@@ -597,30 +653,28 @@
             </div>
         </div>
 
+        <!-- Seção de Configuração -->
+        <div class="config-section" id="configSection">
+            <div class="config-title">🔗 Configuração do Google Sheets</div>
+            <div class="config-form">
+                <div class="config-input">
+                    <label for="webappUrl">URL do Google Apps Script:</label>
+                    <input type="url" id="webappUrl" placeholder="Cole aqui a URL do Web App do Google Sheets">
+                </div>
+                <button type="button" class="btn btn-success" onclick="testConnection()">
+                    🔗 Testar Conexão
+                </button>
+                <button type="button" class="btn btn-export" onclick="toggleConfig()">
+                    🔒 Fechar
+                </button>
+            </div>
+        </div>
+
         <div class="quick-add">
             <h2>➕ Solicitar Novo Transfer</h2>
             
-            <!-- Configuração do Google Sheets - APENAS PARA ADMIN -->
-            <div id="adminConfig" style="display: none; background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <h4 style="color: #856404; margin-bottom: 10px;">🔗 Configuração Google Sheets</h4>
-                <div style="display: flex; gap: 15px; align-items: end; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 300px;">
-                        <label for="webappUrl" style="font-size: 0.9rem; color: #856404;">URL do Google Apps Script:</label>
-                        <input type="url" id="webappUrl" placeholder="Cole aqui a URL do seu Web App" 
-                               style="margin-top: 5px; border-color: #ffc107; padding: 12px 16px; border: 2px solid #ffc107; border-radius: 10px; width: 100%;">
-                    </div>
-                    <button type="button" class="btn btn-success" onclick="testConnection()" style="padding: 10px 20px;">
-                        🔗 Testar Conexão
-                    </button>
-                </div>
-                <p style="font-size: 0.85rem; color: #856404; margin: 10px 0 0 0;">
-                    ℹ️ <strong>Configuração necessária apenas uma vez pelo administrador</strong>
-                </p>
-            </div>
-
             <form id="transferForm">
-
-<div class="form-grid">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="nomeCliente">Nome do Cliente *</label>
                         <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
@@ -652,8 +706,7 @@
                         </div>
                         <input type="number" id="numeroBagagens" min="0" max="20" value="0" style="display: none;">
                     </div>
-
-<div class="form-group">
+                    <div class="form-group">
                         <label for="data">Data do Transfer *</label>
                         <div class="date-buttons">
                             <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
@@ -689,8 +742,7 @@
                             <button type="button" class="btn-time" onclick="setTime('23:00')">23:00</button>
                         </div>
                     </div>
-
-<div class="form-group">
+                    <div class="form-group">
                         <label for="contacto">Contacto do Cliente *</label>
                         <div class="phone-container">
                             <input type="tel" id="contacto" required placeholder="Digite o número...">
@@ -724,8 +776,7 @@
                         </div>
                         <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
                     </div>
-
-<div class="form-group">
+                    <div class="form-group">
                         <label for="valorTotal">Valor do Serviço (€) *</label>
                         <div class="price-buttons">
                             <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
@@ -781,147 +832,133 @@
                             <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
                             <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
                         </div>
-                        <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
-                    </div>
-                </div>
+<textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                   </div>
+               </div>
 
-<div class="form-actions">
-                    <button type="submit" class="btn btn-primary">✅ Solicitar Transfer</button>
-                    <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
-                    <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
-                    <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">
-                        📤 Sincronizar Tudo
-                    </button>
-                    <!-- Botão Admin (discreto) -->
-                    <button type="button" onclick="toggleAdmin()" class="btn" style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; font-size: 0.75rem; padding: 8px 12px;" id="adminBtn">
-                        ⚙️
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Instruções Admin (ocultas) -->
-            <div id="adminInstructions" style="display: none; background: #e7f3ff; padding: 20px; border-radius: 15px; margin-top: 20px;">
-                <h3 style="color: #004085; margin-bottom: 15px;">📋 Instruções para Configurar Google Sheets</h3>
-                <div style="font-size: 0.95rem; color: #004085; line-height: 1.6;">
-                    <p><strong>1.</strong> Crie uma nova planilha no Google Sheets</p>
-                    <p><strong>2.</strong> Vá em Extensões → Apps Script</p>
-                    <p><strong>3.</strong> Cole o código do Google Sheets Script (artifact separado)</p>
-                    <p><strong>4.</strong> Clique em Implantar → Nova implantação</p>
-                    <p><strong>5.</strong> Escolha "Aplicativo da Web" e "Executar como: Eu"</p>
-                    <p><strong>6.</strong> Copie a URL e cole no campo de configuração acima</p>
-                </div>
-                
-                <button onclick="toggleAdmin()" class="btn btn-export" style="margin-top: 15px;">
-                    🔒 Fechar
-                </button>
-            </div>
-        </div>
+               <div class="form-actions">
+                   <button type="submit" class="btn btn-primary">✅ Solicitar Transfer</button>
+                   <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
+                   <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
+                   <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">
+                       📤 Sincronizar Tudo
+                   </button>
+                   <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
+               </div>
+           </form>
+       </div>
 
-        <div class="summary-section">
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="summary-number" id="totalServices">0</div>
-                    <div class="summary-label">Total de Serviços</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="pendingServices">0</div>
-                    <div class="summary-label">Solicitados</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="confirmedServices">0</div>
-                    <div class="summary-label">Confirmados</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="completedServices">0</div>
-                    <div class="summary-label">Finalizados</div>
-                </div>
-            </div>
+       <div class="summary-section">
+           <div class="summary-grid">
+               <div class="summary-card">
+                   <div class="summary-number" id="totalServices">0</div>
+                   <div class="summary-label">Total de Serviços</div>
+               </div>
+               <div class="summary-card">
+                   <div class="summary-number" id="pendingServices">0</div>
+                   <div class="summary-label">Solicitados</div>
+               </div>
+               <div class="summary-card">
+                   <div class="summary-number" id="confirmedServices">0</div>
+                   <div class="summary-label">Confirmados</div>
+               </div>
+               <div class="summary-card">
+                   <div class="summary-number" id="completedServices">0</div>
+                   <div class="summary-label">Finalizados</div>
+               </div>
+           </div>
 
-            <div class="financial-summary">
-                <h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem;">💰 Resumo Financeiro</h3>
-                <div class="financial-grid">
-                    <div class="financial-item">
-                        <div class="financial-value" id="totalRevenue">€0.00</div>
-                        <div class="financial-label">Receita Total</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="pendingRevenue">€0.00</div>
-                        <div class="financial-label">Valor Pendente</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="confirmedRevenue">€0.00</div>
-                        <div class="financial-label">Valor Confirmado</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="completedRevenue">€0.00</div>
-                        <div class="financial-label">Valor Finalizado</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+           <div class="financial-summary">
+               <h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem;">💰 Resumo Financeiro</h3>
+               <div class="financial-grid">
+                   <div class="financial-item">
+                       <div class="financial-value" id="totalRevenue">€0.00</div>
+                       <div class="financial-label">Receita Total</div>
+                   </div>
+                   <div class="financial-item">
+                       <div class="financial-value" id="pendingRevenue">€0.00</div>
+                       <div class="financial-label">Valor Pendente</div>
+                   </div>
+                   <div class="financial-item">
+                       <div class="financial-value" id="confirmedRevenue">€0.00</div>
+                       <div class="financial-label">Valor Confirmado</div>
+                   </div>
+                   <div class="financial-item">
+                       <div class="financial-value" id="completedRevenue">€0.00</div>
+                       <div class="financial-label">Valor Finalizado</div>
+                   </div>
+               </div>
+           </div>
+       </div>
 
-<div class="services-section">
-            <div class="services-header">
-                <h2 class="services-title">📋 Serviços de Transfer</h2>
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="filterStatus">Status:</label>
-                        <select id="filterStatus" onchange="filterTable()">
-                            <option value="">Todos</option>
-                            <option value="Solicitado">Solicitado</option>
-                            <option value="Confirmado">Confirmado</option>
-                            <option value="Finalizado">Finalizado</option>
-                            <option value="Cancelado">Cancelado</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterData">Data:</label>
-                        <input type="date" id="filterData" onchange="filterTable()">
-                    </div>
-                    <div class="filter-group">
-                        <label for="searchClient">Cliente:</label>
-                        <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="filterTable()">
-                    </div>
-                </div>
-            </div>
+       <div class="services-section">
+           <div class="services-header">
+               <h2 class="services-title">📋 Serviços de Transfer</h2>
+               <div class="filters">
+                   <div class="filter-group">
+                       <label for="filterStatus">Status:</label>
+                       <select id="filterStatus" onchange="filterTable()">
+                           <option value="">Todos</option>
+                           <option value="Solicitado">Solicitado</option>
+                           <option value="Confirmado">Confirmado</option>
+                           <option value="Finalizado">Finalizado</option>
+                           <option value="Cancelado">Cancelado</option>
+                       </select>
+                   </div>
+                   <div class="filter-group">
+                       <label for="filterData">Data:</label>
+                       <input type="date" id="filterData" onchange="filterTable()">
+                   </div>
+                   <div class="filter-group">
+                       <label for="searchClient">Cliente:</label>
+                       <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="filterTable()">
+                   </div>
+               </div>
+           </div>
 
-            <div class="services-table">
-                <table id="servicesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Cliente</th>
-                            <th>Pessoas</th>
-                            <th>Bagagens</th>
-                            <th>Data</th>
-                            <th>Hora Pick-up</th>
-                            <th>Contacto</th>
-                            <th>Voo</th>
-                            <th>Rota</th>
-                            <th>Valor</th>
-                            <th>Pagamento</th>
-                            <th>Pago Para</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="servicesTableBody">
-                        <tr>
-                            <td colspan="14" class="empty-state">
-                                <h3>Nenhum serviço cadastrado</h3>
-                                <p>Adicione o primeiro transfer usando o formulário acima</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+           <div class="services-table">
+               <table id="servicesTable">
+                   <thead>
+                       <tr>
+                           <th>ID</th>
+                           <th>Cliente</th>
+                           <th>Pessoas</th>
+                           <th>Bagagens</th>
+                           <th>Data</th>
+                           <th>Hora Pick-up</th>
+                           <th>Contacto</th>
+                           <th>Voo</th>
+                           <th>Rota</th>
+                           <th>Valor</th>
+                           <th>Pagamento</th>
+                           <th>Pago Para</th>
+                           <th>Status</th>
+                           <th>Ações</th>
+                       </tr>
+                   </thead>
+                   <tbody id="servicesTableBody">
+                       <tr>
+                           <td colspan="14" class="empty-state">
+                               <h3>Nenhum serviço cadastrado</h3>
+                               <p>Adicione o primeiro transfer usando o formulário acima</p>
+                           </td>
+                       </tr>
+                   </tbody>
+               </table>
+           </div>
+       </div>
+   </div>
 
-<script>
+   <script>
         let services = [];
         let editingId = null;
         let phoneInput = null;
+
+        // Função para mostrar/ocultar configurações
+        function toggleConfig() {
+            const configSection = document.getElementById('configSection');
+            configSection.classList.toggle('show');
+        }
 
         // Inicializar campo telefone com detecção de país
         function initializePhoneInput() {
@@ -1018,20 +1055,6 @@
                 return phoneInput.getNumber();
             }
             return document.getElementById('contacto').value;
-        }
-
-// Função para mostrar/ocultar configurações de admin
-        function toggleAdmin() {
-            const adminConfig = document.getElementById('adminConfig');
-            const adminInstructions = document.getElementById('adminInstructions');
-            
-            if (adminConfig.style.display === 'none') {
-                adminConfig.style.display = 'block';
-                adminInstructions.style.display = 'block';
-            } else {
-                adminConfig.style.display = 'none';
-                adminInstructions.style.display = 'none';
-            }
         }
 
         function setPeople(number) {
@@ -1132,7 +1155,7 @@
             }, 1000);
         }
 
-// Carregar dados
+        // Carregar dados
         function loadData() {
             const savedData = localStorage.getItem('partnershipTransferData');
             const savedUrl = localStorage.getItem('webappUrl');
@@ -1177,10 +1200,11 @@
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    alert('✅ Conexão funcionando! Agora os dados serão enviados automaticamente para o Google Sheets.');
+                    alert('✅ Conexão funcionando! Sistema integrado com Google Sheets.');
                     saveWebappUrl();
+                    toggleConfig();
                 } else {
-                    alert('❌ Erro na conexão. Verifique a URL e as configurações do Apps Script.');
+                    alert('❌ Erro na conexão. Verifique a URL e as configurações.');
                 }
             } catch (error) {
                 alert('❌ Erro ao conectar: ' + error.message);
@@ -1189,7 +1213,7 @@
 
         // Enviar dados para Google Sheets
         async function sendToSheets(serviceData) {
-            const url = document.getElementById('webappUrl').value;
+            const url = document.getElementById('webappUrl').value || localStorage.getItem('webappUrl');
             
             if (!url) {
                 return false;
@@ -1214,7 +1238,7 @@
 
         // Sincronizar todos os dados existentes
         async function syncToSheets() {
-            const url = document.getElementById('webappUrl').value;
+            const url = document.getElementById('webappUrl').value || localStorage.getItem('webappUrl');
             
             if (!url) {
                 alert('Configure a URL do Google Apps Script primeiro!');
@@ -1240,7 +1264,7 @@
             alert(`Sincronização concluída!\n✅ ${successCount} de ${totalCount} registros enviados com sucesso.`);
         }
 
-// Renderizar tabela
+        // Renderizar tabela
         function renderTable() {
             const tbody = document.getElementById('servicesTableBody');
             tbody.innerHTML = '';
@@ -1347,7 +1371,7 @@
             });
         }
 
-// Submeter formulário
+        // Submeter formulário
         document.getElementById('transferForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1390,7 +1414,7 @@
                 if (sheetSuccess) {
                     alert('✅ Transfer adicionado e enviado para Google Sheets com sucesso!');
                 } else {
-                    alert('⚠️ Transfer adicionado localmente, mas não foi possível enviar para Google Sheets. Verifique a conexão.');
+                    alert('⚠️ Transfer adicionado localmente. Para sincronizar com Google Sheets, configure a URL no botão ⚙️ Configurar.');
                 }
             }
 
@@ -1408,9 +1432,12 @@
             document.getElementById('transferForm').reset();
             editingId = null;
             document.querySelector('.btn-primary').textContent = '✅ Solicitar Transfer';
+            
+            // Remover classes active
+            document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to').forEach(btn => btn.classList.remove('active'));
         }
 
-// Editar serviço
+        // Editar serviço
         function editService(id) {
             const service = services.find(s => s.id === id);
             if (service) {
@@ -1470,7 +1497,7 @@
             }
         }
 
-// Filtrar tabela
+        // Filtrar tabela
         function filterTable() {
             const statusFilter = document.getElementById('filterStatus').value;
             const dataFilter = document.getElementById('filterData').value;
@@ -1536,67 +1563,61 @@
                 csvContent += row.join(',') + '\n';
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `transfers_lioz_hub_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+           const link = document.createElement('a');
+           const url = URL.createObjectURL(blob);
+           link.setAttribute('href', url);
+           link.setAttribute('download', `transfers_lioz_hub_${new Date().toISOString().split('T')[0]}.csv`);
+           link.style.visibility = 'hidden';
+           document.body.appendChild(link);
+           link.click();
+           document.body.removeChild(link);
+       }
 
-// Inicializar aplicação
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            
-            // Definir data de hoje como padrão
-            document.getElementById('data').valueAsDate = new Date();
-            
-            // Inicializar Google Maps Autocomplete
-            initializeAutocomplete();
-            
-            // Inicializar campo de telefone
-            setTimeout(initializePhoneInput, 500);
-            
-            // Verificar se é admin (URL contém ?admin=true)
-            if (window.location.search.includes('admin=true')) {
-                document.getElementById('adminConfig').style.display = 'block';
-                document.getElementById('adminInstructions').style.display = 'block';
-            }
-        });
+       // Inicializar aplicação
+       document.addEventListener('DOMContentLoaded', function() {
+           loadData();
+           
+           // Definir data de hoje como padrão
+           document.getElementById('data').valueAsDate = new Date();
+           
+           // Inicializar Google Maps Autocomplete
+           initializeAutocomplete();
+           
+           // Inicializar campo de telefone
+           setTimeout(initializePhoneInput, 500);
+       });
 
-        // Inicializar Google Maps Autocomplete
-        function initializeAutocomplete() {
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                // Autocomplete para origem
-                const origemInput = document.getElementById('origem');
-                const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
-                    types: ['establishment', 'geocode'],
-                    componentRestrictions: { country: 'pt' }
-                });
+       // Inicializar Google Maps Autocomplete
+       function initializeAutocomplete() {
+           if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+               // Autocomplete para origem
+               const origemInput = document.getElementById('origem');
+               const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                   types: ['establishment', 'geocode'],
+                   componentRestrictions: { country: 'pt' }
+               });
 
-                // Autocomplete para destino
-                const destinoInput = document.getElementById('destino');
-                const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-                    types: ['establishment', 'geocode'],
-                    componentRestrictions: { country: 'pt' }
-                });
+               // Autocomplete para destino
+               const destinoInput = document.getElementById('destino');
+               const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                   types: ['establishment', 'geocode'],
+                   componentRestrictions: { country: 'pt' }
+               });
 
-                // Eventos para limpar botões quando digitado manualmente
-                origemInput.addEventListener('input', function() {
-                    document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
-                });
+               // Eventos para limpar botões quando digitado manualmente
+               origemInput.addEventListener('input', function() {
+                   document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
+               });
 
-                destinoInput.addEventListener('input', function() {
-                    document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
-                });
-            } else {
-                // Tentar novamente após 1 segundo se Google Maps não estiver carregado
-                setTimeout(initializeAutocomplete, 1000);
-            }
-        }
-    </script>
+               destinoInput.addEventListener('input', function() {
+                   document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
+               });
+           } else {
+               // Tentar novamente após 1 segundo se Google Maps não estiver carregado
+               setTimeout(initializeAutocomplete, 1000);
+           }
+       }
+   </script>
 </body>
 </html>
