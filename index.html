@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Parceria - Hotel LIOZ & HUB Transfer</title>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .company-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .company-logo {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+.quick-add {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .quick-add h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        input, select, textarea {
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+.summary-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+
+        .summary-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .summary-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .financial-summary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        .financial-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .financial-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .financial-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .services-section {
+            padding: 30px;
+        }
+
+        .services-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .services-title {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 140px;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .services-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.95rem;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-solicitado {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-finalizado {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .payment-method {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .payment-cash {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-card {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .payment-transfer {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            min-width: auto;
+        }
+
+        .client-info {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .route-info {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .value-highlight {
+            font-weight: 700;
+            color: #27ae60;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .pago-para {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .pago-recepcao {
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .pago-motorista {
+            background: #d4edda;
+            color: #155724;
+        }
+
+/* Botões Intuitivos */
+        .date-buttons, .time-buttons, .location-buttons, 
+        .price-buttons, .payment-buttons, .payment-to-buttons, .obs-buttons,
+        .people-buttons, .baggage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-date, .btn-time, .btn-location, 
+        .btn-price, .btn-payment, .btn-payment-to, .btn-obs,
+        .btn-people, .btn-baggage {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-date:hover, .btn-time:hover, 
+        .btn-location:hover, .btn-price:hover, .btn-payment:hover, 
+        .btn-payment-to:hover, .btn-obs:hover,
+        .btn-people:hover, .btn-baggage:hover {
+            border-color: #3498db;
+            background: #e7f3ff;
+            transform: translateY(-1px);
+        }
+
+        .btn-date.active, .btn-time.active, 
+        .btn-location.active, .btn-price.active, .btn-payment.active, 
+        .btn-payment-to.active, .btn-obs.active,
+        .btn-people.active, .btn-baggage.active {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .btn-people {
+            min-width: 45px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-color: #9b59b6;
+            color: #9b59b6;
+        }
+
+        .btn-people:hover {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-people.active {
+            background: #9b59b6;
+            border-color: #8e44ad;
+        }
+
+        .btn-baggage {
+            min-width: 45px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-color: #e67e22;
+            color: #e67e22;
+        }
+
+        .btn-baggage:hover {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-baggage.active {
+            background: #e67e22;
+            border-color: #d35400;
+        }
+
+        .btn-location {
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .origem-btn {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .destino-btn {
+            border-left: 4px solid #27ae60;
+        }
+
+        .btn-payment {
+            min-width: 120px;
+            font-size: 1rem;
+        }
+
+        .btn-payment-to {
+            min-width: 130px;
+            font-size: 1rem;
+        }
+
+        .btn-price {
+            font-weight: 600;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-price:hover {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-obs {
+            font-size: 0.85rem;
+            background: #f8f9fa;
+        }
+
+        /* Google Maps Autocomplete */
+        .pac-container {
+            z-index: 9999;
+        }
+
+        /* International Tel Input */
+        .phone-container {
+            position: relative;
+        }
+
+        .iti {
+            width: 100%;
+        }
+
+        .iti__country-list {
+            z-index: 9999;
+        }
+
+        .iti__selected-flag {
+            padding: 14px 12px;
+        }
+
+        .iti__flag-container {
+            padding: 0;
+        }
+
+        #contacto {
+            padding-left: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .financial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .services-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .company-logos {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+        <div class="header">
+            <h1>🤝 Sistema de Parceria</h1>
+            <p>Gestão de Transfers - Colaboração Empresarial</p>
+            <div class="company-logos">
+                <div class="company-logo">🏨 Hotel LIOZ</div>
+                <div class="company-logo">🚐 HUB Transfer</div>
+            </div>
+        </div>
+
+        <div class="quick-add">
+            <h2>➕ Solicitar Novo Transfer</h2>
+            
+            <!-- Configuração do Google Sheets - APENAS PARA ADMIN -->
+            <div id="adminConfig" style="display: none; background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: #856404; margin-bottom: 10px;">🔗 Configuração Google Sheets</h4>
+                <div style="display: flex; gap: 15px; align-items: end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <label for="webappUrl" style="font-size: 0.9rem; color: #856404;">URL do Google Apps Script:</label>
+                        <input type="url" id="webappUrl" placeholder="Cole aqui a URL do seu Web App" 
+                               style="margin-top: 5px; border-color: #ffc107; padding: 12px 16px; border: 2px solid #ffc107; border-radius: 10px; width: 100%;">
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="testConnection()" style="padding: 10px 20px;">
+                        🔗 Testar Conexão
+                    </button>
+                </div>
+                <p style="font-size: 0.85rem; color: #856404; margin: 10px 0 0 0;">
+                    ℹ️ <strong>Configuração necessária apenas uma vez pelo administrador</strong>
+                </p>
+            </div>
+
+            <form id="transferForm">
+
+<div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeCliente">Nome do Cliente *</label>
+                        <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroPessoas">Número de Pessoas *</label>
+                        <div class="people-buttons">
+                            <button type="button" class="btn-people" onclick="setPeople(1)">1</button>
+                            <button type="button" class="btn-people" onclick="setPeople(2)">2</button>
+                            <button type="button" class="btn-people" onclick="setPeople(3)">3</button>
+                            <button type="button" class="btn-people" onclick="setPeople(4)">4</button>
+                            <button type="button" class="btn-people" onclick="setPeople(5)">5</button>
+                            <button type="button" class="btn-people" onclick="setPeople(6)">6</button>
+                            <button type="button" class="btn-people" onclick="setPeople(7)">7</button>
+                            <button type="button" class="btn-people" onclick="setPeople(8)">8+</button>
+                        </div>
+                        <input type="number" id="numeroPessoas" min="1" max="20" required style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroBagagens">Número de Bagagens</label>
+                        <div class="baggage-buttons">
+                            <button type="button" class="btn-baggage" onclick="setBaggage(0)">0</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(1)">1</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(2)">2</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(3)">3</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(4)">4</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(5)">5</button>
+                            <button type="button" class="btn-baggage" onclick="setBaggage(6)">6+</button>
+                        </div>
+                        <input type="number" id="numeroBagagens" min="0" max="20" value="0" style="display: none;">
+                    </div>
+
+<div class="form-group">
+                        <label for="data">Data do Transfer *</label>
+                        <div class="date-buttons">
+                            <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
+                            <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
+                            <input type="date" id="data" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="horaPickup">Hora de Pick-up *</label>
+                        <div class="time-buttons">
+                            <button type="button" class="btn-time" onclick="setTime('06:00')">06:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('07:00')">07:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('08:00')">08:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('09:00')">09:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('10:00')">10:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('11:00')">11:00</button>
+                            <input type="time" id="horaPickup" required>
+                        </div>
+                        <div class="time-buttons" style="margin-top: 10px;">
+                            <button type="button" class="btn-time" onclick="setTime('12:00')">12:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('13:00')">13:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('14:00')">14:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('15:00')">15:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('16:00')">16:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('17:00')">17:00</button>
+                        </div>
+                        <div class="time-buttons" style="margin-top: 10px;">
+                            <button type="button" class="btn-time" onclick="setTime('18:00')">18:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('19:00')">19:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('20:00')">20:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('21:00')">21:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('22:00')">22:00</button>
+                            <button type="button" class="btn-time" onclick="setTime('23:00')">23:00</button>
+                        </div>
+                    </div>
+
+<div class="form-group">
+                        <label for="contacto">Contacto do Cliente *</label>
+                        <div class="phone-container">
+                            <input type="tel" id="contacto" required placeholder="Digite o número...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroVoo">Número do Voo</label>
+                        <input type="text" id="numeroVoo" placeholder="Ex: TP1234">
+                    </div>
+                    <div class="form-group">
+                        <label for="origem">Local de Origem *</label>
+                        <div class="location-buttons">
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
+                                ✈️ Aeroporto de Lisboa
+                            </button>
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Hotel LIOZ')">
+                                🏨 Hotel LIOZ
+                            </button>
+                        </div>
+                        <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
+                    </div>
+                    <div class="form-group">
+                        <label for="destino">Local de Destino *</label>
+                        <div class="location-buttons">
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Hotel LIOZ')">
+                                🏨 Hotel LIOZ
+                            </button>
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
+                                ✈️ Aeroporto de Lisboa
+                            </button>
+                        </div>
+                        <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
+                    </div>
+
+<div class="form-group">
+                        <label for="valorTotal">Valor do Serviço (€) *</label>
+                        <div class="price-buttons">
+                            <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
+                            <button type="button" class="btn-price" onclick="setPrice(35)">€35</button>
+                            <button type="button" class="btn-price" onclick="setPrice(45)">€45</button>
+                            <button type="button" class="btn-price" onclick="setPrice(60)">€60</button>
+                            <button type="button" class="btn-price" onclick="setPrice(75)">€75</button>
+                            <button type="button" class="btn-price" onclick="setPrice(100)">€100</button>
+                        </div>
+                        <input type="number" id="valorTotal" step="0.01" required placeholder="Ou digite valor...">
+                    </div>
+                    <div class="form-group">
+                        <label for="modoPagamento">Forma de Pagamento *</label>
+                        <div class="payment-buttons">
+                            <button type="button" class="btn-payment" onclick="setPayment('Dinheiro')">
+                                💵 Dinheiro
+                            </button>
+                            <button type="button" class="btn-payment" onclick="setPayment('Cartão')">
+                                💳 Cartão
+                            </button>
+                            <button type="button" class="btn-payment" onclick="setPayment('Transferência')">
+                                🏦 Transferência
+                            </button>
+                        </div>
+                        <select id="modoPagamento" required style="display: none;">
+                            <option value="">Selecionar...</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                            <option value="Transferência">Transferência Bancária</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pagoParaQuem">Pago Para *</label>
+                        <div class="payment-to-buttons">
+                            <button type="button" class="btn-payment-to" onclick="setPaymentTo('Recepção')">
+                                🏨 Recepção
+                            </button>
+                            <button type="button" class="btn-payment-to" onclick="setPaymentTo('Motorista')">
+                                🚐 Motorista
+                            </button>
+                        </div>
+                        <select id="pagoParaQuem" required style="display: none;">
+                            <option value="">Selecionar...</option>
+                            <option value="Recepção">Recepção</option>
+                            <option value="Motorista">Motorista</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacoes">Observações</label>
+                        <div class="obs-buttons">
+                            <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">Bagagem Extra</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">Urgente</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
+                        </div>
+                        <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                    </div>
+                </div>
+
+<div class="form-actions">
+                    <button type="submit" class="btn btn-primary">✅ Solicitar Transfer</button>
+                    <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
+                    <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
+                    <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">
+                        📤 Sincronizar Tudo
+                    </button>
+                    <!-- Botão Admin (discreto) -->
+                    <button type="button" onclick="toggleAdmin()" class="btn" style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; font-size: 0.75rem; padding: 8px 12px;" id="adminBtn">
+                        ⚙️
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Instruções Admin (ocultas) -->
+            <div id="adminInstructions" style="display: none; background: #e7f3ff; padding: 20px; border-radius: 15px; margin-top: 20px;">
+                <h3 style="color: #004085; margin-bottom: 15px;">📋 Instruções para Configurar Google Sheets</h3>
+                <div style="font-size: 0.95rem; color: #004085; line-height: 1.6;">
+                    <p><strong>1.</strong> Crie uma nova planilha no Google Sheets</p>
+                    <p><strong>2.</strong> Vá em Extensões → Apps Script</p>
+                    <p><strong>3.</strong> Cole o código do Google Sheets Script (artifact separado)</p>
+                    <p><strong>4.</strong> Clique em Implantar → Nova implantação</p>
+                    <p><strong>5.</strong> Escolha "Aplicativo da Web" e "Executar como: Eu"</p>
+                    <p><strong>6.</strong> Copie a URL e cole no campo de configuração acima</p>
+                </div>
+                
+                <button onclick="toggleAdmin()" class="btn btn-export" style="margin-top: 15px;">
+                    🔒 Fechar
+                </button>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-number" id="totalServices">0</div>
+                    <div class="summary-label">Total de Serviços</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="pendingServices">0</div>
+                    <div class="summary-label">Solicitados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="confirmedServices">0</div>
+                    <div class="summary-label">Confirmados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="completedServices">0</div>
+                    <div class="summary-label">Finalizados</div>
+                </div>
+            </div>
+
+            <div class="financial-summary">
+                <h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem;">💰 Resumo Financeiro</h3>
+                <div class="financial-grid">
+                    <div class="financial-item">
+                        <div class="financial-value" id="totalRevenue">€0.00</div>
+                        <div class="financial-label">Receita Total</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="pendingRevenue">€0.00</div>
+                        <div class="financial-label">Valor Pendente</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="confirmedRevenue">€0.00</div>
+                        <div class="financial-label">Valor Confirmado</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="completedRevenue">€0.00</div>
+                        <div class="financial-label">Valor Finalizado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<div class="services-section">
+            <div class="services-header">
+                <h2 class="services-title">📋 Serviços de Transfer</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filterStatus">Status:</label>
+                        <select id="filterStatus" onchange="filterTable()">
+                            <option value="">Todos</option>
+                            <option value="Solicitado">Solicitado</option>
+                            <option value="Confirmado">Confirmado</option>
+                            <option value="Finalizado">Finalizado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterData">Data:</label>
+                        <input type="date" id="filterData" onchange="filterTable()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="searchClient">Cliente:</label>
+                        <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="filterTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="services-table">
+                <table id="servicesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Pessoas</th>
+                            <th>Bagagens</th>
+                            <th>Data</th>
+                            <th>Hora Pick-up</th>
+                            <th>Contacto</th>
+                            <th>Voo</th>
+                            <th>Rota</th>
+                            <th>Valor</th>
+                            <th>Pagamento</th>
+                            <th>Pago Para</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicesTableBody">
+                        <tr>
+                            <td colspan="14" class="empty-state">
+                                <h3>Nenhum serviço cadastrado</h3>
+                                <p>Adicione o primeiro transfer usando o formulário acima</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+        let services = [];
+        let editingId = null;
+        let phoneInput = null;
+
+        // Inicializar campo telefone com detecção de país
+        function initializePhoneInput() {
+            const phoneInputElement = document.getElementById('contacto');
+            
+            phoneInput = window.intlTelInput(phoneInputElement, {
+                initialCountry: "pt", // Portugal como padrão
+                preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
+                separateDialCode: true,
+                autoHideDialCode: false,
+                nationalMode: false,
+                formatOnDisplay: true,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+            });
+
+            // Detectar país automaticamente quando o usuário digita
+            phoneInputElement.addEventListener('input', function() {
+                const number = phoneInputElement.value;
+                
+                // Se começar com +, tentar detectar o país
+                if (number.startsWith('+')) {
+                    const countryCode = detectCountryFromNumber(number);
+                    if (countryCode) {
+                        phoneInput.setCountry(countryCode);
+                    }
+                }
+            });
+
+            // Formatar o número automaticamente
+            phoneInputElement.addEventListener('blur', function() {
+                if (phoneInput.isValidNumber()) {
+                    phoneInputElement.value = phoneInput.getNumber();
+                }
+            });
+        }
+
+        // Detectar país baseado no código do número
+        function detectCountryFromNumber(number) {
+            const countryCodesMap = {
+                '+351': 'pt', // Portugal
+                '+34': 'es',  // Espanha
+                '+33': 'fr',  // França
+                '+49': 'de',  // Alemanha
+                '+55': 'br',  // Brasil
+                '+1': 'us',   // EUA/Canadá
+                '+44': 'gb',  // Reino Unido
+                '+39': 'it',  // Itália
+                '+31': 'nl',  // Holanda
+                '+32': 'be',  // Bélgica
+                '+41': 'ch',  // Suíça
+                '+43': 'at',  // Áustria
+                '+45': 'dk',  // Dinamarca
+                '+46': 'se',  // Suécia
+                '+47': 'no',  // Noruega
+                '+358': 'fi', // Finlândia
+                '+420': 'cz', // República Checa
+                '+48': 'pl',  // Polônia
+                '+7': 'ru',   // Rússia
+                '+86': 'cn',  // China
+                '+81': 'jp',  // Japão
+                '+82': 'kr',  // Coreia do Sul
+                '+61': 'au',  // Austrália
+                '+64': 'nz',  // Nova Zelândia
+                '+27': 'za',  // África do Sul
+                '+52': 'mx',  // México
+                '+54': 'ar',  // Argentina
+                '+56': 'cl',  // Chile
+                '+57': 'co',  // Colômbia
+                '+58': 've',  // Venezuela
+                '+90': 'tr',  // Turquia
+                '+91': 'in',  // Índia
+                '+60': 'my',  // Malásia
+                '+65': 'sg',  // Singapura
+                '+66': 'th',  // Tailândia
+                '+84': 'vn',  // Vietnã
+                '+63': 'ph',  // Filipinas
+                '+62': 'id'   // Indonésia
+            };
+
+            // Tentar match com códigos de 2 a 4 dígitos
+            for (let i = 4; i >= 2; i--) {
+                const code = number.substring(0, i);
+                if (countryCodesMap[code]) {
+                    return countryCodesMap[code];
+                }
+            }
+            
+            return null;
+        }
+
+        // Obter número formatado do telefone
+        function getFormattedPhoneNumber() {
+            if (phoneInput && phoneInput.isValidNumber()) {
+                return phoneInput.getNumber();
+            }
+            return document.getElementById('contacto').value;
+        }
+
+// Função para mostrar/ocultar configurações de admin
+        function toggleAdmin() {
+            const adminConfig = document.getElementById('adminConfig');
+            const adminInstructions = document.getElementById('adminInstructions');
+            
+            if (adminConfig.style.display === 'none') {
+                adminConfig.style.display = 'block';
+                adminInstructions.style.display = 'block';
+            } else {
+                adminConfig.style.display = 'none';
+                adminInstructions.style.display = 'none';
+            }
+        }
+
+        function setPeople(number) {
+            document.getElementById('numeroPessoas').value = number;
+            
+            // Remover classe active de todos os botões de pessoas
+            document.querySelectorAll('.btn-people').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setBaggage(number) {
+            document.getElementById('numeroBagagens').value = number;
+            
+            // Remover classe active de todos os botões de bagagem
+            document.querySelectorAll('.btn-baggage').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setDate(option) {
+            const dateInput = document.getElementById('data');
+            const today = new Date();
+            
+            // Remover classe active de todos os botões de data
+            document.querySelectorAll('.btn-date').forEach(btn => btn.classList.remove('active'));
+            
+            if (option === 'today') {
+                dateInput.valueAsDate = today;
+                event.target.classList.add('active');
+            } else if (option === 'tomorrow') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                dateInput.valueAsDate = tomorrow;
+                event.target.classList.add('active');
+            }
+        }
+
+        function setTime(time) {
+            document.getElementById('horaPickup').value = time;
+            
+            // Remover classe active de todos os botões de hora
+            document.querySelectorAll('.btn-time').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setOrigin(location) {
+            document.getElementById('origem').value = location;
+            
+            // Remover classe active de todos os botões de origem
+            document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setDestination(location) {
+            document.getElementById('destino').value = location;
+            
+            // Remover classe active de todos os botões de destino
+            document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setPrice(price) {
+            document.getElementById('valorTotal').value = price;
+            
+            // Remover classe active de todos os botões de preço
+            document.querySelectorAll('.btn-price').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setPayment(method) {
+            document.getElementById('modoPagamento').value = method;
+            
+            // Remover classe active de todos os botões de pagamento
+            document.querySelectorAll('.btn-payment').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setPaymentTo(recipient) {
+            document.getElementById('pagoParaQuem').value = recipient;
+            
+            // Remover classe active de todos os botões
+            document.querySelectorAll('.btn-payment-to').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function addObservation(text) {
+            const obsInput = document.getElementById('observacoes');
+            const currentText = obsInput.value;
+            
+            if (currentText === '') {
+                obsInput.value = text;
+            } else {
+                obsInput.value = currentText + '; ' + text;
+            }
+            
+            event.target.classList.add('active');
+            setTimeout(() => {
+                event.target.classList.remove('active');
+            }, 1000);
+        }
+
+// Carregar dados
+        function loadData() {
+            const savedData = localStorage.getItem('partnershipTransferData');
+            const savedUrl = localStorage.getItem('webappUrl');
+            
+            if (savedData) {
+                services = JSON.parse(savedData);
+                renderTable();
+                updateSummary();
+            }
+            
+            if (savedUrl) {
+                document.getElementById('webappUrl').value = savedUrl;
+                document.getElementById('syncBtn').style.display = 'inline-block';
+            }
+        }
+
+        // Salvar dados
+        function saveData() {
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+        }
+
+        // Salvar URL do webapp
+        function saveWebappUrl() {
+            const url = document.getElementById('webappUrl').value;
+            if (url) {
+                localStorage.setItem('webappUrl', url);
+                document.getElementById('syncBtn').style.display = 'inline-block';
+            }
+        }
+
+        // Testar conexão com Google Sheets
+        async function testConnection() {
+            const url = document.getElementById('webappUrl').value;
+            
+            if (!url) {
+                alert('Por favor, insira a URL do Google Apps Script!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('✅ Conexão funcionando! Agora os dados serão enviados automaticamente para o Google Sheets.');
+                    saveWebappUrl();
+                } else {
+                    alert('❌ Erro na conexão. Verifique a URL e as configurações do Apps Script.');
+                }
+            } catch (error) {
+                alert('❌ Erro ao conectar: ' + error.message);
+            }
+        }
+
+        // Enviar dados para Google Sheets
+        async function sendToSheets(serviceData) {
+            const url = document.getElementById('webappUrl').value;
+            
+            if (!url) {
+                return false;
+            }
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(serviceData)
+                });
+                
+                const result = await response.json();
+                return result.status === 'success';
+            } catch (error) {
+                console.error('Erro ao enviar para Google Sheets:', error);
+                return false;
+            }
+        }
+
+        // Sincronizar todos os dados existentes
+        async function syncToSheets() {
+            const url = document.getElementById('webappUrl').value;
+            
+            if (!url) {
+                alert('Configure a URL do Google Apps Script primeiro!');
+                return;
+            }
+            
+            if (services.length === 0) {
+                alert('Não há dados para sincronizar!');
+                return;
+            }
+            
+            let successCount = 0;
+            let totalCount = services.length;
+            
+            for (const service of services) {
+                const success = await sendToSheets(service);
+                if (success) successCount++;
+                
+                // Pequena pausa entre as requisições
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            alert(`Sincronização concluída!\n✅ ${successCount} de ${totalCount} registros enviados com sucesso.`);
+        }
+
+// Renderizar tabela
+        function renderTable() {
+            const tbody = document.getElementById('servicesTableBody');
+            tbody.innerHTML = '';
+
+            if (services.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="14" class="empty-state">
+                            <h3>Nenhum serviço cadastrado</h3>
+                            <p>Adicione o primeiro transfer usando o formulário acima</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            services.forEach(service => {
+                const row = document.createElement('tr');
+                const paymentClass = service.modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
+                                   service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+                
+                row.innerHTML = `
+                    <td><strong>#${service.id}</strong></td>
+                    <td>
+                        <div class="client-info">${service.nomeCliente}</div>
+                        <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
+                    </td>
+                    <td>
+                        <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                            👥 ${service.numeroPessoas}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                            🧳 ${service.numeroBagagens}
+                        </span>
+                    </td>
+                    <td>
+                        <div><strong>${formatDate(service.data)}</strong></div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
+                            ${service.horaPickup}
+                        </div>
+                    </td>
+                    <td>${service.contacto}</td>
+                    <td>${service.numeroVoo || '-'}</td>
+                    <td>
+                        <div style="font-size: 0.9rem;">
+                            <div><strong>De:</strong> ${service.origem}</div>
+                            <div><strong>Para:</strong> ${service.destino}</div>
+                        </div>
+                    </td>
+                    <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
+                    <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
+                    <td>
+                        <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
+                            ${service.pagoParaQuem}
+                        </span>
+                    </td>
+                    <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
+                            <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
+                            <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Atualizar resumo
+        function updateSummary() {
+            const total = services.length;
+            const pending = services.filter(s => s.status === 'Solicitado').length;
+            const confirmed = services.filter(s => s.status === 'Confirmado').length;
+            const completed = services.filter(s => s.status === 'Finalizado').length;
+
+            const totalRevenue = services.reduce((sum, s) => sum + s.valorTotal, 0);
+            const pendingRevenue = services.filter(s => s.status === 'Solicitado').reduce((sum, s) => sum + s.valorTotal, 0);
+            const confirmedRevenue = services.filter(s => s.status === 'Confirmado').reduce((sum, s) => sum + s.valorTotal, 0);
+            const completedRevenue = services.filter(s => s.status === 'Finalizado').reduce((sum, s) => sum + s.valorTotal, 0);
+
+            document.getElementById('totalServices').textContent = total;
+            document.getElementById('pendingServices').textContent = pending;
+            document.getElementById('confirmedServices').textContent = confirmed;
+            document.getElementById('completedServices').textContent = completed;
+
+            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
+            document.getElementById('pendingRevenue').textContent = `€${pendingRevenue.toFixed(2)}`;
+            document.getElementById('confirmedRevenue').textContent = `€${confirmedRevenue.toFixed(2)}`;
+            document.getElementById('completedRevenue').textContent = `€${completedRevenue.toFixed(2)}`;
+        }
+
+        // Formatar data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-PT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+// Submeter formulário
+        document.getElementById('transferForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                nomeCliente: document.getElementById('nomeCliente').value,
+                numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
+                numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
+                data: document.getElementById('data').value,
+                contacto: getFormattedPhoneNumber(),
+                numeroVoo: document.getElementById('numeroVoo').value,
+                origem: document.getElementById('origem').value,
+                destino: document.getElementById('destino').value,
+                horaPickup: document.getElementById('horaPickup').value,
+                valorTotal: parseFloat(document.getElementById('valorTotal').value),
+                modoPagamento: document.getElementById('modoPagamento').value,
+                pagoParaQuem: document.getElementById('pagoParaQuem').value,
+                observacoes: document.getElementById('observacoes').value,
+                status: 'Solicitado'
+            };
+
+            if (editingId) {
+                const index = services.findIndex(s => s.id === editingId);
+                services[index] = { ...services[index], ...formData };
+                editingId = null;
+                
+                // Enviar atualização para Google Sheets
+                sendToSheets(services[index]);
+            } else {
+                const newId = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
+                const newService = {
+                    id: newId,
+                    ...formData,
+                    created: new Date().toISOString()
+                };
+                
+                services.push(newService);
+                
+                // Enviar para Google Sheets automaticamente
+                const sheetSuccess = await sendToSheets(newService);
+                if (sheetSuccess) {
+                    alert('✅ Transfer adicionado e enviado para Google Sheets com sucesso!');
+                } else {
+                    alert('⚠️ Transfer adicionado localmente, mas não foi possível enviar para Google Sheets. Verifique a conexão.');
+                }
+            }
+
+            saveData();
+            renderTable();
+            updateSummary();
+            clearForm();
+            
+            // Scroll para a tabela
+            document.querySelector('.services-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Limpar formulário
+        function clearForm() {
+            document.getElementById('transferForm').reset();
+            editingId = null;
+            document.querySelector('.btn-primary').textContent = '✅ Solicitar Transfer';
+        }
+
+// Editar serviço
+        function editService(id) {
+            const service = services.find(s => s.id === id);
+            if (service) {
+                document.getElementById('nomeCliente').value = service.nomeCliente;
+                document.getElementById('numeroPessoas').value = service.numeroPessoas;
+                document.getElementById('numeroBagagens').value = service.numeroBagagens;
+                document.getElementById('data').value = service.data;
+                
+                // Definir número de telefone
+                if (phoneInput) {
+                    phoneInput.setNumber(service.contacto);
+                } else {
+                    document.getElementById('contacto').value = service.contacto;
+                }
+                
+                document.getElementById('numeroVoo').value = service.numeroVoo || '';
+                document.getElementById('origem').value = service.origem;
+                document.getElementById('destino').value = service.destino;
+                document.getElementById('horaPickup').value = service.horaPickup;
+                document.getElementById('valorTotal').value = service.valorTotal;
+                document.getElementById('modoPagamento').value = service.modoPagamento;
+                document.getElementById('pagoParaQuem').value = service.pagoParaQuem;
+                document.getElementById('observacoes').value = service.observacoes || '';
+                
+                editingId = id;
+                document.querySelector('.btn-primary').textContent = '✏️ Atualizar Transfer';
+                
+                document.querySelector('.quick-add').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Alterar status
+        async function changeStatus(id) {
+            const service = services.find(s => s.id === id);
+            if (service) {
+                const statuses = ['Solicitado', 'Confirmado', 'Finalizado', 'Cancelado'];
+                const currentIndex = statuses.indexOf(service.status);
+                const nextIndex = (currentIndex + 1) % statuses.length;
+                
+                service.status = statuses[nextIndex];
+                saveData();
+                renderTable();
+                updateSummary();
+                
+                // Enviar atualização para Google Sheets
+                await sendToSheets(service);
+            }
+        }
+
+        // Deletar serviço
+        function deleteService(id) {
+            if (confirm('Tem certeza que deseja deletar este serviço?')) {
+                services = services.filter(s => s.id !== id);
+                saveData();
+                renderTable();
+                updateSummary();
+            }
+        }
+
+// Filtrar tabela
+        function filterTable() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const dataFilter = document.getElementById('filterData').value;
+            const clientFilter = document.getElementById('searchClient').value.toLowerCase();
+
+            const tbody = document.getElementById('servicesTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let row of rows) {
+                if (row.cells.length < 14) continue; // Skip empty state row
+                
+                let showRow = true;
+
+                if (statusFilter && !row.textContent.includes(statusFilter)) {
+                    showRow = false;
+                }
+
+                if (dataFilter) {
+                    const rowDate = row.cells[4].textContent;
+                    const filterDate = formatDate(dataFilter);
+                    if (!rowDate.includes(filterDate)) {
+                        showRow = false;
+                    }
+                }
+
+                if (clientFilter && !row.cells[1].textContent.toLowerCase().includes(clientFilter)) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            }
+        }
+
+        // Exportar CSV
+        function exportToCSV() {
+            if (services.length === 0) {
+                alert('Não há dados para exportar!');
+                return;
+            }
+
+            const headers = ['ID', 'Cliente', 'Pessoas', 'Bagagens', 'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor', 'Pagamento', 'Pago Para', 'Status', 'Observações'];
+            
+            let csvContent = headers.join(',') + '\n';
+            
+            services.forEach(service => {
+                const row = [
+                    service.id,
+                    `"${service.nomeCliente}"`,
+                    service.numeroPessoas,
+                    service.numeroBagagens,
+                    service.data,
+                    service.contacto,
+                    service.numeroVoo || '',
+                    `"${service.origem}"`,
+                    `"${service.destino}"`,
+                    service.horaPickup,
+                    service.valorTotal,
+                    `"${service.modoPagamento}"`,
+                    `"${service.pagoParaQuem}"`,
+                    service.status,
+                    `"${service.observacoes || ''}"`
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `transfers_lioz_hub_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+// Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Definir data de hoje como padrão
+            document.getElementById('data').valueAsDate = new Date();
+            
+            // Inicializar Google Maps Autocomplete
+            initializeAutocomplete();
+            
+            // Inicializar campo de telefone
+            setTimeout(initializePhoneInput, 500);
+            
+            // Verificar se é admin (URL contém ?admin=true)
+            if (window.location.search.includes('admin=true')) {
+                document.getElementById('adminConfig').style.display = 'block';
+                document.getElementById('adminInstructions').style.display = 'block';
+            }
+        });
+
+        // Inicializar Google Maps Autocomplete
+        function initializeAutocomplete() {
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                // Autocomplete para origem
+                const origemInput = document.getElementById('origem');
+                const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                    types: ['establishment', 'geocode'],
+                    componentRestrictions: { country: 'pt' }
+                });
+
+                // Autocomplete para destino
+                const destinoInput = document.getElementById('destino');
+                const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                    types: ['establishment', 'geocode'],
+                    componentRestrictions: { country: 'pt' }
+                });
+
+                // Eventos para limpar botões quando digitado manualmente
+                origemInput.addEventListener('input', function() {
+                    document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
+                });
+
+                destinoInput.addEventListener('input', function() {
+                    document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
+                });
+            } else {
+                // Tentar novamente após 1 segundo se Google Maps não estiver carregado
+                setTimeout(initializeAutocomplete, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
