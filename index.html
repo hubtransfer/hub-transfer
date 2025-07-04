@@ -1392,31 +1392,70 @@
             }
         }
 
+// ============================================
+        // FUNÇÕES CORRIGIDAS - SUBSTITUA NO SEU HTML
+        // ============================================
+
         // Enviar dados para Google Sheets
         async function sendToSheets(serviceData) {
             const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl');
             
             if (!url) {
-                console.log('URL não configurada');
+                console.log('❌ URL não configurada');
                 return false;
             }
             
             try {
+                // ✅ FORMATAÇÃO CORRETA DOS DADOS
+                const dataToSend = {
+                    id: serviceData.id,
+                    nomeCliente: serviceData.nomeCliente,
+                    numeroPessoas: serviceData.numeroPessoas,
+                    numeroBagagens: serviceData.numeroBagagens,
+                    data: serviceData.data,
+                    contacto: serviceData.contacto,
+                    numeroVoo: serviceData.numeroVoo || '',
+                    origem: serviceData.origem,
+                    destino: serviceData.destino,
+                    horaPickup: serviceData.horaPickup,
+                    valorTotal: serviceData.valorTotal,
+                    modoPagamento: serviceData.modoPagamento,
+                    pagoParaQuem: serviceData.pagoParaQuem,
+                    status: serviceData.status,
+                    observacoes: serviceData.observacoes || ''
+                };
+                
+                console.log('📤 Enviando dados para Google Sheets:', dataToSend);
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(serviceData),
+                    body: JSON.stringify(dataToSend),
                     mode: 'cors'
                 });
                 
-                const result = await response.json();
-                console.log('Resposta do Sheets:', result);
+                console.log('📡 Status da resposta:', response.status);
                 
-                return result.status === 'success';
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('📄 Resposta completa do Google Sheets:', result);
+                
+                if (result.status === 'success') {
+                    console.log('✅ Dados enviados com sucesso!');
+                    return true;
+                } else {
+                    console.error('❌ Erro na resposta do servidor:', result.message);
+                    return false;
+                }
+                
             } catch (error) {
-                console.error('Erro ao enviar para Google Sheets:', error);
+                console.error('❌ Erro crítico ao enviar para Google Sheets:', error);
+                console.error('📋 Dados que falharam:', serviceData);
                 return false;
             }
         }
@@ -1437,18 +1476,37 @@
             
             setButtonLoading('syncBtn', true);
             let successCount = 0;
+            let errorCount = 0;
             
             try {
+                console.log(`🔄 Iniciando sincronização de ${services.length} registros...`);
+                
                 for (const service of services) {
+                    console.log(`📤 Enviando registro ID: ${service.id} - ${service.nomeCliente}`);
+                    
                     const success = await sendToSheets(service);
-                    if (success) successCount++;
+                    if (success) {
+                        successCount++;
+                        console.log(`✅ ID ${service.id} enviado com sucesso`);
+                    } else {
+                        errorCount++;
+                        console.log(`❌ ID ${service.id} falhou no envio`);
+                    }
                     
                     // Pequena pausa entre requisições
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    await new Promise(resolve => setTimeout(resolve, 300));
                 }
                 
-                showStatus(`Sincronização concluída! ${successCount}/${services.length} registros enviados.`, 'success');
+                console.log(`📊 Sincronização completa: ${successCount} sucessos, ${errorCount} erros`);
+                
+                if (successCount > 0) {
+                    showStatus(`✅ Sincronização concluída! ${successCount}/${services.length} registros enviados.`, 'success');
+                } else {
+                    showStatus(`❌ Falha na sincronização! Nenhum registro foi enviado.`, 'error');
+                }
+                
             } catch (error) {
+                console.error('❌ Erro durante sincronização:', error);
                 showStatus('Erro durante sincronização: ' + error.message, 'error');
             } finally {
                 setButtonLoading('syncBtn', false);
@@ -1470,6 +1528,8 @@
                 const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl');
                 
                 if (url) {
+                    console.log('🗑️ Tentando limpar dados no Google Sheets...');
+                    
                     // Tentar limpar dados no Google Sheets
                     const response = await fetch(url, {
                         method: 'POST',
@@ -1484,6 +1544,8 @@
                     });
                     
                     const result = await response.json();
+                    console.log('📄 Resposta da limpeza:', result);
+                    
                     if (result.status === 'success') {
                         showStatus('✅ Dados limpos no Google Sheets com sucesso!', 'success');
                     } else {
@@ -1500,6 +1562,7 @@
                 updateSummary();
                 
                 showStatus('🗑️ Todos os dados foram limpos com sucesso!', 'success');
+                console.log('✅ Dados locais limpos com sucesso');
                 
                 // Fechar seção de limpeza
                 setTimeout(() => {
@@ -1507,7 +1570,7 @@
                 }, 2000);
                 
             } catch (error) {
-                console.error('Erro ao limpar dados:', error);
+                console.error('❌ Erro ao limpar dados:', error);
                 
                 // Limpar dados locais mesmo se houver erro no servidor
                 services = [];
@@ -1536,6 +1599,8 @@
                 const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl');
                 
                 if (url) {
+                    console.log('🧹 Tentando limpar dados de teste no Google Sheets...');
+                    
                     // Tentar limpar dados de teste no Google Sheets
                     const response = await fetch(url, {
                         method: 'POST',
@@ -1550,6 +1615,8 @@
                     });
                     
                     const result = await response.json();
+                    console.log('📄 Resposta da limpeza de teste:', result);
+                    
                     if (result.status === 'success') {
                         showStatus('✅ Dados de teste limpos no Google Sheets!', 'success');
                     } else {
@@ -1561,10 +1628,12 @@
                 const originalLength = services.length;
                 services = services.filter(service => 
                     !service.nomeCliente.toUpperCase().includes('TESTE') &&
-                    !service.nomeCliente.toUpperCase().includes('TEST')
+                    !service.nomeCliente.toUpperCase().includes('TEST') &&
+                    !service.nomeCliente.toUpperCase().includes('DEBUG')
                 );
                 
                 const removedCount = originalLength - services.length;
+                console.log(`🧹 ${removedCount} registros de teste removidos localmente`);
                 
                 if (removedCount > 0) {
                     saveData();
@@ -1581,7 +1650,7 @@
                 }, 2000);
                 
             } catch (error) {
-                console.error('Erro ao limpar dados de teste:', error);
+                console.error('❌ Erro ao limpar dados de teste:', error);
                 showStatus('❌ Erro ao limpar dados de teste: ' + error.message, 'error');
             } finally {
                 setButtonLoading('clearTestBtn', false);
@@ -1595,6 +1664,7 @@
                 localStorage.setItem('webappUrl', url);
                 document.getElementById('syncBtn').style.display = 'inline-block';
                 isConnected = true;
+                console.log('✅ URL do Web App salva:', url);
             }
         }
 
@@ -1606,11 +1676,11 @@
             if (savedData) {
                 try {
                     services = JSON.parse(savedData);
-                    console.log(`${services.length} transfers carregados do localStorage`);
+                    console.log(`📂 ${services.length} transfers carregados do localStorage`);
                     renderTable();
                     updateSummary();
                 } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
+                    console.error('❌ Erro ao carregar dados salvos:', error);
                     services = [];
                 }
             }
@@ -1619,6 +1689,7 @@
                 document.getElementById('webappUrl').value = savedUrl;
                 document.getElementById('syncBtn').style.display = 'inline-block';
                 isConnected = true;
+                console.log('🔗 URL salva carregada automaticamente');
             }
         }
 
@@ -1626,9 +1697,9 @@
         function saveData() {
             try {
                 localStorage.setItem('partnershipTransferData', JSON.stringify(services));
-                console.log('Dados salvos no localStorage');
+                console.log('💾 Dados salvos no localStorage');
             } catch (error) {
-                console.error('Erro ao salvar dados:', error);
+                console.error('❌ Erro ao salvar dados localmente:', error);
                 showStatus('Erro ao salvar dados localmente', 'error');
             }
         }
@@ -1649,6 +1720,52 @@
                 `;
                 return;
             }
+
+            console.log(`📋 Renderizando tabela com ${services.length} registros`);
+
+        // ============================================
+        // FUNÇÃO DE DEBUG ADICIONAL
+        // Cole esta função NO FINAL do seu JavaScript (antes de </script>)
+        // ============================================
+
+        // Teste de envio direto para debug
+        async function debugSendTest() {
+            console.log('🧪 === INICIANDO TESTE DE DEBUG ===');
+            
+            const testData = {
+                id: 9999,
+                nomeCliente: 'TESTE DEBUG SISTEMA',
+                numeroPessoas: 1,
+                numeroBagagens: 0,
+                data: new Date().toISOString().split('T')[0],
+                contacto: '+351999888777',
+                numeroVoo: 'DEBUG999',
+                origem: 'Teste Debug - Origem',
+                destino: 'Teste Debug - Destino',
+                horaPickup: '15:30',
+                valorTotal: 25.00,
+                modoPagamento: 'Dinheiro',
+                pagoParaQuem: 'Recepção',
+                status: 'Solicitado',
+                observacoes: 'Registro de teste para debug do sistema'
+            };
+            
+            console.log('📋 Dados de teste preparados:', testData);
+            
+            const success = await sendToSheets(testData);
+            
+            if (success) {
+                console.log('✅ TESTE DE DEBUG BEM-SUCEDIDO!');
+                alert('✅ Teste bem-sucedido! Verifique o Google Sheets para o registro DEBUG.');
+            } else {
+                console.log('❌ TESTE DE DEBUG FALHOU!');
+                alert('❌ Teste falhou! Verifique o console (F12) para detalhes dos erros.');
+            }
+            
+            console.log('🏁 === TESTE DE DEBUG CONCLUÍDO ===');
+        }
+
+        // Para executar o teste, abra o console (F12) e digite: debugSendTest()
 
             // Ordenar por data mais recente primeiro
             const sortedServices = services.sort((a, b) => {
