@@ -1161,7 +1161,7 @@
            let phoneInput = null;
            let isConnected = false;
            const SPREADSHEET_ID = '1jXhF6tAPhuieIoIm6F3zsaEkq7NV_tafarkxcot4IE8';
-           const WEBAPP_URL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxUEcknPq91_O1NpIlMkcRlhm4HVyl56CAbj3oU1STajIwTWTFMt8OHvBq6HQ6xYZodrA/exec';
+           const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbydhDPc8ODKGmyvpfzriJ8Orudi6NFpCCuWZTUfvpZhm8cJDGfrM3J53jgXQ96VSgJhzQ/exec';
 
            // Auto-configurar URL se não estiver configurada
            function autoConfigureUrl() {
@@ -1223,61 +1223,76 @@
                }
            }
 
-           // Inicializar campo telefone com detecção de país
-           function initializePhoneInput() {
-               const phoneInputElement = document.getElementById('contacto');
-               
-               if (window.intlTelInput) {
-                   phoneInput = window.intlTelInput(phoneInputElement, {
-                       initialCountry: "pt",
-                       preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
-                       separateDialCode: true,
-                       autoHideDialCode: false,
-                       nationalMode: false,
-                       formatOnDisplay: true,
-                       utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-                   });
+// ✅ Inicializa o campo de telefone com detecção de país e bandeira
+let phoneInput;
 
-                   phoneInputElement.addEventListener('input', function() {
-                       const number = phoneInputElement.value;
-                       if (number.startsWith('+')) {
-                           const countryCode = detectCountryFromNumber(number);
-                           if (countryCode) {
-                               phoneInput.setCountry(countryCode);
-                           }
-                       }
-                   });
+function initializePhoneInput() {
+    const phoneInputElement = document.getElementById('contacto');
 
-                   phoneInputElement.addEventListener('blur', function() {
-                       if (phoneInput.isValidNumber()) {
-                           phoneInputElement.value = phoneInput.getNumber();
-                       }
-                   });
-               }
-           }
+    if (!phoneInputElement) {
+        console.warn("Elemento #contacto não encontrado.");
+        return;
+    }
 
-           function detectCountryFromNumber(number) {
-               const countryCodesMap = {
-                   '+351': 'pt', '+34': 'es', '+33': 'fr', '+49': 'de', '+55': 'br',
-                   '+1': 'us', '+44': 'gb', '+39': 'it', '+31': 'nl', '+32': 'be',
-                   '+41': 'ch', '+43': 'at', '+45': 'dk', '+46': 'se', '+47': 'no'
-               };
+    if (window.intlTelInput) {
+        phoneInput = window.intlTelInput(phoneInputElement, {
+            initialCountry: "pt",
+            preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
+            separateDialCode: true,
+            autoHideDialCode: false,
+            nationalMode: false,
+            formatOnDisplay: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+        });
 
-               for (let i = 4; i >= 2; i--) {
-                   const code = number.substring(0, i);
-                   if (countryCodesMap[code]) {
-                       return countryCodesMap[code];
-                   }
-               }
-               return null;
-           }
+        // Atualiza o país ao digitar manualmente
+        phoneInputElement.addEventListener('input', function () {
+            const number = phoneInputElement.value;
+            if (number.startsWith('+')) {
+                const countryCode = detectCountryFromNumber(number);
+                if (countryCode) {
+                    phoneInput.setCountry(countryCode);
+                }
+            }
+        });
 
-           function getFormattedPhoneNumber() {
-               if (phoneInput && phoneInput.isValidNumber()) {
-                   return phoneInput.getNumber();
-               }
-               return document.getElementById('contacto').value;
-           }
+        // Formata o número completo ao sair do campo
+        phoneInputElement.addEventListener('blur', function () {
+            if (phoneInput.isValidNumber()) {
+                phoneInputElement.value = phoneInput.getNumber();
+            }
+        });
+    } else {
+        console.error("intlTelInput não foi carregado corretamente.");
+    }
+}
+
+// 🔍 Detecta país com base no prefixo
+function detectCountryFromNumber(number) {
+    const countryCodesMap = {
+        '+351': 'pt', '+34': 'es', '+33': 'fr', '+49': 'de', '+55': 'br',
+        '+1': 'us', '+44': 'gb', '+39': 'it', '+31': 'nl', '+32': 'be',
+        '+41': 'ch', '+43': 'at', '+45': 'dk', '+46': 'se', '+47': 'no'
+    };
+
+    for (let i = 5; i >= 2; i--) {
+        const code = number.substring(0, i);
+        if (countryCodesMap[code]) {
+            return countryCodesMap[code];
+        }
+    }
+
+    return null;
+}
+
+// 🔁 Pega o número formatado com código internacional
+function getFormattedPhoneNumber() {
+    if (phoneInput && phoneInput.isValidNumber()) {
+        return phoneInput.getNumber();
+    }
+    return document.getElementById('contacto').value;
+}
+
 
            function setPeople(number) {
                document.getElementById('numeroPessoas').value = number;
