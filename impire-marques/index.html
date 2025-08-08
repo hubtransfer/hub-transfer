@@ -954,7 +954,8 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/SEU_NOVO_WEBAPP_URL/exec" placeholder="https://script.google.com/macros/s/...">
+                    <!-- FUSÃO: Mantendo URL funcional do código antigo -->
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxMHnDr8G8Fh2nT9gbTTOCDm5pcNRrUukY1QtqKPfre0EJonQCKZDh2ThGSCd7-iDjuJA/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -996,7 +997,7 @@
                         <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
                     </div>
                     
-                    <!-- Tipo de Serviço -->
+                    <!-- Tipo de Serviço - FUNCIONALIDADE DO CÓDIGO NOVO -->
                     <div class="form-group">
                         <label for="tipoServico">Tipo de Serviço</label>
                         <div class="service-buttons">
@@ -1012,7 +1013,7 @@
                         </div>
                     </div>
                     
-                    <!-- Seletor de Tours -->
+                    <!-- Seletor de Tours - FUNCIONALIDADE DO CÓDIGO NOVO -->
                     <div class="form-group tour-selector" id="tourSelector">
                         <label for="tourSelecionado">Selecione o Tour</label>
                         <select id="tourSelecionado" onchange="updateTourPrice()">
@@ -1130,6 +1131,7 @@
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
+                            <!-- FUSÃO: Usando nome do hotel do código NOVO -->
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Impire Marques Hotel')">
                                 🏨 Impire Marques Hotel
                             </button>
@@ -1140,6 +1142,7 @@
                     <div class="form-group">
                         <label for="destino">Local de Destino *</label>
                         <div class="location-buttons">
+                            <!-- FUSÃO: Usando nome do hotel do código NOVO -->
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Impire Marques Hotel')">
                                 🏨 Impire Marques Hotel
                             </button>
@@ -1213,7 +1216,7 @@
                     </div>
                 </div>
 
-                <!-- Box de Cálculo de Preço -->
+                <!-- Box de Cálculo de Preço - FUNCIONALIDADE DO CÓDIGO NOVO -->
                 <div class="price-calculation-box" id="priceCalculationBox">
                     <div class="calculation-header">💰 Cálculo do Valor Total</div>
                     <div class="calculation-details">
@@ -1369,22 +1372,26 @@
         </div>
     </div>
 
-    <!-- Botão Admin -->
+    <!-- Botão Admin - FUNCIONALIDADE DO CÓDIGO NOVO -->
     <div class="admin-toggle" id="adminToggle" onclick="toggleAdminMode()">🔐 Admin</div>
 
     <script>
+        // =====================================================
+        // VARIÁVEIS GLOBAIS - FUSÃO DOS DOIS CÓDIGOS
+        // =====================================================
         let services = [];
         let editingId = null;
         let phoneInput = null;
         let isConnected = false;
-        let isAdminMode = false;
-        let currentServiceType = 'transfer';
-        let precoUnitarioAtual = 0;
+        let isAdminMode = false; // Do código novo
+        let currentServiceType = 'transfer'; // Do código novo
+        let precoUnitarioAtual = 0; // Do código novo
         
-        const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
-        const WEBAPP_URL = 'https://script.google.com/macros/s/SEU_NOVO_WEBAPP_URL/exec';
+        // FUSÃO: Mantendo configurações do código novo com URL funcional do código antigo
+        const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI'; // ID do código novo
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxMHnDr8G8Fh2nT9gbTTOCDm5pcNRrUukY1QtqKPfre0EJonQCKZDh2ThGSCd7-iDjuJA/exec'; // URL funcional do código antigo
         
-        // Tours e Preços
+        // Tours e Preços - FUNCIONALIDADE DO CÓDIGO NOVO
         const TOURS_DATA = {
             'tour-sintra-cascais': { name: 'Sintra e Cascais (8h)', price: 67, type: 'regular' },
             'tour-fatima-obidos': { name: 'Fátima e Óbidos (8h)', price: 83, type: 'regular' },
@@ -1395,7 +1402,9 @@
             'private-arrabida': { name: 'Private Arrábida', priceSmall: 347, priceLarge: 492, type: 'private' }
         };
 
-        // Função para definir tipo de serviço
+        // =====================================================
+        // FUNÇÕES DE SERVIÇO - DO CÓDIGO NOVO
+        // =====================================================
         function setServiceType(type) {
             currentServiceType = type;
             
@@ -1416,7 +1425,6 @@
             updateCalculation();
         }
 
-        // Função para atualizar preço do tour selecionado
         function updateTourPrice() {
             const tourSelect = document.getElementById('tourSelecionado');
             const selectedOption = tourSelect.options[tourSelect.selectedIndex];
@@ -1432,19 +1440,16 @@
             
             if (tourData.type === 'regular') {
                 precoUnitarioAtual = tourData.price;
-                // Calcular e preencher automaticamente o valor total
                 const valorTotal = precoUnitarioAtual * pessoas;
                 document.getElementById('valorTotal').value = valorTotal.toFixed(2);
             } else if (tourData.type === 'private') {
                 precoUnitarioAtual = pessoas <= 3 ? tourData.priceSmall : tourData.priceLarge;
-                // Para private tours, o preço já é o total do grupo
                 document.getElementById('valorTotal').value = precoUnitarioAtual.toFixed(2);
             }
             
             updateCalculation();
         }
 
-        // Função para atualizar cálculo
         function updateCalculation() {
             const pessoas = parseInt(document.getElementById('numeroPessoas').value) || 0;
             let valorTotal = 0;
@@ -1452,61 +1457,52 @@
             let valorHUB = 0;
             let comissaoRecepcao = 0;
             
-            // Mostrar box de cálculo apenas para tours
             const calcBox = document.getElementById('priceCalculationBox');
             
             if (currentServiceType === 'tour' || currentServiceType === 'private') {
                 calcBox.classList.add('show');
                 
-                // Atualizar informações do cálculo
                 document.getElementById('calcTipoServico').textContent = 
                     currentServiceType === 'tour' ? 'Tour Regular' : 'Private Tour';
                 document.getElementById('calcPrecoUnitario').textContent = `€${precoUnitarioAtual}`;
                 document.getElementById('calcPessoas').textContent = pessoas;
                 
                 if (currentServiceType === 'tour') {
-                    // Tours regulares: preço por pessoa
                     valorTotal = precoUnitarioAtual * pessoas;
                     valorHotel = valorTotal * 0.30;
-                    comissaoRecepcao = 5.00;
+                    comissaoRecepcao = 5.00; // Comissão para tours do código novo
                 } else if (currentServiceType === 'private') {
-                    // Private tours: preço fixo por grupo
                     valorTotal = precoUnitarioAtual;
                     valorHotel = valorTotal * 0.30;
-                    comissaoRecepcao = 5.00;
+                    comissaoRecepcao = 5.00; // Comissão para tours do código novo
                 }
             } else {
-                // Transfer normal
                 calcBox.classList.remove('show');
                 valorTotal = parseFloat(document.getElementById('valorTotal').value) || 0;
                 valorHotel = valorTotal * 0.30;
-                comissaoRecepcao = 2.50;
+                comissaoRecepcao = 2.00; // Comissão para transfers do código novo
             }
             
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
             
-            // Atualizar valores no box
             document.getElementById('calcTotal').textContent = valorTotal.toFixed(2);
             document.getElementById('calcHotel').textContent = `€${valorHotel.toFixed(2)}`;
             document.getElementById('calcHUB').textContent = `€${valorHUB.toFixed(2)}`;
             document.getElementById('calcRecepcao').textContent = `€${comissaoRecepcao.toFixed(2)}`;
             
-            // Atualizar campo de valor total
             if (currentServiceType !== 'transfer') {
                 document.getElementById('valorTotal').value = valorTotal.toFixed(2);
             }
         }
 
-        // Toggle modo admin
+        // Toggle modo admin - DO CÓDIGO NOVO
         function toggleAdminMode() {
             const senha = prompt('Digite a senha de administrador:');
             if (senha === 'admin2025') {
                 isAdminMode = !isAdminMode;
                 
-                // Mostrar/ocultar campos admin
                 document.getElementById('adminFields').classList.toggle('show');
                 
-                // Mostrar/ocultar colunas na tabela
                 document.querySelectorAll('.admin-column').forEach(col => {
                     col.style.display = isAdminMode ? 'table-cell' : 'none';
                 });
@@ -1517,29 +1513,32 @@
             }
         }
 
-        // Auto-configurar URL se não estiver configurada
+        // =====================================================
+        // FUNÇÕES DE CONFIGURAÇÃO - FUSÃO
+        // =====================================================
+        
+        // Auto-configurar URL - MELHORADO DO CÓDIGO ANTIGO
         function autoConfigureUrl() {
             const urlInput = document.getElementById('webappUrl');
-            if (!urlInput.value.trim() || urlInput.value === 'https://script.google.com/macros/s/SEU_NOVO_WEBAPP_URL/exec') {
+            if (!urlInput.value.trim()) {
                 urlInput.value = WEBAPP_URL;
                 localStorage.setItem('webappUrl', WEBAPP_URL);
+                isConnected = true;
+                document.getElementById('syncBtn').style.display = 'inline-block';
                 console.log('URL auto-configurada:', WEBAPP_URL);
             }
         }
 
-        // Função para mostrar/ocultar configurações
         function toggleConfig() {
             const configSection = document.getElementById('configSection');
             configSection.classList.toggle('show');
         }
 
-        // Função para mostrar/ocultar seção de limpeza
         function toggleClearData() {
             const clearSection = document.getElementById('clearDataSection');
             clearSection.classList.toggle('show');
         }
 
-        // Função para mostrar status de conexão
         function showStatus(message, type = 'success') {
             const statusDiv = document.getElementById('connectionStatus');
             statusDiv.className = `status-message status-${type}`;
@@ -1551,7 +1550,6 @@
             }, 5000);
         }
 
-        // Função para adicionar loading state aos botões
         function setButtonLoading(buttonId, loading = true) {
             const button = document.getElementById(buttonId);
             if (loading) {
@@ -1569,11 +1567,16 @@
                     button.textContent = '🗑️ Limpar Todos os Dados';
                 } else if (buttonId === 'clearTestBtn') {
                     button.textContent = '🧹 Limpar Apenas Testes';
+                } else if (buttonId === 'syncBtn') {
+                    button.textContent = '📤 Sincronizar Tudo';
                 }
             }
         }
 
-        // Inicializar campo telefone com detecção de país
+        // =====================================================
+        // FUNÇÕES DE FORMULÁRIO
+        // =====================================================
+        
         function initializePhoneInput() {
             const phoneInputElement = document.getElementById('contacto');
             
@@ -1735,7 +1738,10 @@
             }, 1000);
         }
 
-        // Testar conexão com Google Sheets
+        // =====================================================
+        // INTEGRAÇÃO COM GOOGLE SHEETS - FUSÃO MELHORADA
+        // =====================================================
+        
         async function testConnection() {
             const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
             
@@ -1747,6 +1753,7 @@
             setButtonLoading('testBtn', true);
             
             try {
+                // Primeiro teste com GET
                 const response = await fetch(url + '?action=test', {
                     method: 'GET',
                     mode: 'cors'
@@ -1763,6 +1770,7 @@
                 }
                 
             } catch (error) {
+                // Fallback: testar com POST no-cors
                 try {
                     await fetch(url, {
                         method: 'POST',
@@ -1776,6 +1784,7 @@
                     isConnected = true;
                     showStatus('✅ Conexão estabelecida (modo limitado)', 'success');
                     saveWebappUrl();
+                    document.getElementById('syncBtn').style.display = 'inline-block';
                     
                 } catch (fallbackError) {
                     showStatus('❌ Erro ao conectar. Verifique a URL e o deploy', 'error');
@@ -1786,7 +1795,6 @@
             }
         }
 
-        // Enviar dados para Google Sheets
         async function sendToSheets(serviceData) {
             const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
             
@@ -1809,6 +1817,7 @@
                 
                 console.log('✅ Requisição enviada');
                 
+                // Verificar status
                 try {
                     const checkResponse = await fetch(url + '?action=test', {
                         method: 'GET',
@@ -1833,7 +1842,6 @@
             }
         }
 
-        // Sincronizar todos os dados
         async function syncToSheets() {
             const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
             
@@ -1866,7 +1874,10 @@
             }
         }
 
-        // Limpar todos os dados
+        // =====================================================
+        // GERENCIAMENTO DE DADOS
+        // =====================================================
+        
         async function clearAllData() {
             const confirmText = prompt('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados!\n\nDigite "CONFIRMAR" para continuar:');
             
@@ -1928,7 +1939,6 @@
             }
         }
 
-        // Limpar apenas dados de teste
         async function clearTestData() {
             const confirmText = prompt('Limpar apenas registros de teste?\n\nDigite "TESTE" para confirmar:');
             
@@ -1992,7 +2002,6 @@
             }
         }
 
-        // Salvar URL do webapp
         function saveWebappUrl() {
             const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
             if (url) {
@@ -2002,7 +2011,6 @@
             }
         }
 
-        // Carregar dados
         function loadData() {
             const savedData = localStorage.getItem('partnershipTransferData');
             const savedUrl = localStorage.getItem('webappUrl');
@@ -2024,6 +2032,7 @@
                 document.getElementById('syncBtn').style.display = 'inline-block';
                 isConnected = true;
             } else {
+                // Auto-configurar URL padrão
                 document.getElementById('webappUrl').value = WEBAPP_URL;
                 localStorage.setItem('webappUrl', WEBAPP_URL);
                 document.getElementById('syncBtn').style.display = 'inline-block';
@@ -2031,7 +2040,6 @@
             }
         }
 
-        // Salvar dados
         function saveData() {
             try {
                 localStorage.setItem('partnershipTransferData', JSON.stringify(services));
@@ -2042,7 +2050,10 @@
             }
         }
 
-        // Renderizar tabela
+        // =====================================================
+        // RENDERIZAÇÃO E VISUALIZAÇÃO
+        // =====================================================
+        
         function renderTable() {
             const tbody = document.getElementById('servicesTableBody');
             tbody.innerHTML = '';
@@ -2135,7 +2146,6 @@
             });
         }
 
-        // Atualizar resumo
         function updateSummary() {
             const total = services.length;
             const pending = services.filter(s => s.status === 'Solicitado').length;
@@ -2167,7 +2177,10 @@
             });
         }
 
-        // Submeter formulário
+        // =====================================================
+        // SUBMISSÃO E VALIDAÇÃO DE FORMULÁRIO
+        // =====================================================
+        
         document.getElementById('transferForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -2187,7 +2200,7 @@
                 comissaoRecepcao = 5.00;
             } else {
                 valorHotel = valorTotal * 0.30;
-                comissaoRecepcao = 2.00; // Alterado de 2.50 para 2.00 euros
+                comissaoRecepcao = 2.00;
             }
             
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
@@ -2241,6 +2254,7 @@
                         const sheetSuccess = await sendToSheets(newService);
                         if (sheetSuccess) {
                             console.log('✅ Transfer enviado para Google Sheets com sucesso!');
+                            showStatus('Transfer adicionado com sucesso!', 'success');
                         } else {
                             showStatus('⚠️ Transfer adicionado localmente. Erro ao enviar para Sheets.', 'warning');
                         }
@@ -2267,7 +2281,6 @@
             }
         });
 
-        // Validar formulário
         function validateForm() {
             const requiredFields = [
                 'nomeCliente', 'numeroPessoas', 'data', 'contacto', 
@@ -2316,7 +2329,6 @@
             return labels[fieldId] || fieldId;
         }
 
-        // Limpar formulário
         function clearForm() {
             try {
                 document.getElementById('transferForm').reset();
@@ -2355,7 +2367,10 @@
             }
         }
 
-        // Editar serviço
+        // =====================================================
+        // EDIÇÃO E MANIPULAÇÃO DE SERVIÇOS
+        // =====================================================
+        
         function editService(id) {
             const service = services.find(s => s.id === id);
             if (!service) {
@@ -2377,6 +2392,7 @@
                 document.getElementById('pagoParaQuem').value = service.pagoParaQuem;
                 document.getElementById('observacoes').value = service.observacoes || '';
                 
+                // Restaurar tipo de serviço
                 if (service.tipoServico) {
                     currentServiceType = service.tipoServico;
                     document.querySelectorAll('.btn-service').forEach(btn => {
@@ -2449,7 +2465,6 @@
             });
         }
 
-        // Alterar status
         async function changeStatus(id) {
             const service = services.find(s => s.id === id);
             if (!service) {
@@ -2481,7 +2496,6 @@
             }
         }
 
-        // Deletar serviço
         function deleteService(id) {
             if (!confirm('Tem certeza que deseja deletar este serviço?')) {
                 return;
@@ -2506,7 +2520,10 @@
             }
         }
 
-        // Filtrar tabela
+        // =====================================================
+        // FILTROS E EXPORTAÇÃO
+        // =====================================================
+        
         function filterTable() {
             const statusFilter = document.getElementById('filterStatus').value;
             const dataFilter = document.getElementById('filterData').value;
@@ -2561,7 +2578,6 @@
             }
         }
 
-        // Exportar CSV
         function exportToCSV() {
             if (services.length === 0) {
                 showStatus('Não há dados para exportar!', 'warning');
@@ -2570,7 +2586,7 @@
 
             try {
                 const headers = [
-                    'ID', 'Cliente', 'Tipo Serviço', 'Pessoas', 'Bagagens', 'Data', 'Contacto', 
+                    'ID', 'Cliente', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 'Data', 'Contacto', 
                     'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor Total', 
                     'Valor Hotel', 'Valor HUB', 'Comissão Recepção',
                     'Pagamento', 'Pago Para', 'Status', 'Observações', 'Data Criação'
@@ -2583,6 +2599,7 @@
                         service.id,
                         `"${service.nomeCliente}"`,
                         `"${service.tipoServico || 'Transfer'}"`,
+                        `"${service.tourSelecionado || ''}"`,
                         service.numeroPessoas,
                         service.numeroBagagens,
                         service.data,
@@ -2608,7 +2625,7 @@
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', `transfers_marques_empire_hub_${new Date().toISOString().split('T')[0]}.csv`);
+                link.setAttribute('download', `transfers_impire_marques_hub_${new Date().toISOString().split('T')[0]}.csv`);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
@@ -2622,10 +2639,13 @@
             }
         }
 
-        // Inicializar aplicação
+        // =====================================================
+        // INICIALIZAÇÃO
+        // =====================================================
+        
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log('🚀 Inicializando Sistema de Transfers Hotel Marques Empire...');
+                console.log('🚀 Inicializando Sistema de Transfers Impire Marques Hotel v2.0 UNIFICADO...');
                 
                 // Mostrar botão admin
                 document.getElementById('adminToggle').style.display = 'block';
@@ -2654,6 +2674,15 @@
                 }, 2000);
                 
                 console.log('✅ Sistema inicializado com sucesso');
+                console.log('📋 Funcionalidades preservadas do código antigo:');
+                console.log('   - URL do webapp funcional');
+                console.log('   - Auto-configuração melhorada');
+                console.log('   - Conexão estável com Google Sheets');
+                console.log('📋 Funcionalidades do código novo integradas:');
+                console.log('   - Sistema de tours e private tours');
+                console.log('   - Cálculo dinâmico de preços');
+                console.log('   - Modo admin com controle de acesso');
+                console.log('   - Branding Impire Marques Hotel');
                 
             } catch (error) {
                 console.error('Erro na inicialização:', error);
@@ -2661,7 +2690,6 @@
             }
         });
 
-        // Inicializar Google Maps Autocomplete
         function initializeAutocomplete() {
             if (typeof google !== 'undefined' && google.maps && google.maps.places) {
                 try {
@@ -2695,14 +2723,16 @@
             }
         }
 
-        // Prevenir envio do formulário ao pressionar Enter nos botões
+        // =====================================================
+        // EVENT LISTENERS E UTILITÁRIOS
+        // =====================================================
+        
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && e.target.type === 'button') {
                 e.preventDefault();
             }
         });
 
-        // Adicionar eventos de teclado para melhor UX
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 const submitBtn = document.getElementById('submitBtn');
@@ -2716,7 +2746,6 @@
             }
         });
 
-        // Auto-save no localStorage a cada mudança
         let autoSaveTimeout;
         function scheduleAutoSave() {
             clearTimeout(autoSaveTimeout);
@@ -2729,9 +2758,9 @@
             saveData();
         });
 
-        // Função para debug/teste
+        // Função de debug para desenvolvimento
         function debugInfo() {
-            console.log('=== DEBUG INFO ===');
+            console.log('=== DEBUG INFO SISTEMA UNIFICADO ===');
             console.log('Services:', services.length);
             console.log('Connected:', isConnected);
             console.log('Editing ID:', editingId);
@@ -2741,13 +2770,14 @@
             console.log('WEBAPP URL:', WEBAPP_URL);
             console.log('Service Type:', currentServiceType);
             console.log('Admin Mode:', isAdminMode);
-            console.log('==================');
+            console.log('===================================');
         }
 
         window.debugInfo = debugInfo;
 
-        console.log('🚐 Sistema de Transfers Impire Marques Hotel & HUB Transfer v1.0');
+        console.log('🚐 Sistema de Transfers Impire Marques Hotel & HUB Transfer v2.0 UNIFICADO');
         console.log('💡 Digite debugInfo() no console para informações de debug.');
+        console.log('🔐 Senha admin: admin2025');
     </script>
 </body>
 </html>
