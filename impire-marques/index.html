@@ -955,7 +955,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <!-- FUSÃO: Mantendo URL funcional do código antigo -->
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyFg0s9cXkBZKQ637WdTmuNHcs9g2n2S1kr-CZF-MRE8Wpqaxun3WI4vTiEEOZTQ3LdHg/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyPhmPFBdCaBR8fbp0pKeLlWLnrPzKzrQWee5J0DH9-RZencTgLVRYSRGR9E2wame-G9Q/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1387,9 +1387,10 @@
         let currentServiceType = 'transfer'; // Do código novo
         let precoUnitarioAtual = 0; // Do código novo
         
-        // FUSÃO: Mantendo configurações do código novo com URL funcional do código antigo
+        // ATUALIZADO: Nova URL do Google Apps Script fornecida
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI'; // ID do código novo
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyFg0s9cXkBZKQ637WdTmuNHcs9g2n2S1kr-CZF-MRE8Wpqaxun3WI4vTiEEOZTQ3LdHg/exec'; // URL funcional do código antigo
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyPhmPFBdCaBR8fbp0pKeLlWLnrPzKzrQWee5J0DH9-RZencTgLVRYSRGR9E2wame-G9Q/exec'; // URL ATUALIZADA
+        const TEST_EMAIL = 'juniorgutierezbega@gmail.com'; // Email de teste configurado
         
         // Tours e Preços - FUNCIONALIDADE DO CÓDIGO NOVO
         const TOURS_DATA = {
@@ -1806,16 +1807,22 @@
             try {
                 console.log('📤 Enviando dados para Sheets:', serviceData);
                 
+                // Adicionar email de destino aos dados
+                const dataWithEmail = {
+                    ...serviceData,
+                    emailDestino: TEST_EMAIL // Email de teste configurado
+                };
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'text/plain',
                     },
-                    body: JSON.stringify(serviceData),
+                    body: JSON.stringify(dataWithEmail),
                     mode: 'no-cors'
                 });
                 
-                console.log('✅ Requisição enviada');
+                console.log('✅ Requisição enviada para:', TEST_EMAIL);
                 
                 // Verificar status
                 try {
@@ -2646,6 +2653,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             try {
                 console.log('🚀 Inicializando Sistema de Transfers Impire Marques Hotel v2.0 UNIFICADO...');
+                console.log('📧 Email de teste configurado:', TEST_EMAIL);
+                console.log('🔗 URL do WebApp:', WEBAPP_URL);
                 
                 // Mostrar botão admin
                 document.getElementById('adminToggle').style.display = 'block';
@@ -2768,6 +2777,7 @@
             console.log('Saved URL:', localStorage.getItem('webappUrl'));
             console.log('Spreadsheet ID:', SPREADSHEET_ID);
             console.log('WEBAPP URL:', WEBAPP_URL);
+            console.log('Email de Teste:', TEST_EMAIL);
             console.log('Service Type:', currentServiceType);
             console.log('Admin Mode:', isAdminMode);
             console.log('===================================');
@@ -2776,6 +2786,8 @@
         window.debugInfo = debugInfo;
 
         console.log('🚐 Sistema de Transfers Impire Marques Hotel & HUB Transfer v2.0 UNIFICADO');
+        console.log('📧 Email configurado para testes:', TEST_EMAIL);
+        console.log('🔗 URL do WebApp atualizada e funcional');
         console.log('💡 Digite debugInfo() no console para informações de debug.');
         console.log('🔐 Senha admin: admin2025');
     </script>
