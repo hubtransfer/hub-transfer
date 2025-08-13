@@ -3,11 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Parceria - Impire Marques Hotel & HUB Transfer</title>
-    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&loading=async"></script>
+    <title>Sistema de Parceria - Empire Marques Hotel & HUB Transfer</title>
+    
+    <!-- Google Maps API com callback e tratamento de erros -->
+    <script>
+        function initMap() {
+            // Callback quando o Maps carrega
+            console.log('✅ Google Maps carregado com sucesso!');
+            if (typeof initializeAutocomplete === 'function') {
+                initializeAutocomplete();
+            }
+        }
+        
+        // Tratamento de erro do Google Maps
+        window.gm_authFailure = function() {
+            console.error('❌ Erro de autenticação do Google Maps');
+            console.log('Usando sistema de sugestões local');
+            // Usar fallback sem Google Maps
+            if (typeof initializeAutocompleteWithoutGoogle === 'function') {
+                initializeAutocompleteWithoutGoogle();
+            }
+        };
+    </script>
+    
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap">
+    </script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
-
+    
     <style>
         * {
             margin: 0;
@@ -943,7 +968,7 @@
             <h1>🤝 Sistema de Parceria</h1>
             <p>Gestão de Transfers - Colaboração Empresarial</p>
             <div class="company-logos">
-                <div class="company-logo">🏨 Impire Marques Hotel</div>
+                <div class="company-logo">🏨 Empire Marques Hotel</div>
                 <div class="company-logo">🚐 HUB Transfer</div>
             </div>
         </div>
@@ -1132,8 +1157,8 @@
                                 ✈️ Aeroporto de Lisboa
                             </button>
                             <!-- FUSÃO: Usando nome do hotel do código NOVO -->
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Impire Marques Hotel')">
-                                🏨 Impire Marques Hotel
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
+                                🏨 Empire Marques Hotel
                             </button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
@@ -1143,8 +1168,8 @@
                         <label for="destino">Local de Destino *</label>
                         <div class="location-buttons">
                             <!-- FUSÃO: Usando nome do hotel do código NOVO -->
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Impire Marques Hotel')">
-                                🏨 Impire Marques Hotel
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
+                                🏨 Empire Marques Hotel
                             </button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
@@ -1240,7 +1265,7 @@
                     <!-- Campos Admin (ocultos por padrão) -->
                     <div class="admin-fields" id="adminFields">
                         <div class="calculation-row">
-                            <span class="calculation-label">Valor Impire Marques Hotel (30%):</span>
+                            <span class="calculation-label">Valor Empire Marques Hotel (30%):</span>
                             <span class="calculation-value" id="calcHotel">€0</span>
                         </div>
                         <div class="calculation-row">
@@ -2632,7 +2657,7 @@
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', `transfers_impire_marques_hub_${new Date().toISOString().split('T')[0]}.csv`);
+                link.setAttribute('download', `transfers_Empire_marques_hub_${new Date().toISOString().split('T')[0]}.csv`);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
@@ -2652,7 +2677,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log('🚀 Inicializando Sistema de Transfers Impire Marques Hotel v2.0 UNIFICADO...');
+                console.log('🚀 Inicializando Sistema de Transfers Empire Marques Hotel v2.0 UNIFICADO...');
                 console.log('📧 Email de teste configurado:', TEST_EMAIL);
                 console.log('🔗 URL do WebApp:', WEBAPP_URL);
                 
@@ -2691,7 +2716,7 @@
                 console.log('   - Sistema de tours e private tours');
                 console.log('   - Cálculo dinâmico de preços');
                 console.log('   - Modo admin com controle de acesso');
-                console.log('   - Branding Impire Marques Hotel');
+                console.log('   - Branding Empire Marques Hotel');
                 
             } catch (error) {
                 console.error('Erro na inicialização:', error);
@@ -2785,7 +2810,7 @@
 
         window.debugInfo = debugInfo;
 
-        console.log('🚐 Sistema de Transfers Impire Marques Hotel & HUB Transfer v2.0 UNIFICADO');
+        console.log('🚐 Sistema de Transfers Empire Marques Hotel & HUB Transfer v2.0 UNIFICADO');
         console.log('📧 Email configurado para testes:', TEST_EMAIL);
         console.log('🔗 URL do WebApp atualizada e funcional');
         console.log('💡 Digite debugInfo() no console para informações de debug.');
