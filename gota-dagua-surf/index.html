@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Parceria - Gota D' Agua & HUB Transfer</title>
+    <title>Sistema de Parceria - Gota d Agua & HUB Transfer</title>
     
     <!-- Google Maps API com callback e tratamento de erros -->
     <script>
@@ -28,7 +28,7 @@
     </script>
     
     <script async defer
-        src="src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap">
     </script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
@@ -969,7 +969,7 @@
             <h1>🤝 Sistema de Parceria</h1>
             <p>Gestão de Transfers - Colaboração Empresarial</p>
             <div class="company-logos">
-                <div class="company-logo">🏨 Gota D' Agua</div>
+                <div class="company-logo">🏨 Gota d Agua</div>
                 <div class="company-logo">🚐 HUB Transfer</div>
             </div>
         </div>
@@ -981,7 +981,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <!-- FUSÃO: Mantendo URL funcional do código antigo -->
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbw6N5Ia6ev4OrI7JlI-oiVzqUPHwVFZ9RS7ATouMMDhJzpkUmjBRZ5F0YLyvf-55WdD0A/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxcUtOng8f8PyYDIBuFOXw_mc6R2ayZFjW-IRPyFhE5LVeNJBoVzOdjTzt9EEv5MJoNvw/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1158,8 +1158,8 @@
                                 ✈️ Aeroporto de Lisboa
                             </button>
                             <!-- FUSÃO: Usando nome do hotel do código NOVO -->
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Gota D' Agua')">
-                                🏨 Gota D' Agua
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Gota d Agua')">
+                                🏨 Gota d Agua
                             </button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
@@ -1169,8 +1169,8 @@
                         <label for="destino">Local de Destino *</label>
                         <div class="location-buttons">
                             <!-- FUSÃO: Usando nome do hotel do código NOVO -->
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Gota D' Agua')">
-                                🏨 Gota D' Agua
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Gota d Agua')">
+                                🏨 Gota d Agua
                             </button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
@@ -1266,7 +1266,7 @@
                     <!-- Campos Admin (ocultos por padrão) -->
                     <div class="admin-fields" id="adminFields">
                         <div class="calculation-row">
-                            <span class="calculation-label">Valor Gota D' Agua (30%):</span>
+                            <span class="calculation-label">Valor Gota d Agua (30%):</span>
                             <span class="calculation-value" id="calcHotel">€0</span>
                         </div>
                         <div class="calculation-row">
@@ -1415,7 +1415,7 @@
         
         // ATUALIZADO: Nova URL do Google Apps Script fornecida
         const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A'; // ID do código novo
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw6N5Ia6ev4OrI7JlI-oiVzqUPHwVFZ9RS7ATouMMDhJzpkUmjBRZ5F0YLyvf-55WdD0A/exec'; // URL ATUALIZADA
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxcUtOng8f8PyYDIBuFOXw_mc6R2ayZFjW-IRPyFhE5LVeNJBoVzOdjTzt9EEv5MJoNvw/exec'; // URL ATUALIZADA
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com'; // Email de teste configurado
         
         // Tours e Preços - FUNCIONALIDADE DO CÓDIGO NOVO
@@ -2678,7 +2678,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log('🚀 Inicializando Sistema de Transfers Gota D' Agua v2.0 UNIFICADO...');
+                console.log('🚀 Inicializando Sistema de Transfers Gota d Agua v2.0 UNIFICADO...');
                 console.log('📧 Email de teste configurado:', TEST_EMAIL);
                 console.log('🔗 URL do WebApp:', WEBAPP_URL);
                 
@@ -2717,7 +2717,7 @@
                 console.log('   - Sistema de tours e private tours');
                 console.log('   - Cálculo dinâmico de preços');
                 console.log('   - Modo admin com controle de acesso');
-                console.log('   - Branding Gota D' Agua');
+                console.log('   - Branding Gota d Agua');
                 
             } catch (error) {
                 console.error('Erro na inicialização:', error);
@@ -2811,47 +2811,11 @@
 
         window.debugInfo = debugInfo;
 
-        console.log('🚐 Sistema de Transfers Gota D' Agua & HUB Transfer v2.0 UNIFICADO');
+        console.log('🚐 Sistema de Transfers Gota d Agua & HUB Transfer v2.0 UNIFICADO');
         console.log('📧 Email configurado para testes:', TEST_EMAIL);
         console.log('🔗 URL do WebApp atualizada e funcional');
         console.log('💡 Digite debugInfo() no console para informações de debug.');
         console.log('🔐 Senha admin: admin2025');
-// ADICIONAR ESTAS FUNÇÕES NO FINAL DO <script> PRINCIPAL (antes da tag </script> final)
-
-// Função para mostrar/ocultar configuração
-function toggleConfig() {
-    const configSection = document.getElementById('configSection');
-    if (configSection) {
-        configSection.classList.toggle('show');
-        console.log('📧 Configuração toggled:', configSection.classList.contains('show'));
-    } else {
-        console.error('❌ Elemento configSection não encontrado!');
-    }
-}
-
-// Função para mostrar/ocultar limpeza de dados
-function toggleClearData() {
-    const clearSection = document.getElementById('clearDataSection');
-    if (clearSection) {
-        clearSection.classList.toggle('show');
-        console.log('🗑️ Limpeza toggled:', clearSection.classList.contains('show'));
-    } else {
-        console.error('❌ Elemento clearDataSection não encontrado!');
-    }
-}
-
-// Auto-configurar URL na inicialização
-function autoConfigureUrl() {
-    const urlInput = document.getElementById('webappUrl');
-    const defaultUrl = 'https://script.google.com/macros/s/AKfycbw6N5Ia6ev4OrI7JlI-oiVzqUPHwVFZ9RS7ATouMMDhJzpkUmjBRZ5F0YLyvf-55WdD0A/exec';
-    
-    if (urlInput && !urlInput.value.trim()) {
-        urlInput.value = defaultUrl;
-        localStorage.setItem('webappUrl', defaultUrl);
-        console.log('🔗 URL auto-configurada:', defaultUrl);
-    }
-}
-
     </script>
 </body>
 </html>
