@@ -2816,6 +2816,42 @@
         console.log('🔗 URL do WebApp atualizada e funcional');
         console.log('💡 Digite debugInfo() no console para informações de debug.');
         console.log('🔐 Senha admin: admin2025');
+// ADICIONAR ESTAS FUNÇÕES NO FINAL DO <script> PRINCIPAL (antes da tag </script> final)
+
+// Função para mostrar/ocultar configuração
+function toggleConfig() {
+    const configSection = document.getElementById('configSection');
+    if (configSection) {
+        configSection.classList.toggle('show');
+        console.log('📧 Configuração toggled:', configSection.classList.contains('show'));
+    } else {
+        console.error('❌ Elemento configSection não encontrado!');
+    }
+}
+
+// Função para mostrar/ocultar limpeza de dados
+function toggleClearData() {
+    const clearSection = document.getElementById('clearDataSection');
+    if (clearSection) {
+        clearSection.classList.toggle('show');
+        console.log('🗑️ Limpeza toggled:', clearSection.classList.contains('show'));
+    } else {
+        console.error('❌ Elemento clearDataSection não encontrado!');
+    }
+}
+
+// Auto-configurar URL na inicialização
+function autoConfigureUrl() {
+    const urlInput = document.getElementById('webappUrl');
+    const defaultUrl = 'https://script.google.com/macros/s/AKfycbw6N5Ia6ev4OrI7JlI-oiVzqUPHwVFZ9RS7ATouMMDhJzpkUmjBRZ5F0YLyvf-55WdD0A/exec';
+    
+    if (urlInput && !urlInput.value.trim()) {
+        urlInput.value = defaultUrl;
+        localStorage.setItem('webappUrl', defaultUrl);
+        console.log('🔗 URL auto-configurada:', defaultUrl);
+    }
+}
+
     </script>
 </body>
 </html>
