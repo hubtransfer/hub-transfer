@@ -610,16 +610,22 @@
         </div>
 
 <!-- Configuração de URL -->
-<div class="roberta-info" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
-    <h3>🔧 Configuração Backend</h3>
-    <div style="margin-top: 15px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600;">URL do Backend:</label>
-        <input type="url" id="backendUrl" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #fff;" 
-               placeholder="https://script.google.com/macros/s/.../exec">
-        <button onclick="atualizarBackendUrl()" style="margin-top: 10px; padding: 10px 20px; background: #fff; color: #e74c3c; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-            🔄 Atualizar URL
+<!-- Seção de Configuração Discreta -->
+<div class="config-section" id="configSection">
+    <div class="config-title">🔗 Configuração do Backend</div>
+    <div class="config-form">
+        <div class="config-input">
+            <label for="backendUrl">URL do Google Apps Script:</label>
+            <input type="url" id="backendUrl" placeholder="https://script.google.com/macros/s/...">
+        </div>
+        <button type="button" class="btn btn-success" onclick="atualizarBackendUrl()" id="updateBtn">
+            🔗 Atualizar URL
+        </button>
+        <button type="button" class="btn btn-warning" onclick="toggleConfig()">
+            🔒 Fechar
         </button>
     </div>
+    <div id="configStatus" class="status-message"></div>
 </div>
 
         <!-- Conteúdo Principal -->
@@ -848,38 +854,41 @@
 
                    <!-- Botões de Ação -->
                    <div class="form-actions">
-                       <button type="submit" class="btn btn-primary" id="submitBtn">
-                           ✅ Solicitar Transfer
-                       </button>
-                       <button type="button" class="btn btn-success" onclick="limparFormulario()">
-                           🔄 Limpar Formulário
-                       </button>
-                       <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
-                           📋 Carregar Transfers
-                       </button>
-                       <button type="button" class="btn btn-danger" onclick="testarConexao()">
-                           🔧 Testar Conexão
-                       </button>
-                   </div>
-               </form>
+   <button type="submit" class="btn btn-primary" id="submitBtn">
+       ✅ Solicitar Transfer
+   </button>
+   <button type="button" class="btn btn-success" onclick="limparFormulario()">
+       🔄 Limpar Formulário
+   </button>
+   <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
+       📋 Carregar Transfers
+   </button>
+   <button type="button" class="btn btn-danger" onclick="testarConexao()">
+       🔧 Testar Conexão
+   </button>
+   <button type="button" class="btn btn-warning" onclick="toggleConfig()">
+       ⚙️ Configurar
+   </button>
+</div>
+</form>
 
-               <!-- Mensagem de Status -->
-               <div id="statusMessage" class="status-message"></div>
-           </div>
+<!-- Mensagem de Status -->
+<div id="statusMessage" class="status-message"></div>
+</div>
 
-           <!-- Seção de Visualização de Dados -->
-           <div class="data-section">
-               <h2 class="data-title">📋 Transfers Registrados</h2>
-               <div id="transfersContainer" class="transfers-grid">
-                   <div class="transfer-card">
-                       <div style="text-align: center; padding: 40px; color: #999;">
-                           <h3>Nenhum transfer carregado</h3>
-                           <p>Clique em "Carregar Transfers" para visualizar os dados</p>
-                       </div>
-                   </div>
-               </div>
+<!-- Seção de Visualização de Dados -->
+<div class="data-section">
+   <h2 class="data-title">📋 Transfers Registrados</h2>
+   <div id="transfersContainer" class="transfers-grid">
+       <div class="transfer-card">
+           <div style="text-align: center; padding: 40px; color: #999;">
+               <h3>Nenhum transfer carregado</h3>
+               <p>Clique em "Carregar Transfers" para visualizar os dados</p>
            </div>
        </div>
+   </div>
+</div>
+</div>
 
        <!-- Footer -->
        <div class="footer">
@@ -1991,6 +2000,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Função para mostrar/ocultar configuração
+function toggleConfig() {
+    const configSection = document.getElementById('configSection');
+    configSection.classList.toggle('show');
+    
+    if (configSection.classList.contains('show')) {
+        showNotification('⚙️ Painel de configuração aberto', 'success');
+    } else {
+        showNotification('🔒 Painel de configuração fechado', 'success');
+    }
+}
 
 // Função para limpar seleção de hotel
 function limparHotelOperadora() {
