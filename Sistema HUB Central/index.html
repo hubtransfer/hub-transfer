@@ -869,7 +869,7 @@
     <button type="button" class="btn btn-warning" onclick="toggleConfig()">
         ⚙️ Configurar
     </button>
-    <!-- ADICIONAR ESTE BOTÃO -->
+    <!-- ADICIONAR ESTA LINHA -->
     <button type="button" class="btn btn-danger" onclick="limparTodosOsDados()">
         🗑️ Limpar Dados
     </button>
@@ -2014,6 +2014,17 @@ function toggleConfig() {
         showNotification('⚙️ Painel de configuração aberto', 'success');
     } else {
         showNotification('🔒 Painel de configuração fechado', 'success');
+    }
+}
+
+// Função para limpar dados de demonstração
+function limparTodosOsDados() {
+    if (confirm('⚠️ Isso vai limpar todos os transfers carregados. Continuar?')) {
+        transfers = [];
+        const container = document.getElementById('transfersContainer');
+        container.innerHTML = '<div class="transfer-card"><div style="text-align: center; padding: 40px; color: #999;"><h3>Nenhum transfer carregado</h3><p>Clique em "Carregar Transfers" para visualizar os dados</p></div></div>';
+        localStorage.clear();
+        showNotification('🗑️ Todos os dados foram limpos!', 'success');
     }
 }
 
