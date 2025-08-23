@@ -854,21 +854,25 @@
 
                    <!-- Botões de Ação -->
                    <div class="form-actions">
-   <button type="submit" class="btn btn-primary" id="submitBtn">
-       ✅ Solicitar Transfer
-   </button>
-   <button type="button" class="btn btn-success" onclick="limparFormulario()">
-       🔄 Limpar Formulário
-   </button>
-   <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
-       📋 Carregar Transfers
-   </button>
-   <button type="button" class="btn btn-danger" onclick="testarConexao()">
-       🔧 Testar Conexão
-   </button>
-   <button type="button" class="btn btn-warning" onclick="toggleConfig()">
-       ⚙️ Configurar
-   </button>
+    <button type="submit" class="btn btn-primary" id="submitBtn">
+        ✅ Solicitar Transfer
+    </button>
+    <button type="button" class="btn btn-success" onclick="limparFormulario()">
+        🔄 Limpar Formulário
+    </button>
+    <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
+        📋 Carregar Transfers
+    </button>
+    <button type="button" class="btn btn-danger" onclick="testarConexao()">
+        🔧 Testar Conexão
+    </button>
+    <button type="button" class="btn btn-warning" onclick="toggleConfig()">
+        ⚙️ Configurar
+    </button>
+    <!-- ADICIONAR ESTE BOTÃO -->
+    <button type="button" class="btn btn-danger" onclick="limparTodosOsDados()">
+        🗑️ Limpar Dados
+    </button>
 </div>
 </form>
 
@@ -2010,6 +2014,31 @@ function toggleConfig() {
         showNotification('⚙️ Painel de configuração aberto', 'success');
     } else {
         showNotification('🔒 Painel de configuração fechado', 'success');
+    }
+}
+
+// Função para limpar todos os dados (para uso da equipe)
+function limparTodosOsDados() {
+    if (confirm('⚠️ Isso vai limpar todos os transfers carregados. Continuar?')) {
+        // Limpar array
+        transfers = [];
+        
+        // Limpar visualização
+        const container = document.getElementById('transfersContainer');
+        container.innerHTML = `
+            <div class="transfer-card">
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <h3>Nenhum transfer carregado</h3>
+                    <p>Clique em "Carregar Transfers" para visualizar os dados</p>
+                </div>
+            </div>
+        `;
+        
+        // Limpar cache local
+        localStorage.clear();
+        
+        showNotification('🗑️ Todos os dados foram limpos!', 'success');
+        console.log('🗑️ Sistema limpo pela equipe');
     }
 }
 
