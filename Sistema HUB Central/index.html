@@ -609,6 +609,19 @@
             <p>WhatsApp automático será enviado após confirmação do transfer (+351928283652)</p>
         </div>
 
+<!-- Configuração de URL -->
+<div class="roberta-info" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+    <h3>🔧 Configuração Backend</h3>
+    <div style="margin-top: 15px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">URL do Backend:</label>
+        <input type="url" id="backendUrl" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #fff;" 
+               placeholder="https://script.google.com/macros/s/.../exec">
+        <button onclick="atualizarBackendUrl()" style="margin-top: 10px; padding: 10px 20px; background: #fff; color: #e74c3c; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            🔄 Atualizar URL
+        </button>
+    </div>
+</div>
+
         <!-- Conteúdo Principal -->
         <div class="main-content">
             <!-- Seção do Formulário -->
@@ -627,22 +640,22 @@
                         <div class="form-group">
                             <label for="hotelOperadora">Hotel/Operadora de Origem *</label>
                             <div class="hotel-buttons">
-                                <button type="button" class="btn-hotel" onclick="setHotel('Empire Marques Hotel')">
-                                    🏨 Empire Marques
-                                </button>
-                                <button type="button" class="btn-hotel" onclick="setHotel('Hotel Lioz')">
-                                    🏨 Hotel Lioz
-                                </button>
-                                <button type="button" class="btn-hotel" onclick="setHotel('Empire Lisbon Hotel')">
-                                    🏨 Empire Lisbon
-                                </button>
-                                <button type="button" class="btn-hotel" onclick="setHotel('Gota d´água')">
-                                    🏨 Gota d'água
-                                </button>
-                            </div>
-                            <input type="text" id="hotelOperadora" required 
-                                   placeholder="Ou digite: World Driver, Nova Operadora...">
-                        </div>
+    <button type="button" class="btn-hotel" onclick="setHotel('WT Driver')">
+        🚐 WT Driver
+    </button>
+    <button type="button" class="btn-hotel" onclick="setHotel('Connecto')">
+        🔗 Connecto
+    </button>
+    <button type="button" class="btn-hotel" onclick="setHotel('HUB Transfer')">
+        🎯 HUB Transfer
+    </button>
+    <button type="button" class="btn-hotel" onclick="limparHotelOperadora()">
+        ✏️ Outro
+    </button>
+</div>
+<input type="text" id="hotelOperadora" required 
+       placeholder="Digite: World Driver, Nova Operadora..." style="margin-top: 10px;">
+                       </div>
 
                         <!-- Tipo de Serviço -->
                         <div class="form-group">
@@ -1069,42 +1082,95 @@
            clickedButton.classList.add('active');
        }
 
-       // =====================================================
-       // FUNÇÕES DE TELEFONE
-       // =====================================================
-       
-       function initializePhoneInput() {
-           const phoneInputElement = document.getElementById('contacto');
+// =====================================================
+// FUNÇÕES DE TELEFONE
+// =====================================================
+
+function initializePhoneInput() {
+   const phoneInputElement = document.getElementById('contacto');
+   
+   if (window.intlTelInput) {
+       phoneInput = window.intlTelInput(phoneInputElement, {
+           initialCountry: "pt",
+           preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
+           separateDialCode: true,
+           autoHideDialCode: false,
+           nationalMode: false,
+           formatOnDisplay: true,
+           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+       });
+
+       // NOVO: Detectar país automaticamente pelo DDI
+       phoneInputElement.addEventListener('input', function() {
+           const number = phoneInputElement.value.trim();
            
-           if (window.intlTelInput) {
-               phoneInput = window.intlTelInput(phoneInputElement, {
-                   initialCountry: "pt",
-                   preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
-                   separateDialCode: true,
-                   autoHideDialCode: false,
-                   nationalMode: false,
-                   formatOnDisplay: true,
-                   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-               });
-
-               phoneInputElement.addEventListener('blur', function() {
-                   if (phoneInput.isValidNumber()) {
-                       phoneInputElement.value = phoneInput.getNumber();
-                   }
-               });
-               
-               console.log('📱 Campo de telefone inicializado');
-           } else {
-               console.warn('⚠️ Biblioteca intlTelInput não carregada');
+           // Se começar com +, detectar país
+           if (number.startsWith('+')) {
+               const countryCode = detectCountryFromDDI(number);
+               if (countryCode && countryCode !== phoneInput.getSelectedCountryData().iso2) {
+                   phoneInput.setCountry(countryCode);
+                   console.log(`🌍 País detectado: ${countryCode} para ${number.substring(0, 4)}`);
+               }
            }
-       }
+       });
 
-       function getFormattedPhoneNumber() {
-           if (phoneInput && phoneInput.isValidNumber()) {
-               return phoneInput.getNumber();
+       phoneInputElement.addEventListener('blur', function() {
+           if (phoneInput.isValidNumber()) {
+               phoneInputElement.value = phoneInput.getNumber();
            }
-           return document.getElementById('contacto').value;
+       });
+       
+       console.log('📱 Campo de telefone inicializado com DDI automático');
+   } else {
+       console.warn('⚠️ Biblioteca intlTelInput não carregada');
+   }
+}
+
+// NOVA FUNÇÃO: Detectar país pelo DDI
+function detectCountryFromDDI(number) {
+   const ddiMap = {
+       '+351': 'pt', // Portugal
+       '+55': 'br',  // Brasil
+       '+34': 'es',  // Espanha
+       '+33': 'fr',  // França
+       '+49': 'de',  // Alemanha
+       '+1': 'us',   // EUA/Canadá
+       '+44': 'gb',  // Reino Unido
+       '+39': 'it',  // Itália
+       '+31': 'nl',  // Holanda
+       '+32': 'be',  // Bélgica
+       '+41': 'ch',  // Suíça
+       '+43': 'at',  // Áustria
+       '+45': 'dk',  // Dinamarca
+       '+46': 'se',  // Suécia
+       '+47': 'no',  // Noruega
+       '+54': 'ar',  // Argentina
+       '+56': 'cl',  // Chile
+       '+57': 'co',  // Colômbia
+       '+58': 've',  // Venezuela
+       '+52': 'mx',  // México
+       '+213': 'dz', // Argélia
+       '+212': 'ma', // Marrocos
+       '+27': 'za'   // África do Sul
+   };
+
+   // Testar DDIs de 4 dígitos primeiro, depois 3, depois 2
+   for (let i = 4; i >= 2; i--) {
+       const ddi = number.substring(0, i);
+       if (ddiMap[ddi]) {
+           return ddiMap[ddi];
        }
+   }
+   
+   return null;
+}
+
+function getFormattedPhoneNumber() {
+   if (phoneInput && phoneInput.isValidNumber()) {
+       return phoneInput.getNumber();
+   }
+   return document.getElementById('contacto').value;
+}
 
        // =====================================================
        // FUNÇÕES DO GOOGLE MAPS
@@ -1226,7 +1292,7 @@
        function coletarDadosFormulario() {
            return {
                nomeCliente: document.getElementById('nomeCliente').value.trim(),
-               operadora: document.getElementById('hotelOperadora').value.trim(),
+               hotelOperadora: document.getElementById('hotelOperadora').value.trim(),
                tipoServico: document.getElementById('tipoServico').value,
                numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
                numeroBagagens: parseInt(document.getElementById('numeroBagagens').value) || 0,
@@ -1236,9 +1302,9 @@
                numeroVoo: document.getElementById('numeroVoo').value.trim(),
                origem: document.getElementById('origem').value.trim(),
                destino: document.getElementById('destino').value.trim(),
-               valorServico: parseFloat(document.getElementById('valorServico').value),
-               formaPagamento: document.getElementById('formaPagamento').value,
-               cobranca: document.getElementById('cobranca').value,
+               valorTotal: parseFloat(document.getElementById('valorServico').value),
+               modoPagamento: document.getElementById('formaPagamento').value,
+               pagoParaQuem: document.getElementById('cobranca').value,
                observacoes: document.getElementById('observacoes').value.trim(),
                
                // Dados do sistema
@@ -1532,31 +1598,65 @@
        }
 
        function limparFormulario() {
-           try {
-               document.getElementById('transferForm').reset();
-               
-               // Limpar seleções ativas
-               document.querySelectorAll('.btn-hotel, .btn-quick').forEach(btn => {
-                   btn.classList.remove('active');
-               });
-               
-               // Resetar valores específicos
-               document.getElementById('numeroBagagens').value = '0';
-               document.getElementById('data').value = new Date().toISOString().split('T')[0];
-               
-               // Limpar telefone se inicializado
-               if (phoneInput) {
-                   phoneInput.setNumber('');
-               }
-               
-               showNotification('🔄 Formulário limpo', 'success');
-               
-           } catch (error) {
-               console.error('Erro ao limpar formulário:', error);
-               showNotification('❌ Erro ao limpar formulário', 'error');
-           }
-       }
-
+    try {
+        // Resetar o formulário HTML
+        document.getElementById('transferForm').reset();
+        
+        // Limpar campos específicos que podem não resetar
+        document.getElementById('nomeCliente').value = '';
+        document.getElementById('hotelOperadora').value = '';
+        document.getElementById('tipoServico').value = 'Transfer';
+        document.getElementById('numeroPessoas').value = '';
+        document.getElementById('numeroBagagens').value = '0';
+        document.getElementById('contacto').value = '';
+        document.getElementById('numeroVoo').value = '';
+        document.getElementById('origem').value = '';
+        document.getElementById('destino').value = '';
+        document.getElementById('valorServico').value = '';
+        document.getElementById('formaPagamento').value = '';
+        document.getElementById('cobranca').value = '';
+        document.getElementById('observacoes').value = '';
+        
+        // Resetar data para hoje
+        const hoje = new Date();
+        document.getElementById('data').value = hoje.toISOString().split('T')[0];
+        
+        // Limpar hora
+        document.getElementById('horaPickup').value = '';
+        
+        // Limpar todas as seleções ativas
+        document.querySelectorAll('.btn-hotel, .btn-quick').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Limpar telefone se inicializado
+        if (phoneInput) {
+            phoneInput.setNumber('');
+        }
+        
+        // Resetar variáveis
+        isSubmitting = false;
+        
+        // Focar no primeiro campo
+        document.getElementById('nomeCliente').focus();
+        
+        showNotification('🔄 Formulário limpo com sucesso', 'success');
+        console.log('✅ Formulário limpo');
+        
+    } catch (error) {
+        console.error('❌ Erro ao limpar formulário:', error);
+        
+        // Fallback: tentar resetar pelo menos o formulário base
+        try {
+            document.getElementById('transferForm').reset();
+            document.getElementById('data').value = new Date().toISOString().split('T')[0];
+            document.getElementById('numeroBagagens').value = '0';
+            showNotification('⚠️ Formulário parcialmente limpo', 'warning');
+        } catch (fallbackError) {
+            showNotification('❌ Erro ao limpar formulário', 'error');
+        }
+    }
+}
        function setButtonLoading(buttonId, loading = true) {
            const button = document.getElementById(buttonId);
            if (!button) return;
@@ -1851,7 +1951,62 @@
                localStorage.setItem('hub_welcome_shown', 'true');
            }
        }, 5000);
-       
+// Função para atualizar URL do backend
+function atualizarBackendUrl() {
+    const novaUrl = document.getElementById('backendUrl').value.trim();
+    
+    if (!novaUrl) {
+        showNotification('❌ Digite uma URL válida', 'error');
+        return;
+    }
+    
+    if (!novaUrl.startsWith('https://script.google.com/macros/')) {
+        showNotification('❌ URL deve ser do Google Apps Script', 'error');
+        return;
+    }
+    
+    // Atualizar a configuração
+    HUB_CONFIG.WEBAPP_URL = novaUrl;
+    
+    // Salvar no localStorage
+    localStorage.setItem('hub_backend_url', novaUrl);
+    
+    showNotification('✅ URL do backend atualizada!', 'success');
+    console.log('🔗 Nova URL:', novaUrl);
+}
+
+// Carregar URL salva na inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    const urlSalva = localStorage.getItem('hub_backend_url');
+    if (urlSalva) {
+        HUB_CONFIG.WEBAPP_URL = urlSalva;
+        if (document.getElementById('backendUrl')) {
+            document.getElementById('backendUrl').value = urlSalva;
+        }
+        console.log('🔗 URL carregada do localStorage:', urlSalva);
+    } else {
+        // Mostrar URL atual no campo
+        if (document.getElementById('backendUrl')) {
+            document.getElementById('backendUrl').value = HUB_CONFIG.WEBAPP_URL;
+        }
+    }
+});
+
+// Função para limpar seleção de hotel
+function limparHotelOperadora() {
+    document.getElementById('hotelOperadora').value = '';
+    document.getElementById('hotelOperadora').focus();
+    
+    // Remover classe active de todos os botões hotel
+    document.querySelectorAll('.btn-hotel').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Ativar apenas o botão "Outro"
+    event.target.classList.add('active');
+    
+    showNotification('✏️ Digite o nome da operadora', 'success');
+}       
    </script>
 </body>
 </html>
