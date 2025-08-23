@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Sistema HUB Central - HUB Transfer</title>
+    
+    <!-- Google Maps API -->
+    <script>
+        function initMap() {
+            console.log('✅ Google Maps carregado com sucesso!');
+            if (typeof initializeAutocomplete === 'function') {
+                initializeAutocomplete();
+            }
+        }
+        
+        window.gm_authFailure = function() {
+            console.error('❌ Erro de autenticação do Google Maps');
+            console.log('Usando sistema de sugestões local');
+        };
+    </script>
+    
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap">
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --hub-primary: #2c3e50;
+            --hub-secondary: #3498db;
+            --hub-accent: #FFD700;
+            --hub-black: #000000;
+            --hub-success: #27ae60;
+            --hub-warning: #f39c12;
+            --hub-danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--hub-black) 0%, var(--hub-primary) 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--hub-black) 0%, var(--hub-primary) 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--hub-accent);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .company-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .company-logo {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid var(--hub-accent);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--hub-accent);
+        }
+
+        .roberta-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--hub-accent);
+            margin: 0 auto 15px;
+            display: block;
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .form-section {
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .form-title {
+            color: var(--hub-primary);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid var(--hub-accent);
+            padding-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: var(--hub-primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--hub-accent);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Botões de Hotel/Operadora - NOVA FUNCIONALIDADE */
+        .hotel-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-hotel {
+            padding: 15px 20px;
+            border: 2px solid var(--hub-accent);
+            border-radius: 12px;
+            background: white;
+            color: var(--hub-primary);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-hotel:hover {
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-hotel.active {
+            background: var(--hub-primary);
+            color: var(--hub-accent);
+            border-color: var(--hub-primary);
+            box-shadow: 0 6px 15px rgba(44, 62, 80, 0.4);
+        }
+
+        /* Botões rápidos */
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-quick {
+            padding: 10px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            color: var(--hub-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-quick:hover {
+            border-color: var(--hub-accent);
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-quick.active {
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            border-color: var(--hub-accent);
+        }
+
+        /* Botões de ação */
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--hub-accent) 0%, #FFA500 100%);
+            color: var(--hub-black);
+            font-weight: 900;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--hub-success) 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--hub-warning) 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--hub-danger) 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* Status e mensagens */
+        .status-message {
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+
+        /* Seção de visualização dos dados */
+        .data-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .data-title {
+            color: var(--hub-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .transfers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .transfer-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--hub-accent);
+            transition: transform 0.3s ease;
+        }
+
+        .transfer-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .transfer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .transfer-id {
+            background: var(--hub-primary);
+            color: var(--hub-accent);
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .transfer-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-solicitado {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-finalizado {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .transfer-client {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--hub-primary);
+            margin-bottom: 10px;
+        }
+
+        .transfer-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .transfer-detail:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--hub-primary);
+        }
+
+        .hotel-badge {
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Loading animation */
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Telefone com flag */
+        .phone-container {
+            position: relative;
+        }
+
+        .iti {
+            width: 100%;
+        }
+
+        .iti__country-list {
+            z-index: 9999;
+        }
+
+        .iti__selected-flag {
+            padding: 15px 12px;
+        }
+
+        #contacto {
+            padding-left: 70px;
+        }
+
+        /* Roberta HUB Info Box */
+        .roberta-info {
+            background: linear-gradient(135deg, var(--hub-accent) 0%, #FFA500 100%);
+            color: var(--hub-black);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .roberta-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hotel-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .company-logos {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Sistema de notificações */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 10000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: var(--hub-success);
+            color: white;
+        }
+
+        .notification.error {
+            background: var(--hub-danger);
+            color: white;
+        }
+
+        .notification.warning {
+            background: var(--hub-warning);
+            color: white;
+        }
+
+        /* Footer HUB */
+        .footer {
+            background: var(--hub-black);
+            color: var(--hub-accent);
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+            border-radius: 20px;
+        }
+
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Principal -->
+        <div class="header">
+            <div class="roberta-avatar">🤖</div>
+            <h1>🎯 Sistema HUB Central</h1>
+            <p>Gestão Centralizada de Transfers - HUB Transfer</p>
+            <div class="company-logos">
+                <div class="company-logo">🏢 HUB Transfer - Central</div>
+                <div class="company-logo">🔗 Multi-Hotéis</div>
+            </div>
+        </div>
+
+        <!-- Roberta HUB Info -->
+        <div class="roberta-info">
+            <h3>🤖 Roberta HUB - Assistente Virtual</h3>
+            <p>WhatsApp automático será enviado após confirmação do transfer (+351928283652)</p>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <!-- Seção do Formulário -->
+            <div class="form-section">
+                <h2 class="form-title">➕ Solicitar Novo Transfer</h2>
+                
+                <form id="transferForm">
+                    <div class="form-grid">
+                        <!-- Nome do Cliente -->
+                        <div class="form-group">
+                            <label for="nomeCliente">Nome do Cliente *</label>
+                            <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+                        </div>
+
+                        <!-- Hotel/Operadora de Origem - NOVO CAMPO -->
+                        <div class="form-group">
+                            <label for="hotelOperadora">Hotel/Operadora de Origem *</label>
+                            <div class="hotel-buttons">
+                                <button type="button" class="btn-hotel" onclick="setHotel('Empire Marques Hotel')">
+                                    🏨 Empire Marques
+                                </button>
+                                <button type="button" class="btn-hotel" onclick="setHotel('Hotel Lioz')">
+                                    🏨 Hotel Lioz
+                                </button>
+                                <button type="button" class="btn-hotel" onclick="setHotel('Empire Lisbon Hotel')">
+                                    🏨 Empire Lisbon
+                                </button>
+                                <button type="button" class="btn-hotel" onclick="setHotel('Gota d´água')">
+                                    🏨 Gota d'água
+                                </button>
+                            </div>
+                            <input type="text" id="hotelOperadora" required 
+                                   placeholder="Ou digite: World Driver, Nova Operadora...">
+                        </div>
+
+                        <!-- Tipo de Serviço -->
+                        <div class="form-group">
+                            <label for="tipoServico">Tipo de Serviço</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setTipoServico('Transfer')">
+                                    🚕 Transfer
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setTipoServico('Tour Regular')">
+                                    🚐 Tour Regular
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setTipoServico('Private Tour')">
+                                    🚗 Private Tour
+                                </button>
+                            </div>
+                            <select id="tipoServico" required>
+                                <option value="Transfer">Transfer</option>
+                                <option value="Tour Regular">Tour Regular</option>
+                                <option value="Private Tour">Private Tour</option>
+                            </select>
+                        </div>
+
+                        <!-- Número de Pessoas -->
+                        <div class="form-group">
+                            <label for="numeroPessoas">Número de Pessoas *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setPessoas(1)">1</button>
+                                <button type="button" class="btn-quick" onclick="setPessoas(2)">2</button>
+                                <button type="button" class="btn-quick" onclick="setPessoas(3)">3</button>
+                                <button type="button" class="btn-quick" onclick="setPessoas(4)">4</button>
+                                <button type="button" class="btn-quick" onclick="setPessoas(5)">5</button>
+                                <button type="button" class="btn-quick" onclick="setPessoas(6)">6+</button>
+                            </div>
+                            <input type="number" id="numeroPessoas" min="1" max="20" required>
+                        </div>
+
+                        <!-- Número de Bagagens -->
+                        <div class="form-group">
+                            <label for="numeroBagagens">Número de Bagagens</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setBagagens(0)">0</button>
+                                <button type="button" class="btn-quick" onclick="setBagagens(1)">1</button>
+                                <button type="button" class="btn-quick" onclick="setBagagens(2)">2</button>
+                                <button type="button" class="btn-quick" onclick="setBagagens(3)">3</button>
+                                <button type="button" class="btn-quick" onclick="setBagagens(4)">4</button>
+                                <button type="button" class="btn-quick" onclick="setBagagens(5)">5+</button>
+                            </div>
+                            <input type="number" id="numeroBagagens" min="0" max="20" value="0">
+                        </div>
+
+                        <!-- Data do Transfer -->
+                        <div class="form-group">
+                            <label for="data">Data do Transfer *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setData('hoje')">Hoje</button>
+                                <button type="button" class="btn-quick" onclick="setData('amanha')">Amanhã</button>
+                            </div>
+                            <input type="date" id="data" required>
+                        </div>
+
+                        <!-- Hora de Pick-up -->
+                        <div class="form-group">
+                            <label for="horaPickup">Hora de Pick-up *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setHora('06:00')">06:00</button>
+                                <button type="button" class="btn-quick" onclick="setHora('08:00')">08:00</button>
+                                <button type="button" class="btn-quick" onclick="setHora('10:00')">10:00</button>
+                                <button type="button" class="btn-quick" onclick="setHora('12:00')">12:00</button>
+                                <button type="button" class="btn-quick" onclick="setHora('14:00')">14:00</button>
+                                <button type="button" class="btn-quick" onclick="setHora('16:00')">16:00</button>
+                            </div>
+                            <input type="time" id="horaPickup" required>
+                        </div>
+
+                        <!-- Contacto do Cliente -->
+                        <div class="form-group">
+                            <label for="contacto">Contacto do Cliente *</label>
+                            <div class="phone-container">
+                                <input type="tel" id="contacto" required placeholder="Digite o número...">
+                            </div>
+                        </div>
+
+                        <!-- Número do Voo -->
+                        <div class="form-group">
+                            <label for="numeroVoo">Número do Voo</label>
+                            <input type="text" id="numeroVoo" placeholder="Ex: TP1234">
+                        </div>
+
+                        <!-- Local de Origem -->
+                        <div class="form-group">
+                            <label for="origem">Local de Origem *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setOrigem('Aeroporto de Lisboa')">
+                                    ✈️ Aeroporto
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setOrigem('Centro de Lisboa')">
+                                    🏛️ Centro
+                                </button>
+                            </div>
+                            <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
+                        </div>
+
+                        <!-- Local de Destino -->
+                        <div class="form-group">
+                            <label for="destino">Local de Destino *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setDestino('Aeroporto de Lisboa')">
+                                    ✈️ Aeroporto
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setDestino('Centro de Lisboa')">
+                                    🏛️ Centro
+                                </button>
+                            </div>
+                            <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
+                        </div>
+
+                        <!-- Valor do Serviço -->
+                        <div class="form-group">
+                            <label for="valorServico">Valor do Serviço (€) *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setValor(25)">€25</button>
+                                <button type="button" class="btn-quick" onclick="setValor(35)">€35</button>
+                                <button type="button" class="btn-quick" onclick="setValor(45)">€45</button>
+                                <button type="button" class="btn-quick" onclick="setValor(60)">€60</button>
+                                <button type="button" class="btn-quick" onclick="setValor(75)">€75</button>
+                                <button type="button" class="btn-quick" onclick="setValor(100)">€100</button>
+                            </div>
+                            <input type="number" id="valorServico" step="0.01" required placeholder="Ou digite valor...">
+                        </div>
+
+                        <!-- Forma de Pagamento -->
+                        <div class="form-group">
+                            <label for="formaPagamento">Forma de Pagamento *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Dinheiro')">
+                                    💵 Dinheiro
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Multibanco')">
+                                    💳 Multibanco
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Transferência')">
+                                    🏦 Transferência
+                                </button>
+                            </div>
+                            <select id="formaPagamento" required>
+                                <option value="">Selecionar...</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Multibanco">Multibanco</option>
+                                <option value="Transferência">Transferência Bancária</option>
+                                <option value="PayPal">PayPal</option>
+                            </select>
+                        </div>
+
+                        <!-- Pago Para -->
+                        <div class="form-group">
+                            <label for="cobranca">Pago Para *</label>
+                            <div class="quick-buttons">
+                                <button type="button" class="btn-quick" onclick="setCobranca('Motorista')">
+                                    🚐 Motorista
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setCobranca('Operador')">
+                                    👤 Operador
+                                </button>
+                                <button type="button" class="btn-quick" onclick="setCobranca('Parceiro')">
+                                    🤝 Parceiro
+                                </button>
+                            </div>
+                            <select id="cobranca" required>
+                                <option value="">Selecionar...</option>
+                                <option value="Motorista">Motorista</option>
+                                <option value="Operador">Operador</option>
+                                <option value="Parceiro">Parceiro</option>
+                                <option value="Banco">Banco</option>
+                                <option value="Empresa">Empresa</option>
+                            </select>
+                        </div>
+
+<!-- Observações -->
+                       <div class="form-group">
+                           <label for="observacoes">Observações</label>
+                           <div class="quick-buttons">
+                               <button type="button" class="btn-quick" onclick="addObservacao('Bagagem extra')">Bagagem Extra</button>
+                               <button type="button" class="btn-quick" onclick="addObservacao('Cliente VIP')">VIP</button>
+                               <button type="button" class="btn-quick" onclick="addObservacao('Transfer urgente')">Urgente</button>
+                               <button type="button" class="btn-quick" onclick="addObservacao('Com criança')">Com Criança</button>
+                           </div>
+                           <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                       </div>
+                   </div>
+
+                   <!-- Botões de Ação -->
+                   <div class="form-actions">
+                       <button type="submit" class="btn btn-primary" id="submitBtn">
+                           ✅ Solicitar Transfer
+                       </button>
+                       <button type="button" class="btn btn-success" onclick="limparFormulario()">
+                           🔄 Limpar Formulário
+                       </button>
+                       <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
+                           📋 Carregar Transfers
+                       </button>
+                       <button type="button" class="btn btn-danger" onclick="testarConexao()">
+                           🔧 Testar Conexão
+                       </button>
+                   </div>
+               </form>
+
+               <!-- Mensagem de Status -->
+               <div id="statusMessage" class="status-message"></div>
+           </div>
+
+           <!-- Seção de Visualização de Dados -->
+           <div class="data-section">
+               <h2 class="data-title">📋 Transfers Registrados</h2>
+               <div id="transfersContainer" class="transfers-grid">
+                   <div class="transfer-card">
+                       <div style="text-align: center; padding: 40px; color: #999;">
+                           <h3>Nenhum transfer carregado</h3>
+                           <p>Clique em "Carregar Transfers" para visualizar os dados</p>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <!-- Footer -->
+       <div class="footer">
+           <h3>🚐 HUB Transfer - Sistema Central</h3>
+           <p>Gestão inteligente de transfers com Roberta HUB</p>
+       </div>
+   </div>
+
+   <!-- Notificação -->
+   <div id="notification" class="notification"></div>
+
+   <script>
+       // =====================================================
+       // CONFIGURAÇÕES DO SISTEMA HUB CENTRAL
+       // =====================================================
+       
+       const HUB_CONFIG = {
+           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbzglEsakiuJx-YPETz0mUR7ozpno591wRXvgTufJfjhIakI499x1rD1hfVhpI1487Ox/exec',
+           SPREADSHEET_URL: 'https://docs.google.com/spreadsheets/d/1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
+           SYSTEM_NAME: 'Sistema HUB Central',
+           VERSION: '1.0-HUB-FRONTEND',
+           
+           // Operadoras disponíveis
+           OPERADORAS: [
+               { id: 'wt', nome: 'WT', cor: '#e74c3c' },
+               { id: 'connecto', nome: 'Connecto', cor: '#3498db' },
+               { id: 'hub_transfer', nome: 'HUB Transfer', cor: '#2ecc71' }
+           ],
+           
+           // Validações
+           VALIDACOES: {
+               nomeCliente: { min: 2, max: 100 },
+               numeroPessoas: { min: 1, max: 8 },
+               valorServico: { min: 5.00, max: 500.00 },
+               contacto: /^\+351\d{9}$/
+           }
+       };
+
+       // =====================================================
+       // VARIÁVEIS GLOBAIS
+       // =====================================================
+       
+       let phoneInput = null;
+       let isSubmitting = false;
+       let transfers = [];
+
+       // =====================================================
+       // FUNÇÕES DE INICIALIZAÇÃO
+       // =====================================================
+       
+       document.addEventListener('DOMContentLoaded', function() {
+           console.log('🚀 Inicializando Sistema HUB Central...');
+           
+           // Definir data de hoje como padrão
+           const hoje = new Date();
+           document.getElementById('data').value = hoje.toISOString().split('T')[0];
+           
+           // Inicializar campo de telefone
+           setTimeout(initializePhoneInput, 1000);
+           
+           // Inicializar Google Maps Autocomplete
+           setTimeout(initializeAutocomplete, 2000);
+           
+           // Configurar event listeners
+           setupEventListeners();
+           
+           console.log('✅ Sistema HUB Central inicializado');
+           console.log('📧 Roberta HUB: WhatsApp automático para transfers confirmados');
+           console.log('🔗 Backend URL:', HUB_CONFIG.WEBAPP_URL);
+       });
+
+       function setupEventListeners() {
+           // Submissão do formulário
+           document.getElementById('transferForm').addEventListener('submit', handleFormSubmit);
+           
+           // Atalhos de teclado
+           document.addEventListener('keydown', function(e) {
+               if (e.ctrlKey && e.key === 'Enter') {
+                   const submitBtn = document.getElementById('submitBtn');
+                   if (!submitBtn.disabled) {
+                       submitBtn.click();
+                   }
+               }
+               
+               if (e.key === 'Escape') {
+                   limparFormulario();
+               }
+           });
+       }
+
+       // =====================================================
+       // FUNÇÕES DE INTERFACE - BOTÕES RÁPIDOS
+       // =====================================================
+       
+       function setHotel(nomeHotel) {
+           document.getElementById('hotelOperadora').value = nomeHotel;
+           
+           // Atualizar botões
+           document.querySelectorAll('.btn-hotel').forEach(btn => {
+               btn.classList.remove('active');
+           });
+           event.target.classList.add('active');
+           
+           showNotification(`Hotel selecionado: ${nomeHotel}`, 'success');
+       }
+
+       function setTipoServico(tipo) {
+           document.getElementById('tipoServico').value = tipo;
+           
+           // Atualizar botões
+           document.querySelectorAll('.btn-quick').forEach(btn => {
+               if (btn.onclick && btn.onclick.toString().includes('setTipoServico')) {
+                   btn.classList.remove('active');
+               }
+           });
+           event.target.classList.add('active');
+       }
+
+       function setPessoas(numero) {
+           document.getElementById('numeroPessoas').value = numero;
+           updateActiveButton(event.target, 'setPessoas');
+       }
+
+       function setBagagens(numero) {
+           document.getElementById('numeroBagagens').value = numero;
+           updateActiveButton(event.target, 'setBagagens');
+       }
+
+       function setData(opcao) {
+           const hoje = new Date();
+           const dataInput = document.getElementById('data');
+           
+           if (opcao === 'hoje') {
+               dataInput.value = hoje.toISOString().split('T')[0];
+           } else if (opcao === 'amanha') {
+               const amanha = new Date(hoje);
+               amanha.setDate(amanha.getDate() + 1);
+               dataInput.value = amanha.toISOString().split('T')[0];
+           }
+           
+           updateActiveButton(event.target, 'setData');
+       }
+
+       function setHora(hora) {
+           document.getElementById('horaPickup').value = hora;
+           updateActiveButton(event.target, 'setHora');
+       }
+
+       function setOrigem(local) {
+           document.getElementById('origem').value = local;
+           updateActiveButton(event.target, 'setOrigem');
+       }
+
+       function setDestino(local) {
+           document.getElementById('destino').value = local;
+           updateActiveButton(event.target, 'setDestino');
+       }
+
+       function setValor(valor) {
+           document.getElementById('valorServico').value = valor;
+           updateActiveButton(event.target, 'setValor');
+       }
+
+       function setFormaPagamento(forma) {
+           document.getElementById('formaPagamento').value = forma;
+           updateActiveButton(event.target, 'setFormaPagamento');
+       }
+
+       function setCobranca(cobranca) {
+           document.getElementById('cobranca').value = cobranca;
+           updateActiveButton(event.target, 'setCobranca');
+       }
+
+       function addObservacao(texto) {
+           const obsInput = document.getElementById('observacoes');
+           const textoAtual = obsInput.value;
+           
+           if (textoAtual === '') {
+               obsInput.value = texto;
+           } else {
+               obsInput.value = textoAtual + '; ' + texto;
+           }
+           
+           // Efeito visual temporário
+           event.target.classList.add('active');
+           setTimeout(() => {
+               event.target.classList.remove('active');
+           }, 1000);
+       }
+
+       function updateActiveButton(clickedButton, functionName) {
+           // Remover classe active de todos os botões da mesma função
+           document.querySelectorAll('.btn-quick').forEach(btn => {
+               if (btn.onclick && btn.onclick.toString().includes(functionName)) {
+                   btn.classList.remove('active');
+               }
+           });
+           
+           // Adicionar classe active ao botão clicado
+           clickedButton.classList.add('active');
+       }
+
+       // =====================================================
+       // FUNÇÕES DE TELEFONE
+       // =====================================================
+       
+       function initializePhoneInput() {
+           const phoneInputElement = document.getElementById('contacto');
+           
+           if (window.intlTelInput) {
+               phoneInput = window.intlTelInput(phoneInputElement, {
+                   initialCountry: "pt",
+                   preferredCountries: ["pt", "es", "fr", "de", "br", "us", "gb"],
+                   separateDialCode: true,
+                   autoHideDialCode: false,
+                   nationalMode: false,
+                   formatOnDisplay: true,
+                   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+               });
+
+               phoneInputElement.addEventListener('blur', function() {
+                   if (phoneInput.isValidNumber()) {
+                       phoneInputElement.value = phoneInput.getNumber();
+                   }
+               });
+               
+               console.log('📱 Campo de telefone inicializado');
+           } else {
+               console.warn('⚠️ Biblioteca intlTelInput não carregada');
+           }
+       }
+
+       function getFormattedPhoneNumber() {
+           if (phoneInput && phoneInput.isValidNumber()) {
+               return phoneInput.getNumber();
+           }
+           return document.getElementById('contacto').value;
+       }
+
+       // =====================================================
+       // FUNÇÕES DO GOOGLE MAPS
+       // =====================================================
+       
+       function initializeAutocomplete() {
+           if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+               try {
+                   const origemInput = document.getElementById('origem');
+                   const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                       types: ['establishment', 'geocode'],
+                       componentRestrictions: { country: 'pt' }
+                   });
+
+                   const destinoInput = document.getElementById('destino');
+                   const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                       types: ['establishment', 'geocode'],
+                       componentRestrictions: { country: 'pt' }
+                   });
+
+                   console.log('📍 Google Maps Autocomplete inicializado');
+                   
+               } catch (error) {
+                   console.error('Erro ao inicializar Google Maps:', error);
+               }
+           } else {
+               setTimeout(initializeAutocomplete, 2000);
+           }
+       }
+
+       // =====================================================
+       // FUNÇÕES DE SUBMISSÃO E VALIDAÇÃO
+       // =====================================================
+       
+       async function handleFormSubmit(event) {
+           event.preventDefault();
+           
+           if (isSubmitting) {
+               showNotification('Aguarde! Já está processando...', 'warning');
+               return;
+           }
+           
+           if (!validarFormulario()) {
+               return;
+           }
+           
+           isSubmitting = true;
+           setButtonLoading('submitBtn', true);
+           
+           try {
+               const dadosTransfer = coletarDadosFormulario();
+               console.log('📤 Enviando dados:', dadosTransfer);
+               
+               const resultado = await enviarParaBackend(dadosTransfer);
+               
+               if (resultado.success) {
+                   showNotification('✅ Transfer solicitado com sucesso! WhatsApp será enviado automaticamente.', 'success');
+                   limparFormulario();
+                   
+                   // Carregar transfers atualizados após 2 segundos
+                   setTimeout(() => {
+                       carregarTransfers();
+                   }, 2000);
+               } else {
+                   throw new Error(resultado.error || 'Erro desconhecido');
+               }
+               
+           } catch (error) {
+               console.error('❌ Erro ao enviar transfer:', error);
+               showNotification('❌ Erro ao enviar transfer: ' + error.message, 'error');
+           } finally {
+               isSubmitting = false;
+               setButtonLoading('submitBtn', false);
+           }
+       }
+
+       function validarFormulario() {
+           const camposObrigatorios = [
+               { id: 'nomeCliente', nome: 'Nome do Cliente' },
+               { id: 'hotelOperadora', nome: 'Hotel/Operadora' },
+               { id: 'numeroPessoas', nome: 'Número de Pessoas' },
+               { id: 'data', nome: 'Data do Transfer' },
+               { id: 'horaPickup', nome: 'Hora de Pick-up' },
+               { id: 'contacto', nome: 'Contacto' },
+               { id: 'origem', nome: 'Local de Origem' },
+               { id: 'destino', nome: 'Local de Destino' },
+               { id: 'valorServico', nome: 'Valor do Serviço' },
+               { id: 'formaPagamento', nome: 'Forma de Pagamento' },
+               { id: 'cobranca', nome: 'Pago Para' }
+           ];
+           
+           for (let campo of camposObrigatorios) {
+               const elemento = document.getElementById(campo.id);
+               if (!elemento.value || elemento.value.trim() === '') {
+                   elemento.focus();
+                   showNotification(`❌ Campo obrigatório: ${campo.nome}`, 'error');
+                   return false;
+               }
+           }
+           
+           // Validar valor
+           const valor = parseFloat(document.getElementById('valorServico').value);
+           if (isNaN(valor) || valor <= 0) {
+               document.getElementById('valorServico').focus();
+               showNotification('❌ Valor deve ser um número positivo', 'error');
+               return false;
+           }
+           
+           // Validar número de pessoas
+           const pessoas = parseInt(document.getElementById('numeroPessoas').value);
+           if (isNaN(pessoas) || pessoas < 1) {
+               showNotification('❌ Número de pessoas deve ser pelo menos 1', 'error');
+               return false;
+           }
+           
+           return true;
+       }
+
+       function coletarDadosFormulario() {
+           return {
+               nomeCliente: document.getElementById('nomeCliente').value.trim(),
+               operadora: document.getElementById('hotelOperadora').value.trim(),
+               tipoServico: document.getElementById('tipoServico').value,
+               numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
+               numeroBagagens: parseInt(document.getElementById('numeroBagagens').value) || 0,
+               data: document.getElementById('data').value,
+               horaPickup: document.getElementById('horaPickup').value,
+               contacto: getFormattedPhoneNumber(),
+               numeroVoo: document.getElementById('numeroVoo').value.trim(),
+               origem: document.getElementById('origem').value.trim(),
+               destino: document.getElementById('destino').value.trim(),
+               valorServico: parseFloat(document.getElementById('valorServico').value),
+               formaPagamento: document.getElementById('formaPagamento').value,
+               cobranca: document.getElementById('cobranca').value,
+               observacoes: document.getElementById('observacoes').value.trim(),
+               
+               // Dados do sistema
+               sistema: 'HUB_FRONTEND',
+               versao: HUB_CONFIG.VERSION,
+               timestamp: new Date().toISOString()
+           };
+       }
+
+       // =====================================================
+       // COMUNICAÇÃO COM BACKEND
+       // =====================================================
+       
+       async function enviarParaBackend(dadosTransfer) {
+           try {
+               console.log('🔗 Conectando com:', HUB_CONFIG.WEBAPP_URL);
+               
+               const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'text/plain',
+                   },
+                   body: JSON.stringify(dadosTransfer),
+                   mode: 'cors'
+               });
+               
+               if (!response.ok) {
+                   // Tentar modo no-cors como fallback
+                   await fetch(HUB_CONFIG.WEBAPP_URL, {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'text/plain',
+                       },
+                       body: JSON.stringify(dadosTransfer),
+                       mode: 'no-cors'
+                   });
+                   
+                   // Em modo no-cors, assumir sucesso
+                   return {
+                       success: true,
+                       message: 'Transfer enviado (modo no-cors)',
+                       transferId: Date.now()
+                   };
+               }
+               
+               const result = await response.json();
+               console.log('📨 Resposta do backend:', result);
+               
+               return result;
+               
+           } catch (error) {
+               console.error('❌ Erro na comunicação:', error);
+               throw new Error('Erro de conexão com o servidor: ' + error.message);
+           }
+       }
+
+       async function testarConexao() {
+           setButtonLoading('testarConexaoBtn', true);
+           
+           try {
+               console.log('🔧 Testando conexão com backend...');
+               
+               const response = await fetch(HUB_CONFIG.WEBAPP_URL + '?action=test', {
+                   method: 'GET',
+                   mode: 'cors'
+               });
+               
+               if (response.ok) {
+                   const result = await response.json();
+                   showNotification('✅ Conexão funcionando! ' + result.message, 'success');
+               } else {
+                   throw new Error('Resposta não OK: ' + response.status);
+               }
+               
+           } catch (error) {
+               console.error('❌ Erro no teste:', error);
+               
+               // Tentar fallback
+               try {
+                   await fetch(HUB_CONFIG.WEBAPP_URL, {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'text/plain' },
+                       body: JSON.stringify({ action: 'test' }),
+                       mode: 'no-cors'
+                   });
+                   
+                   showNotification('⚠️ Conexão estabelecida (modo limitado)', 'warning');
+               } catch (fallbackError) {
+                   showNotification('❌ Erro de conexão: Verifique a URL do backend', 'error');
+               }
+           } finally {
+               setButtonLoading('testarConexaoBtn', false);
+           }
+       }
+
+       async function carregarTransfers() {
+           try {
+               console.log('📋 Carregando transfers...');
+               showNotification('📋 Carregando transfers...', 'success');
+               
+               const response = await fetch(HUB_CONFIG.WEBAPP_URL + '?action=transfers&limit=10', {
+                   method: 'GET',
+                   mode: 'cors'
+               });
+               
+               if (response.ok) {
+                   const result = await response.json();
+                   
+                   if (result.success && result.data && result.data.transfers) {
+                       transfers = result.data.transfers;
+                       renderizarTransfers();
+                       showNotification(`✅ ${transfers.length} transfers carregados`, 'success');
+                   } else {
+                       showNotification('⚠️ Nenhum transfer encontrado', 'warning');
+                       transfers = [];
+                       renderizarTransfers();
+                   }
+               } else {
+                   throw new Error('Erro ao carregar: ' + response.status);
+               }
+               
+           } catch (error) {
+               console.error('❌ Erro ao carregar transfers:', error);
+               showNotification('❌ Erro ao carregar transfers', 'error');
+               
+               // Mostrar dados de exemplo em caso de erro
+               mostrarDadosExemplo();
+           }
+       }
+
+       // =====================================================
+       // RENDERIZAÇÃO DE DADOS
+       // =====================================================
+       
+       function renderizarTransfers() {
+           const container = document.getElementById('transfersContainer');
+           container.innerHTML = '';
+           
+           if (transfers.length === 0) {
+               container.innerHTML = `
+                   <div class="transfer-card">
+                       <div style="text-align: center; padding: 40px; color: #999;">
+                           <h3>Nenhum transfer encontrado</h3>
+                           <p>Os transfers aparecerão aqui quando forem carregados</p>
+                       </div>
+                   </div>
+               `;
+               return;
+           }
+           
+           transfers.forEach(transfer => {
+               const card = criarCardTransfer(transfer);
+               container.appendChild(card);
+           });
+       }
+
+       function criarCardTransfer(transfer) {
+           const card = document.createElement('div');
+           card.className = 'transfer-card';
+           
+           const statusClass = `status-${(transfer.Status || transfer.status || 'solicitado').toLowerCase()}`;
+           const hotelOperadora = transfer['Hotel/Operadora'] || transfer.hotelOperadora || 'Não especificado';
+           
+           card.innerHTML = `
+               <div class="transfer-header">
+                   <div class="transfer-id">#${transfer.ID || transfer.id || 'N/A'}</div>
+                   <div class="transfer-status ${statusClass}">${transfer.Status || transfer.status || 'Solicitado'}</div>
+               </div>
+               
+               <div class="transfer-client">${transfer.Cliente || transfer.nomeCliente || 'Cliente não informado'}</div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Hotel/Operadora:</span>
+                   <span class="detail-value">
+                       <span class="hotel-badge">${hotelOperadora}</span>
+                   </span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Tipo:</span>
+                   <span class="detail-value">${transfer['Tipo Serviço'] || transfer.tipoServico || 'Transfer'}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Pessoas:</span>
+                   <span class="detail-value">${transfer.Pessoas || transfer.numeroPessoas || 'N/A'}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Data:</span>
+                   <span class="detail-value">${formatarData(transfer.Data || transfer.data)}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Hora:</span>
+                   <span class="detail-value">${transfer['Hora Pick-up'] || transfer.horaPickup || 'N/A'}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Origem:</span>
+                   <span class="detail-value">${transfer.Origem || transfer.origem || 'N/A'}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Destino:</span>
+                   <span class="detail-value">${transfer.Destino || transfer.destino || 'N/A'}</span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Valor:</span>
+                   <span class="detail-value" style="color: var(--hub-success); font-weight: 900;">
+                       €${formatarMoeda(transfer['Preço Cliente (€)'] || transfer.valorServico || 0)}
+                   </span>
+               </div>
+               
+               <div class="transfer-detail">
+                   <span class="detail-label">Contacto:</span>
+                   <span class="detail-value">${transfer.Contacto || transfer.contacto || 'N/A'}</span>
+               </div>
+               
+               ${(transfer.Observações || transfer.observacoes) ? `
+               <div class="transfer-detail">
+                   <span class="detail-label">Observações:</span>
+                   <span class="detail-value" style="font-style: italic;">${transfer.Observações || transfer.observacoes}</span>
+               </div>
+               ` : ''}
+           `;
+           
+           return card;
+       }
+
+       function mostrarDadosExemplo() {
+           const exemplos = [
+               {
+                   ID: 'DEMO1',
+                   Cliente: 'João Silva (Exemplo)',
+                   'Hotel/Operadora': 'Empire Marques Hotel',
+                   'Tipo Serviço': 'Transfer',
+                   Pessoas: 2,
+                   Data: new Date().toISOString().split('T')[0],
+                   'Hora Pick-up': '10:00',
+                   Origem: 'Aeroporto de Lisboa',
+                   Destino: 'Empire Marques Hotel',
+                   'Preço Cliente (€)': 35.00,
+                   Contacto: '+351912345678',
+                   Status: 'Confirmado',
+                   Observações: 'Dados de exemplo - Carregue os transfers reais'
+               },
+               {
+                   ID: 'DEMO2',
+                   Cliente: 'Maria Santos (Exemplo)',
+                   'Hotel/Operadora': 'HUB Transfer',
+                   'Tipo Serviço': 'Tour Regular',
+                   Pessoas: 4,
+                   Data: new Date().toISOString().split('T')[0],
+                   'Hora Pick-up': '14:00',
+                   Origem: 'Hotel Lioz',
+                   Destino: 'Sintra',
+                   'Preço Cliente (€)': 125.00,
+                   Contacto: '+351987654321',
+                   Status: 'Solicitado',
+                   Observações: 'Tour de Sintra - Dados de exemplo'
+               }
+           ];
+           
+           transfers = exemplos;
+           renderizarTransfers();
+           showNotification('📋 Dados de exemplo carregados (erro na conexão)', 'warning');
+       }
+
+       // =====================================================
+       // FUNÇÕES UTILITÁRIAS
+       // =====================================================
+       
+       function formatarData(data) {
+           if (!data) return 'N/A';
+           
+           try {
+               const date = new Date(data);
+               return date.toLocaleDateString('pt-PT');
+           } catch (error) {
+               return data;
+           }
+       }
+
+       function formatarMoeda(valor) {
+           if (typeof valor === 'number') {
+               return valor.toFixed(2);
+           }
+           return parseFloat(valor || 0).toFixed(2);
+       }
+
+       function limparFormulario() {
+           try {
+               document.getElementById('transferForm').reset();
+               
+               // Limpar seleções ativas
+               document.querySelectorAll('.btn-hotel, .btn-quick').forEach(btn => {
+                   btn.classList.remove('active');
+               });
+               
+               // Resetar valores específicos
+               document.getElementById('numeroBagagens').value = '0';
+               document.getElementById('data').value = new Date().toISOString().split('T')[0];
+               
+               // Limpar telefone se inicializado
+               if (phoneInput) {
+                   phoneInput.setNumber('');
+               }
+               
+               showNotification('🔄 Formulário limpo', 'success');
+               
+           } catch (error) {
+               console.error('Erro ao limpar formulário:', error);
+               showNotification('❌ Erro ao limpar formulário', 'error');
+           }
+       }
+
+       function setButtonLoading(buttonId, loading = true) {
+           const button = document.getElementById(buttonId);
+           if (!button) return;
+           
+           if (loading) {
+               button.disabled = true;
+               button.classList.add('loading');
+               const originalText = button.textContent;
+               button.setAttribute('data-original-text', originalText);
+               button.textContent = 'Processando...';
+           } else {
+               button.disabled = false;
+               button.classList.remove('loading');
+               const originalText = button.getAttribute('data-original-text');
+               if (originalText) {
+                   button.textContent = originalText;
+               }
+           }
+       }
+
+       function showNotification(message, type = 'success') {
+           const notification = document.getElementById('notification');
+           
+           notification.textContent = message;
+           notification.className = `notification ${type}`;
+           notification.style.display = 'block';
+           
+           // Auto-hide após 5 segundos
+           setTimeout(() => {
+               notification.style.display = 'none';
+           }, 5000);
+           
+           console.log(`[${type.toUpperCase()}] ${message}`);
+       }
+
+       function showStatus(message, type = 'success') {
+           const statusDiv = document.getElementById('statusMessage');
+           statusDiv.className = `status-message status-${type}`;
+           statusDiv.textContent = message;
+           statusDiv.style.display = 'block';
+           
+           setTimeout(() => {
+               statusDiv.style.display = 'none';
+           }, 5000);
+       }
+
+// =====================================================
+       // INICIALIZAÇÃO FINAL
+       // =====================================================
+       
+       // Log de inicialização
+       console.log('🚐 Sistema HUB Central v1.0');
+       console.log('📧 Roberta HUB: WhatsApp automático (+351928283652)');
+       console.log('🔗 Backend:', HUB_CONFIG.WEBAPP_URL);
+       console.log('📊 Planilha:', HUB_CONFIG.SPREADSHEET_URL);
+       console.log('🎯 Sistema pronto para solicitação de transfers');
+       
+       // Função de debug para desenvolvimento
+       window.debugHUB = function() {
+           console.log('=== DEBUG SISTEMA HUB CENTRAL ===');
+           console.log('Configurações:', HUB_CONFIG);
+           console.log('Transfers carregados:', transfers.length);
+           console.log('Phone Input:', phoneInput);
+           console.log('Is Submitting:', isSubmitting);
+           console.log('================================');
+       };
+       
+       // Função para exportar dados (para desenvolvimento)
+       window.exportarTransfers = function() {
+           if (transfers.length === 0) {
+               console.log('Nenhum transfer para exportar');
+               return;
+           }
+           
+           const dataStr = JSON.stringify(transfers, null, 2);
+           const dataBlob = new Blob([dataStr], {type: 'application/json'});
+           const url = URL.createObjectURL(dataBlob);
+           
+           const link = document.createElement('a');
+           link.href = url;
+           link.download = `transfers_hub_${new Date().toISOString().split('T')[0]}.json`;
+           document.body.appendChild(link);
+           link.click();
+           document.body.removeChild(link);
+           
+           console.log('Transfers exportados para download');
+       };
+       
+       // Auto-teste da conexão após 3 segundos
+       setTimeout(() => {
+           console.log('🔧 Executando teste automático de conexão...');
+           testarConexao();
+       }, 3000);
+       
+       // Função para detectar se é um dispositivo móvel
+       function isMobileDevice() {
+           return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+       }
+       
+       // Ajustes específicos para mobile
+       if (isMobileDevice()) {
+           console.log('📱 Dispositivo móvel detectado - Aplicando ajustes');
+           
+           // Adicionar classe CSS para mobile
+           document.body.classList.add('mobile-device');
+           
+           // Ajustar viewport para evitar zoom em inputs
+           const viewport = document.querySelector('meta[name=viewport]');
+           if (viewport) {
+               viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+           }
+       }
+       
+       // Salvar dados no localStorage antes de sair da página
+       window.addEventListener('beforeunload', function(e) {
+           if (transfers.length > 0) {
+               localStorage.setItem('hub_transfers_cache', JSON.stringify(transfers));
+               console.log('💾 Cache de transfers salvo');
+           }
+       });
+       
+       // Carregar cache na inicialização
+       window.addEventListener('load', function() {
+           const cache = localStorage.getItem('hub_transfers_cache');
+           if (cache) {
+               try {
+                   const cachedTransfers = JSON.parse(cache);
+                   if (cachedTransfers.length > 0) {
+                       transfers = cachedTransfers;
+                       renderizarTransfers();
+                       console.log(`📂 ${transfers.length} transfers carregados do cache`);
+                       showNotification(`📂 ${transfers.length} transfers carregados do cache`, 'success');
+                   }
+               } catch (error) {
+                   console.error('Erro ao carregar cache:', error);
+                   localStorage.removeItem('hub_transfers_cache');
+               }
+           }
+       });
+       
+       // Função para limpar cache
+       window.limparCache = function() {
+           localStorage.removeItem('hub_transfers_cache');
+           console.log('🗑️ Cache limpo');
+           showNotification('🗑️ Cache de transfers limpo', 'success');
+       };
+       
+       // Monitorar conexão com a internet
+       function monitorarConexao() {
+           if (!navigator.onLine) {
+               showNotification('🔴 Sem conexão com a internet', 'warning');
+           }
+           
+           window.addEventListener('online', function() {
+               showNotification('🟢 Conexão restaurada', 'success');
+               console.log('🌐 Conexão com internet restaurada');
+           });
+           
+           window.addEventListener('offline', function() {
+               showNotification('🔴 Conexão perdida - Trabalhando offline', 'warning');
+               console.log('🌐 Conexão com internet perdida');
+           });
+       }
+       
+       // Inicializar monitoramento de conexão
+       monitorarConexao();
+       
+       // Função para recarregar página com confirmação
+       window.recarregarPagina = function() {
+           if (confirm('Deseja recarregar a página? Dados não salvos serão perdidos.')) {
+               location.reload();
+           }
+       };
+       
+       // Adicionar atalhos de teclado adicionais
+       document.addEventListener('keydown', function(e) {
+           // F5 personalizado
+           if (e.key === 'F5') {
+               e.preventDefault();
+               carregarTransfers();
+               return false;
+           }
+           
+           // Ctrl+L para limpar formulário
+           if (e.ctrlKey && e.key === 'l') {
+               e.preventDefault();
+               limparFormulario();
+               return false;
+           }
+           
+           // Ctrl+T para testar conexão
+           if (e.ctrlKey && e.key === 't') {
+               e.preventDefault();
+               testarConexao();
+               return false;
+           }
+       });
+       
+       // Configurar tooltips informativos
+       function adicionarTooltips() {
+           const tooltips = {
+               'hotelOperadora': 'Selecione o hotel ou digite uma nova operadora',
+               'contacto': 'Formato: +351XXXXXXXXX',
+               'valorServico': 'Valor em euros (€)',
+               'observacoes': 'Informações extras sobre o transfer'
+           };
+           
+           Object.entries(tooltips).forEach(([id, texto]) => {
+               const elemento = document.getElementById(id);
+               if (elemento) {
+                   elemento.title = texto;
+               }
+           });
+       }
+       
+       // Adicionar tooltips
+       setTimeout(adicionarTooltips, 1000);
+       
+       // Estatísticas de uso (para desenvolvimento)
+       let estatisticasUso = {
+           transfersEnviados: 0,
+           errosConexao: 0,
+           inicioSessao: new Date().toISOString()
+       };
+       
+       // Função para mostrar estatísticas
+       window.mostrarEstatisticas = function() {
+           console.log('=== ESTATÍSTICAS DE USO ===');
+           console.log('Início da sessão:', estatisticasUso.inicioSessao);
+           console.log('Transfers enviados:', estatisticasUso.transfersEnviados);
+           console.log('Erros de conexão:', estatisticasUso.errosConexao);
+           console.log('Transfers em cache:', transfers.length);
+           console.log('==========================');
+           
+           return estatisticasUso;
+       };
+       
+       // Interceptar erros globais
+       window.addEventListener('error', function(e) {
+           console.error('❌ Erro global capturado:', e.error);
+           showNotification('❌ Erro inesperado - Verifique o console', 'error');
+       });
+       
+       // Interceptar promessas rejeitadas
+       window.addEventListener('unhandledrejection', function(e) {
+           console.error('❌ Promise rejeitada:', e.reason);
+           showNotification('❌ Erro de comunicação', 'error');
+       });
+       
+       // Função para resetar completamente o sistema
+       window.resetarSistema = function() {
+           if (confirm('⚠️ ATENÇÃO: Isso vai limpar todos os dados e cache. Continuar?')) {
+               // Limpar cache
+               localStorage.clear();
+               
+               // Limpar variáveis
+               transfers = [];
+               isSubmitting = false;
+               
+               // Limpar formulário
+               limparFormulario();
+               
+               // Recarregar componentes
+               renderizarTransfers();
+               
+               // Reinicializar telefone
+               if (phoneInput) {
+                   phoneInput.destroy();
+                   phoneInput = null;
+                   setTimeout(initializePhoneInput, 1000);
+               }
+               
+               showNotification('🔄 Sistema resetado completamente', 'success');
+               console.log('🔄 Sistema HUB Central resetado');
+           }
+       };
+       
+       // Mensagem final de inicialização
+       console.log('✅ Sistema HUB Central totalmente carregado e pronto!');
+       console.log('💡 Funções disponíveis:');
+       console.log('   - debugHUB(): Informações de debug');
+       console.log('   - exportarTransfers(): Exportar dados');
+       console.log('   - mostrarEstatisticas(): Ver estatísticas');
+       console.log('   - limparCache(): Limpar cache local');
+       console.log('   - resetarSistema(): Reset completo');
+       console.log('⌨️  Atalhos: Ctrl+Enter (enviar), Esc (limpar), F5 (carregar), Ctrl+L (limpar), Ctrl+T (testar)');
+       
+       // Mostrar mensagem de boas-vindas após 5 segundos
+       setTimeout(() => {
+           if (!localStorage.getItem('hub_welcome_shown')) {
+               showNotification('🎯 Bem-vindo ao Sistema HUB Central! Sistema pronto para uso.', 'success');
+               localStorage.setItem('hub_welcome_shown', 'true');
+           }
+       }, 5000);
+       
+   </script>
+</body>
+</html>
