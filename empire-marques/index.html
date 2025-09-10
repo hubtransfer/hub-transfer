@@ -1438,7 +1438,11 @@ async function manualRefresh() {
 //     button.textContent = '🔄 Atualizar Dados';
 
 // Na função loadData(), comentar esta linha:
-// startAutoRefresh(); // COMENTADO para economizar créditos
+/*
+function startAutoRefresh() {
+    // ... toda a função comentada
+}
+*/
 </script>
         // =====================================================
         // VARIÁVEIS GLOBAIS - FUSÃO DOS DOIS CÓDIGOS
@@ -2217,6 +2221,11 @@ function getNextLocalId() {
     return maxId + 1;
 }
 
+// ===================================================
+// AUTO-REFRESH DESATIVADO PARA ECONOMIZAR CRÉDITOS
+// ===================================================
+
+/*
 let autoRefreshInterval = null;
 
 function startAutoRefresh() {
@@ -2258,7 +2267,40 @@ async function autoSyncData() {
         console.error('Erro no auto-sync:', error);
     }
 }
+*/
 
+// FUNÇÃO MANUAL DE ATUALIZAÇÃO (SUBSTITUI O AUTO-REFRESH)
+async function manualRefresh() {
+    setButtonLoading('refreshBtn', true);
+    
+    try {
+        console.log('Atualização manual iniciada...');
+        
+        const sheetsData = await loadDataFromSheets();
+        
+        if (sheetsData && sheetsData.length >= 0) {
+            const oldCount = services.length;
+            services = sheetsData;
+            
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+            
+            renderTable();
+            updateSummary();
+            
+            const newCount = services.length;
+            showStatus(`Dados atualizados: ${newCount} transfers carregados`, 'success');
+            console.log(`Atualização manual concluída: ${oldCount} -> ${newCount} transfers`);
+        } else {
+            showStatus('Nenhum dado encontrado no Google Sheets', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Erro na atualização manual:', error);
+        showStatus('Erro ao atualizar dados: ' + error.message, 'error');
+    } finally {
+        setButtonLoading('refreshBtn', false);
+    }
+}
 function showLoadingState(show) {
     const tbody = document.getElementById('servicesTableBody');
     if (show) {
