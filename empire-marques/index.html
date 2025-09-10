@@ -2043,34 +2043,190 @@
             }
         }
 
-        function loadData() {
+        async function loadData() {
+    console.log('Carregando dados centralizados...');
+    showLoadingState(true);
+    
+    // Configurar URL primeiro
+    const savedUrl = localStorage.getItem('webappUrl');
+    if (savedUrl) {
+        document.getElementById('webappUrl').value = savedUrl;
+        isConnected = true;
+    } else {
+        // Auto-configurar URL padrão
+        document.getElementById('webappUrl').value = WEBAPP_URL;
+        localStorage.setItem('webappUrl', WEBAPP_URL);
+        isConnected = true;
+    }
+    document.getElementById('syncBtn').style.display = 'inline-block';
+    
+    try {
+        // Tentar carregar do Google Sheets primeiro
+        const sheetsData = await loadDataFromSheets();
+        
+        if (sheetsData && sheetsData.length > 0) {
+            services = sheetsData;
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+            console.log(`${services.length} transfers carregados do Google Sheets`);
+            showStatus(`Dados sincronizados: ${services.length} transfers carregados`, 'success');
+        } else {
+            // Fallback para localStorage se Sheets estiver vazio
             const savedData = localStorage.getItem('partnershipTransferData');
-            const savedUrl = localStorage.getItem('webappUrl');
-            
             if (savedData) {
-                try {
-                    services = JSON.parse(savedData);
-                    console.log(`${services.length} transfers carregados do localStorage`);
-                    renderTable();
-                    updateSummary();
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                    services = [];
-                }
-            }
-            
-            if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
+                services = JSON.parse(savedData);
+                console.log(`${services.length} transfers carregados do backup local`);
+                showStatus('Usando dados locais - verifique conexão com Sheets', 'warning');
             } else {
-                // Auto-configurar URL padrão
-                document.getElementById('webappUrl').value = WEBAPP_URL;
-                localStorage.setItem('webappUrl', WEBAPP_URL);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
+                services = [];
+                console.log('Sistema iniciado sem dados');
             }
         }
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados do Sheets:', error);
+        
+        // Fallback para localStorage em caso de erro
+        const savedData = localStorage.getItem('partnershipTransferData');
+        if (savedData) {
+            try {
+                services = JSON.parse(savedData);
+                console.log(`${services.length} transfers carregados do backup local`);
+                showStatus('Usando backup local - problema de conexão detectado', 'warning');
+            } catch (parseError) {
+                console.error('Erro ao carregar backup local:', parseError);
+                services = [];
+            }
+        } else {
+            services = [];
+        }
+    } finally {
+        showLoadingState(false);
+        renderTable();
+        updateSummary();
+        startAutoRefresh();
+    }
+}
+
+async function loadDataFromSheets() {
+    const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+    
+    if (!url) {
+        console.log('URL não configurada para carregar dados');
+        return null;
+    }
+    
+    try {
+        console.log('Buscando dados do Google Sheets...');
+        
+        const response = await fetch(url + '?action=getAllData', {
+            method: 'GET',
+            mode: 'cors'
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            
+            if (result.status === 'success' && result.data) {
+                console.log(`${result.data.length} registros encontrados no Sheets`);
+                return result.data;
+            } else {
+                console.log('Nenhum dado encontrado no Sheets');
+                return [];
+            }
+        } else {
+            throw new Error('Erro na resposta do servidor');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados do Sheets:', error);
+        return null;
+    }
+}
+
+async function getNextIdFromSheets() {
+    try {
+        const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+        
+        if (!url) {
+            return getNextLocalId();
+        }
+        
+        const response = await fetch(url + '?action=getLastId', {
+            method: 'GET',
+            mode: 'cors'
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            
+            if (result.status === 'success' && result.lastId) {
+                const nextId = parseInt(result.lastId) + 1;
+                console.log(`Próximo ID sincronizado: ${nextId}`);
+                return nextId;
+            }
+        }
+        
+        return getNextLocalId();
+        
+    } catch (error) {
+        console.error('Erro ao buscar ID do Sheets:', error);
+        return getNextLocalId();
+    }
+}
+
+function getNextLocalId() {
+    const maxId = services.length > 0 ? Math.max(...services.map(s => s.id)) : 0;
+    return maxId + 1;
+}
+
+let autoRefreshInterval = null;
+
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    
+    autoRefreshInterval = setInterval(async () => {
+        await autoSyncData();
+    }, 45000);
+    
+    console.log('Auto-refresh iniciado (45s)');
+}
+
+async function autoSyncData() {
+    try {
+        console.log('Verificando atualizações...');
+        
+        const sheetsData = await loadDataFromSheets();
+        
+        if (sheetsData && sheetsData.length !== services.length) {
+            const oldCount = services.length;
+            services = sheetsData;
+            
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+            
+            renderTable();
+            updateSummary();
+            
+            const newCount = services.length;
+            if (newCount > oldCount) {
+                showStatus(`${newCount - oldCount} novos transfers detectados!`, 'success');
+            }
+            
+            console.log(`Dados atualizados: ${oldCount} -> ${newCount} transfers`);
+        }
+        
+    } catch (error) {
+        console.error('Erro no auto-sync:', error);
+    }
+}
+
+function showLoadingState(show) {
+    const tbody = document.getElementById('servicesTableBody');
+    if (show) {
+        tbody.innerHTML = '<tr><td colspan="18" style="text-align: center; padding: 40px;"><div>🔄 Carregando dados...</div></td></tr>';
+    }
+}
 
         function saveData() {
             try {
@@ -2273,7 +2429,7 @@
                     }
                     editingId = null;
                 } else {
-                    const newId = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
+                    const newId = await getNextIdFromSheets();
                     const newService = {
                         id: newId,
                         ...formData,
