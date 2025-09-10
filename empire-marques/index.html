@@ -2144,10 +2144,11 @@ function startAutoRefresh() {
             services = [];
         }
     } finally {
-        showLoadingState(false);
-        renderTable();
-        updateSummary();
-    }
+    showLoadingState(false);
+    renderTable();
+    updateSummary();
+    // startAutoRefresh(); // COMENTADO para economizar créditos
+  }
 }
 
 async function loadDataFromSheets() {
@@ -2309,6 +2310,37 @@ function showLoadingState(show) {
     }
 }
 
+async function manualRefresh() {
+    setButtonLoading('refreshBtn', true);
+    
+    try {
+        console.log('Atualização manual iniciada...');
+        
+        const sheetsData = await loadDataFromSheets();
+        
+        if (sheetsData && sheetsData.length >= 0) {
+            const oldCount = services.length;
+            services = sheetsData;
+            
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+            
+            renderTable();
+            updateSummary();
+            
+            const newCount = services.length;
+            showStatus(`Dados atualizados: ${newCount} transfers carregados`, 'success');
+            console.log(`Atualização manual concluída: ${oldCount} -> ${newCount} transfers`);
+        } else {
+            showStatus('Nenhum dado encontrado no Google Sheets', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Erro na atualização manual:', error);
+        showStatus('Erro ao atualizar dados: ' + error.message, 'error');
+    } finally {
+        setButtonLoading('refreshBtn', false);
+    }
+}
         function saveData() {
             try {
                 localStorage.setItem('partnershipTransferData', JSON.stringify(services));
