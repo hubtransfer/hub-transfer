@@ -980,7 +980,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <!-- FUSÃO: Mantendo URL funcional do código antigo -->
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbwTdCkAxmWuitbCODtgTHKnNhoB590JTm9sAgtHS3PtXgqBt81EAemziqOAE32phfdhLA/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbze5RZS9Tt3FdrL2vMja6niNduODq8paOzphYn6TkIeotz-GpmpXv4KLMkBVFpxsVSD/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1280,127 +1280,166 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn">✅ Solicitar Transfer</button>
-                    <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
-                    <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
-                    <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">
-                        📤 Sincronizar Tudo
-                    </button>
-                    <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
-                    <button type="button" class="btn btn-danger" onclick="toggleClearData()">🗑️ Limpar Dados</button>
-                </div>
-            </form>
+    <button type="submit" class="btn btn-primary" id="submitBtn">✅ Solicitar Transfer</button>
+    <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
+    <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
+    <button type="button" class="btn btn-success" onclick="manualRefresh()" id="refreshBtn">🔄 Atualizar Dados</button>
+    <button type="button" class="btn btn-success" onclick="syncToSheets()" id="syncBtn" style="display: none;">📤 Sincronizar Tudo</button>
+    <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
+    <button type="button" class="btn btn-danger" onclick="toggleClearData()">🗑️ Limpar Dados</button>
+</div>
+</form>
+</div>
+
+<div class="summary-section">
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-number" id="totalServices">0</div>
+            <div class="summary-label">Total de Serviços</div>
         </div>
+        <div class="summary-card">
+            <div class="summary-number" id="pendingServices">0</div>
+            <div class="summary-label">Solicitados</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="confirmedServices">0</div>
+            <div class="summary-label">Confirmados</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="completedServices">0</div>
+            <div class="summary-label">Finalizados</div>
+        </div>
+    </div>
 
-        <div class="summary-section">
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="summary-number" id="totalServices">0</div>
-                    <div class="summary-label">Total de Serviços</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="pendingServices">0</div>
-                    <div class="summary-label">Solicitados</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="confirmedServices">0</div>
-                    <div class="summary-label">Confirmados</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number" id="completedServices">0</div>
-                    <div class="summary-label">Finalizados</div>
-                </div>
+    <div class="financial-summary">
+        <h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem;">💰 Resumo Financeiro</h3>
+        <div class="financial-grid">
+            <div class="financial-item">
+                <div class="financial-value" id="totalRevenue">€0.00</div>
+                <div class="financial-label">Receita Total</div>
             </div>
-
-            <div class="financial-summary">
-                <h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem;">💰 Resumo Financeiro</h3>
-                <div class="financial-grid">
-                    <div class="financial-item">
-                        <div class="financial-value" id="totalRevenue">€0.00</div>
-                        <div class="financial-label">Receita Total</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="pendingRevenue">€0.00</div>
-                        <div class="financial-label">Valor Pendente</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="confirmedRevenue">€0.00</div>
-                        <div class="financial-label">Valor Confirmado</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-value" id="completedRevenue">€0.00</div>
-                        <div class="financial-label">Valor Finalizado</div>
-                    </div>
-                </div>
+            <div class="financial-item">
+                <div class="financial-value" id="pendingRevenue">€0.00</div>
+                <div class="financial-label">Valor Pendente</div>
+            </div>
+            <div class="financial-item">
+                <div class="financial-value" id="confirmedRevenue">€0.00</div>
+                <div class="financial-label">Valor Confirmado</div>
+            </div>
+            <div class="financial-item">
+                <div class="financial-value" id="completedRevenue">€0.00</div>
+                <div class="financial-label">Valor Finalizado</div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="services-section">
-            <div class="services-header">
-                <h2 class="services-title">📋 Serviços de Transfer</h2>
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="filterStatus">Status:</label>
-                        <select id="filterStatus" onchange="filterTable()">
-                            <option value="">Todos</option>
-                            <option value="Solicitado">Solicitado</option>
-                            <option value="Confirmado">Confirmado</option>
-                            <option value="Finalizado">Finalizado</option>
-                            <option value="Cancelado">Cancelado</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterData">Data:</label>
-                        <input type="date" id="filterData" onchange="filterTable()">
-                    </div>
-                    <div class="filter-group">
-                        <label for="searchClient">Cliente:</label>
-                        <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="filterTable()">
-                    </div>
-                </div>
+<div class="services-section">
+    <div class="services-header">
+        <h2 class="services-title">📋 Serviços de Transfer</h2>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filterStatus">Status:</label>
+                <select id="filterStatus" onchange="filterTable()">
+                    <option value="">Todos</option>
+                    <option value="Solicitado">Solicitado</option>
+                    <option value="Confirmado">Confirmado</option>
+                    <option value="Finalizado">Finalizado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
             </div>
-
-            <div class="services-table">
-                <table id="servicesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Cliente</th>
-                            <th>Tipo</th>
-                            <th>Pessoas</th>
-                            <th>Bagagens</th>
-                            <th>Data</th>
-                            <th>Hora Pick-up</th>
-                            <th>Contacto</th>
-                            <th>Voo</th>
-                            <th>Rota</th>
-                            <th>Valor Total</th>
-                            <th class="admin-column" style="display: none;">Valor Hotel</th>
-                            <th class="admin-column" style="display: none;">Valor HUB</th>
-                            <th class="admin-column" style="display: none;">Comissão Recepção</th>
-                            <th>Pagamento</th>
-                            <th>Pago Para</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="servicesTableBody">
-                        <tr>
-                            <td colspan="18" class="empty-state">
-                                <h3>Nenhum serviço cadastrado</h3>
-                                <p>Adicione o primeiro transfer usando o formulário acima</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="filter-group">
+                <label for="filterData">Data:</label>
+                <input type="date" id="filterData" onchange="filterTable()">
+            </div>
+            <div class="filter-group">
+                <label for="searchClient">Cliente:</label>
+                <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="filterTable()">
             </div>
         </div>
     </div>
 
-    <!-- Botão Admin - FUNCIONALIDADE DO CÓDIGO NOVO -->
-    <div class="admin-toggle" id="adminToggle" onclick="toggleAdminMode()">🔐 Admin</div>
+    <div class="services-table">
+        <table id="servicesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Tipo</th>
+                    <th>Pessoas</th>
+                    <th>Bagagens</th>
+                    <th>Data</th>
+                    <th>Hora Pick-up</th>
+                    <th>Contacto</th>
+                    <th>Voo</th>
+                    <th>Rota</th>
+                    <th>Valor Total</th>
+                    <th class="admin-column" style="display: none;">Valor Hotel</th>
+                    <th class="admin-column" style="display: none;">Valor HUB</th>
+                    <th class="admin-column" style="display: none;">Comissão Recepção</th>
+                    <th>Pagamento</th>
+                    <th>Pago Para</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="servicesTableBody">
+                <tr>
+                    <td colspan="18" class="empty-state">
+                        <h3>Nenhum serviço cadastrado</h3>
+                        <p>Adicione o primeiro transfer usando o formulário acima</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
 
-    <script>
+<!-- Botão Admin -->
+<div class="admin-toggle" id="adminToggle" onclick="toggleAdminMode()">🔐 Admin</div>
+
+<script>
+// Função de atualização manual (adicionar ao JavaScript existente)
+async function manualRefresh() {
+    setButtonLoading('refreshBtn', true);
+    
+    try {
+        console.log('🔄 Atualização manual iniciada...');
+        
+        const sheetsData = await loadDataFromSheets();
+        
+        if (sheetsData && sheetsData.length >= 0) {
+            const oldCount = services.length;
+            services = sheetsData;
+            
+            localStorage.setItem('partnershipTransferData', JSON.stringify(services));
+            
+            renderTable();
+            updateSummary();
+            
+            const newCount = services.length;
+            showStatus(`Dados atualizados: ${newCount} transfers carregados`, 'success');
+            console.log(`✅ Atualização manual concluída: ${oldCount} -> ${newCount} transfers`);
+        } else {
+            showStatus('Nenhum dado encontrado no Google Sheets', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Erro na atualização manual:', error);
+        showStatus('Erro ao atualizar dados: ' + error.message, 'error');
+    } finally {
+        setButtonLoading('refreshBtn', false);
+    }
+}
+
+// Modificar a função setButtonLoading existente para incluir:
+// } else if (buttonId === 'refreshBtn') {
+//     button.textContent = '🔄 Atualizar Dados';
+
+// Na função loadData(), comentar esta linha:
+// startAutoRefresh(); // COMENTADO para economizar créditos
+</script>
         // =====================================================
         // VARIÁVEIS GLOBAIS - FUSÃO DOS DOIS CÓDIGOS
         // =====================================================
@@ -1414,7 +1453,7 @@
         
         // ATUALIZADO: Nova URL do Google Apps Script fornecida
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI'; // ID do código novo
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwTdCkAxmWuitbCODtgTHKnNhoB590JTm9sAgtHS3PtXgqBt81EAemziqOAE32phfdhLA/exec'; // URL ATUALIZADA
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbze5RZS9Tt3FdrL2vMja6niNduODq8paOzphYn6TkIeotz-GpmpXv4KLMkBVFpxsVSD/exec'; // URL ATUALIZADA
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com'; // Email de teste configurado
         
         // Tours e Preços - FUNCIONALIDADE DO CÓDIGO NOVO
@@ -2103,7 +2142,6 @@
         showLoadingState(false);
         renderTable();
         updateSummary();
-        startAutoRefresh();
     }
 }
 
