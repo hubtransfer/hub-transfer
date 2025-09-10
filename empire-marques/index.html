@@ -1620,28 +1620,29 @@ function startAutoRefresh() {
         }
 
         function setButtonLoading(buttonId, loading = true) {
-            const button = document.getElementById(buttonId);
-            if (loading) {
-                button.disabled = true;
-                button.classList.add('loading');
-                button.textContent = '';
-            } else {
-                button.disabled = false;
-                button.classList.remove('loading');
-                if (buttonId === 'testBtn') {
-                    button.textContent = '🔗 Testar Conexão';
-                } else if (buttonId === 'submitBtn') {
-                    button.textContent = '✅ Solicitar Transfer';
-                } else if (buttonId === 'clearDataBtn') {
-                    button.textContent = '🗑️ Limpar Todos os Dados';
-                } else if (buttonId === 'clearTestBtn') {
-                    button.textContent = '🧹 Limpar Apenas Testes';
-                } else if (buttonId === 'syncBtn') {
-                    button.textContent = '📤 Sincronizar Tudo';
-                }
-            }
+    const button = document.getElementById(buttonId);
+    if (loading) {
+        button.disabled = true;
+        button.classList.add('loading');
+        button.textContent = '';
+    } else {
+        button.disabled = false;
+        button.classList.remove('loading');
+        if (buttonId === 'testBtn') {
+            button.textContent = '🔗 Testar Conexão';
+        } else if (buttonId === 'submitBtn') {
+            button.textContent = '✅ Solicitar Transfer';
+        } else if (buttonId === 'clearDataBtn') {
+            button.textContent = '🗑️ Limpar Todos os Dados';
+        } else if (buttonId === 'clearTestBtn') {
+            button.textContent = '🧹 Limpar Apenas Testes';
+        } else if (buttonId === 'syncBtn') {
+            button.textContent = '📤 Sincronizar Tudo';
+        } else if (buttonId === 'refreshBtn') {
+            button.textContent = '🔄 Atualizar Dados';
         }
-
+    }
+}
         // =====================================================
         // FUNÇÕES DE FORMULÁRIO
         // =====================================================
@@ -2323,96 +2324,98 @@ function showLoadingState(show) {
         // =====================================================
         
         function renderTable() {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = '';
+    const tbody = document.getElementById('servicesTableBody');
+    tbody.innerHTML = '';
 
-            if (services.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="18" class="empty-state">
-                            <h3>Nenhum serviço cadastrado</h3>
-                            <p>Adicione o primeiro transfer usando o formulário acima</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    if (services.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="18" class="empty-state">
+                    <h3>Nenhum serviço cadastrado</h3>
+                    <p>Adicione o primeiro transfer usando o formulário acima</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-            const sortedServices = services.sort((a, b) => {
-                const dateA = new Date(a.data + ' ' + a.horaPickup);
-                const dateB = new Date(b.data + ' ' + b.horaPickup);
-                return dateB - dateA;
-            });
+    const sortedServices = services.sort((a, b) => {
+        const dateA = new Date(a.data + ' ' + a.horaPickup);
+        const dateB = new Date(b.data + ' ' + b.horaPickup);
+        return dateB - dateA;
+    });
 
-            sortedServices.forEach(service => {
-                const row = document.createElement('tr');
-                const paymentClass = service.modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
-                                service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
-                
-                const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'tour' ? '🚐 Tour' : 
-                                 tipoServico === 'private' ? '🚗 Private' : 
-                                 '🚕 Transfer';
-                
-                row.innerHTML = `
-                    <td><strong>#${service.id}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
-                    </td>
-                    <td>${tipoLabel}</td>
-                    <td>
-                        <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            👥 ${service.numeroPessoas}
-                        </span>
-                    </td>
-                    <td>
-                        <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            🧳 ${service.numeroBagagens}
-                        </span>
-                    </td>
-                    <td><strong>${formatDate(service.data)}</strong></td>
-                    <td>
-                        <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
-                            ${service.horaPickup}
-                        </div>
-                    </td>
-                    <td>${service.contacto}</td>
-                    <td>${service.numeroVoo || '-'}</td>
-                    <td>
-                        <div style="font-size: 0.9rem;">
-                            <div><strong>De:</strong> ${service.origem}</div>
-                            <div><strong>Para:</strong> ${service.destino}</div>
-                        </div>
-                    </td>
-                    <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHotel || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHUB || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.comissaoRecepcao || 0).toFixed(2)}
-                    </td>
-                    <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
-                    <td>
-                        <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
-                            ${service.pagoParaQuem}
-                        </span>
-                    </td>
-                    <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
-                            <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
-                            <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+    sortedServices.forEach(service => {
+        const row = document.createElement('tr');
+        
+        // Correção para campos vazios
+        const paymentClass = (service.modoPagamento && service.modoPagamento.toLowerCase().includes('dinheiro')) ? 'payment-cash' : 
+                            (service.modoPagamento && service.modoPagamento.toLowerCase().includes('cartão')) ? 'payment-card' : 'payment-transfer';
+        
+        const tipoServico = service.tipoServico || 'Transfer';
+        const tipoLabel = tipoServico === 'tour' ? '🚐 Tour' : 
+                         tipoServico === 'private' ? '🚗 Private' : 
+                         '🚕 Transfer';
+        
+        row.innerHTML = `
+            <td><strong>#${service.id}</strong></td>
+            <td>
+                <div class="client-info">${service.nomeCliente || 'Não informado'}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto || 'Não informado'}</div>
+            </td>
+            <td>${tipoLabel}</td>
+            <td>
+                <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    👥 ${service.numeroPessoas || 0}
+                </span>
+            </td>
+            <td>
+                <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    🧳 ${service.numeroBagagens || 0}
+                </span>
+            </td>
+            <td><strong>${formatDate(service.data)}</strong></td>
+            <td>
+                <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
+                    ${service.horaPickup || 'Não informado'}
+                </div>
+            </td>
+            <td>${service.contacto || 'Não informado'}</td>
+            <td>${service.numeroVoo || '-'}</td>
+            <td>
+                <div style="font-size: 0.9rem;">
+                    <div><strong>De:</strong> ${service.origem || 'Não informado'}</div>
+                    <div><strong>Para:</strong> ${service.destino || 'Não informado'}</div>
+                </div>
+            </td>
+            <td><span class="value-highlight">€${(service.valorTotal || 0).toFixed(2)}</span></td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHotel || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHUB || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.comissaoRecepcao || 0).toFixed(2)}
+            </td>
+            <td><span class="payment-method ${paymentClass}">${service.modoPagamento || 'Não informado'}</span></td>
+            <td>
+                <span class="pago-para ${(service.pagoParaQuem || '').toLowerCase() === 'recepção' ? 'pago-recepcao' : 'pago-motorista'}">
+                    ${service.pagoParaQuem || 'Não informado'}
+                </span>
+            </td>
+            <td><span class="status status-${(service.status || 'solicitado').toLowerCase()}">${service.status || 'Solicitado'}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
+                    <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
+                    <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
         function updateSummary() {
             const total = services.length;
