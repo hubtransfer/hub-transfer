@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Planeamento Semanal - Turma 6/8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 30px;
+            animation: fadeIn 1s ease-in;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: '✨';
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2em;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-3px); }
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .progress-container {
+            margin: 25px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(250, 112, 154, 0.3);
+        }
+        
+        .progress-container h2 {
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00c851 0%, #007e33 100%);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        #progressText {
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-size: 1.1em;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .motivational-quote {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 15px;
+            margin: 25px 0;
+            font-style: italic;
+            font-size: 1.2em;
+            color: #2c3e50;
+            box-shadow: 0 6px 20px rgba(132, 250, 176, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .motivational-quote::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4em;
+            opacity: 0.3;
+            color: #2c3e50;
+        }
+        
+        .motivational-quote::after {
+            content: '"';
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            font-size: 4em;
+            opacity: 0.3;
+            color: #2c3e50;
+        }
+        
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            gap: 10px;
+        }
+        
+        .day-button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .day-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.3s ease;
+        }
+        
+        .day-button:hover::before {
+            left: 100%;
+        }
+        
+        .day-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .day-button:hover:not(.active) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .day-content {
+            display: none;
+            animation: slideInFromRight 0.5s ease-out;
+        }
+        
+        .day-content.active {
+            display: block;
+        }
+        
+        @keyframes slideInFromRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+        
+        .period {
+            margin: 25px 0;
+            padding: 25px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .period::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+        }
+        
+        .period h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .activity {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        
+        .activity:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateX(5px);
+            border-left-color: #00c851;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .activity input[type="checkbox"] {
+            margin-right: 15px;
+            width: 22px;
+            height: 22px;
+            accent-color: #00c851;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .activity input[type="checkbox"]:checked {
+            transform: scale(1.2);
+        }
+        
+        .activity.completed {
+            opacity: 0.7;
+            text-decoration: line-through;
+            background: rgba(0,200,81,0.3);
+            border-left-color: #00c851;
+        }
+        
+        .activity.completed .activity-content {
+            opacity: 0.8;
+        }
+        
+        .activity-time {
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 100px;
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.2);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .activity-content {
+            flex: 1;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+        
+        .emoji {
+            font-size: 1.3em;
+            margin: 0 8px;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 7% { transform: rotateZ(0); }
+            15% { transform: rotateZ(-15deg); }
+            20% { transform: rotateZ(10deg); }
+            25% { transform: rotateZ(-10deg); }
+            30% { transform: rotateZ(6deg); }
+            35% { transform: rotateZ(-4deg); }
+            40%, 100% { transform: rotateZ(0); }
+        }
+        
+        .reward-system {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        .reward-system:hover {
+            transform: scale(1.05);
+        }
+        
+        .reward-system h4 {
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .achievement {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 3px solid #ffd700;
+        }
+        
+        .achievement.show {
+            display: block;
+            animation: achievementPop 3s ease-out;
+        }
+        
+        @keyframes achievementPop {
+            0% { 
+                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            z-index: 1500;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .day-selector {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .day-button {
+                margin: 0;
+                padding: 12px 20px;
+            }
+            
+            .activity {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .activity-time {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .reward-system {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px 0;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .period {
+                padding: 20px;
+            }
+            
+            .motivational-quote {
+                font-size: 1em;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Meu Planeamento Semanal</h1>
+            <p>Escola Básica Roque Gameiro - Turma 6/8</p>
+            <p>Ano Letivo 2025/26</p>
+        </div>
+        
+        <div class="progress-container">
+            <h2>📊 Progresso Semanal</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">0% completado esta semana</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card" onclick="showAchievements()">
+                <h3 id="completedTasks">0</h3>
+                <p>Tarefas Concluídas</p>
+            </div>
+            <div class="stat-card" onclick="showTotalInfo()">
+                <h3 id="totalTasks">0</h3>
+                <p>Total de Tarefas</p>
+            </div>
+            <div class="stat-card" onclick="showStreakInfo()">
+                <h3 id="streakCount">0</h3>
+                <p>Dias Consecutivos</p>
+            </div>
+            <div class="stat-card" onclick="showRewards()">
+                <h3 id="rewardPoints">0</h3>
+                <p>Pontos Conquistados</p>
+            </div>
+        </div>
+        
+        <div class="motivational-quote" id="motivationalQuote">
+            O sucesso é a soma de pequenos esforços repetidos dia após dia. ✨
+        </div>
+        
+        <div class="day-selector">
+            <button class="day-button active" onclick="showDay('segunda')">Segunda</button>
+            <button class="day-button" onclick="showDay('terca')">Terça</button>
+            <button class="day-button" onclick="showDay('quarta')">Quarta</button>
+            <button class="day-button" onclick="showDay('quinta')">Quinta</button>
+            <button class="day-button" onclick="showDay('sexta')">Sexta</button>
+        </div>
+        
+        <!-- Segunda-feira -->
+        <div class="day-content active" id="segunda">
+            <div class="period">
+                <h3>🌅 Manhã</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:30</span>
+                    <span class="activity-content">Acordar e preparar-se <span class="emoji">⏰</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">09:30</span>
+                    <span class="activity-content">Pequeno-almoço <span class="emoji">🥐</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:30</span>
+                    <span class="activity-content">Estudos/trabalhos de casa <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">12:00</span>
+                    <span class="activity-content">Almoço <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">12:45</span>
+                    <span class="activity-content">Saída para a escola <span class="emoji">🎒</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🏫 Escola</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:20-14:05</span>
+                    <span class="activity-content">AE(M) - Sala B2 <span class="emoji">💡</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">14:05-14:50</span>
+                    <span class="activity-content">HGP - Sala B2 <span class="emoji">🏛️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">15:00-15:45</span>
+                    <span class="activity-content">EV - Sala B3 <span class="emoji">🎨</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">15:45-16:30</span>
+                    <span class="activity-content">ING - Sala B2 <span class="emoji">🇬🇧</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🌙 Tarde/Noite</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">18:30</span>
+                    <span class="activity-content">Lanche e descanso <span class="emoji">🥪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">19:00</span>
+                    <span class="activity-content">Trabalhos de casa e estudos (AE, HGP, ING) <span class="emoji">✍️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">20:30</span>
+                    <span class="activity-content">Jantar <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:00</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">✝️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:30</span>
+                    <span class="activity-content">Preparar material do dia seguinte <span class="emoji">🎒</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:30</span>
+                    <span class="activity-content">Deitar <span class="emoji">😴</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Terça-feira -->
+        <div class="day-content" id="terca">
+            <div class="period">
+                <h3>🌅 Manhã</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:30</span>
+                    <span class="activity-content">Acordar e preparar-se <span class="emoji">⏰</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">09:30</span>
+                    <span class="activity-content">Pequeno-almoço <span class="emoji">🥐</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:30</span>
+                    <span class="activity-content">Estudos/trabalhos de casa <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">12:00</span>
+                    <span class="activity-content">Almoço <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:45</span>
+                    <span class="activity-content">Saída para a escola <span class="emoji">🎒</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🏫 Escola</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:00-10:45</span>
+                    <span class="activity-content">ET - Sala B3 <span class="emoji">🔧</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:45-11:30</span>
+                    <span class="activity-content">ING - Sala C3 <span class="emoji">🇬🇧</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:40-12:25</span>
+                    <span class="activity-content">EMRC - Sala C1 <span class="emoji">✝️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:20-14:05</span>
+                    <span class="activity-content">ING-B/POR-A - Sala A4/D4 <span class="emoji">📝</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">14:05-14:50</span>
+                    <span class="activity-content">ING-A/POR-B - Sala A4/D4 <span class="emoji">📝</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">15:45-16:30</span>
+                    <span class="activity-content">CN - Sala B9 <span class="emoji">🧪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">16:45-17:30</span>
+                    <span class="activity-content">MAT - Sala B3 <span class="emoji">➕</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">17:30-18:15</span>
+                    <span class="activity-content">EM - Sala C3 <span class="emoji">🎵</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🌙 Tarde/Noite</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">18:30</span>
+                    <span class="activity-content">Lanche <span class="emoji">🥪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">19:30</span>
+                    <span class="activity-content">Jantar <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">20:30</span>
+                    <span class="activity-content">Trabalhos de casa e estudos (MAT, POR, CN) <span class="emoji">✍️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:00</span>
+                    <span class="activity-content">Preparar material do dia seguinte <span class="emoji">🎒</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:30</span>
+                    <span class="activity-content">Deitar <span class="emoji">😴</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quarta-feira -->
+        <div class="day-content" id="quarta">
+            <div class="period">
+                <h3>🌅 Manhã</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">07:30</span>
+                    <span class="activity-content">Acordar e preparar-se <span class="emoji">⏰</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:00</span>
+                    <span class="activity-content">Pequeno-almoço <span class="emoji">🥐</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:30</span>
+                    <span class="activity-content">Estudos/trabalhos de casa e leitura da Bíblia <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">09:30</span>
+                    <span class="activity-content">Saída para a escola <span class="emoji">🎒</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🏫 Escola</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:00-10:45</span>
+                    <span class="activity-content">EF - Sala G <span class="emoji">⚽</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:40-12:25</span>
+                    <span class="activity-content">AE(P) - Sala C3 <span class="emoji">💡</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:20-14:05</span>
+                    <span class="activity-content">DT TURMA - Sala B6 <span class="emoji">👥</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">14:05-14:50</span>
+                    <span class="activity-content">MAT - Sala B6 <span class="emoji">➕</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">15:45-16:30</span>
+                    <span class="activity-content">EM - Sala C3 <span class="emoji">🎵</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">16:45-17:30</span>
+                    <span class="activity-content">CD TIC - Sala C3/E4 <span class="emoji">💻</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">17:30-18:15</span>
+                    <span class="activity-content">EF - Sala G <span class="emoji">⚽</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🌙 Tarde/Noite</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">18:30</span>
+                    <span class="activity-content">Lanche <span class="emoji">🥪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">19:30</span>
+                    <span class="activity-content">Jantar <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">20:30</span>
+                    <span class="activity-content">Trabalhos de casa e estudos (MAT, TIC, AE) <span class="emoji">✍️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:00</span>
+                    <span class="activity-content">Preparar material do dia seguinte <span class="emoji">🎒</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:30</span>
+                    <span class="activity-content">Deitar <span class="emoji">😴</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quinta-feira -->
+        <div class="day-content" id="quinta">
+            <div class="period">
+                <h3>🌅 Manhã</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:30</span>
+                    <span class="activity-content">Acordar e preparar-se <span class="emoji">⏰</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">09:30</span>
+                    <span class="activity-content">Pequeno-almoço <span class="emoji">🥐</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:30</span>
+                    <span class="activity-content">Estudos/trabalhos de casa <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">12:00</span>
+                    <span class="activity-content">Almoço <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:45</span>
+                    <span class="activity-content">Saída para a escola <span class="emoji">🎒</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🏫 Escola</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:20-14:05</span>
+                    <span class="activity-content">MAT - Sala B2 <span class="emoji">➕</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">14:05-14:50</span>
+                    <span class="activity-content">CN - Sala B2 <span class="emoji">🧪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">15:00-15:45</span>
+                    <span class="activity-content">POR - Sala B2 <span class="emoji">📝</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">16:45-17:30</span>
+                    <span class="activity-content">HGP - Sala B2 <span class="emoji">🏛️</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🌙 Tarde/Noite</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">18:30</span>
+                    <span class="activity-content">Lanche <span class="emoji">🥪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">19:30</span>
+                    <span class="activity-content">Jantar <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">20:30</span>
+                    <span class="activity-content">Trabalhos de casa e estudos (MAT, CN, POR, HGP) <span class="emoji">✍️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:30</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:00</span>
+                    <span class="activity-content">Preparar material do dia seguinte <span class="emoji">🎒</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:30</span>
+                    <span class="activity-content">Deitar <span class="emoji">😴</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sexta-feira -->
+        <div class="day-content" id="sexta">
+            <div class="period">
+                <h3>🌅 Manhã</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">07:30</span>
+                    <span class="activity-content">Acordar e preparar-se <span class="emoji">⏰</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:00</span>
+                    <span class="activity-content">Pequeno-almoço <span class="emoji">🥐</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">08:30</span>
+                    <span class="activity-content">Estudos/trabalhos de casa e leitura da Bíblia <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">09:30</span>
+                    <span class="activity-content">Saída para a escola <span class="emoji">🎒</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🏫 Escola</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:00-10:45</span>
+                    <span class="activity-content">POR - Sala B3 <span class="emoji">📝</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">10:45-11:30</span>
+                    <span class="activity-content">MAT - Sala B3 <span class="emoji">➕</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">11:40-12:25</span>
+                    <span class="activity-content">EF - Sala G <span class="emoji">⚽</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">13:20-14:05</span>
+                    <span class="activity-content">CN - Sala B3 <span class="emoji">🧪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">14:05-14:50</span>
+                    <span class="activity-content">HGP - Sala B3 <span class="emoji">🏛️</span></span>
+                </div>
+            </div>
+            
+            <div class="period">
+                <h3>🌙 Tarde/Noite</h3>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">16:00</span>
+                    <span class="activity-content">Lanche e descanso <span class="emoji">🥪</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">17:00</span>
+                    <span class="activity-content">Tempo livre/brincadeiras <span class="emoji">🎮</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">19:00</span>
+                    <span class="activity-content">Jantar <span class="emoji">🍽️</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">20:00</span>
+                    <span class="activity-content">Revisão da semana e trabalhos pendentes <span class="emoji">📚</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:00</span>
+                    <span class="activity-content">Leitura da Bíblia <span class="emoji">📖</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">21:30</span>
+                    <span class="activity-content">Preparar fim de semana <span class="emoji">🎉</span></span>
+                </div>
+                <div class="activity" onclick="toggleActivity(this)">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <span class="activity-time">22:30</span>
+                    <span class="activity-content">Deitar <span class="emoji">😴</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="reward-system">
+            <h4>🏆 Sistema de Recompensas</h4>
+            <div id="achievements"></div>
+            <p>Complete 100% do dia e ganhe 50 pontos!</p>
+            <p>Complete todos os dias da semana e ganhe 200 pontos bônus!</p>
+        </div>
+        
+        <div class="achievement" id="achievementPopup">
+            <h2>🎉 Parabéns!</h2>
+            <p id="achievementText">Você conquistou uma nova conquista!</p>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let totalTasksCount = 0;
+        let completedTasksCount = 0;
+        let streakCount = parseInt(localStorage.getItem('streakCount') || '0');
+        let rewardPoints = parseInt(localStorage.getItem('rewardPoints') || '0');
+        let lastCompletedDay = localStorage.getItem('lastCompletedDay') || '';
+        let weeklyProgress = JSON.parse(localStorage.getItem('weeklyProgress') || '{}');
+        
+        // Frases motivacionais
+        const motivationalQuotes = [
+            "O sucesso é a soma de pequenos esforços repetidos dia após dia. ✨",
+            "Cada pequeno passo te aproxima dos teus sonhos! 🌟",
+            "A disciplina é a ponte entre objetivos e conquistas! 🌉",
+            "Tu és mais forte do que pensas e mais capaz do que imaginas! 💪",
+            "Cada dia é uma nova oportunidade para crescer! 🌱",
+            "O conhecimento é o tesouro que ninguém pode roubar! 📚",
+            "Persistência é o caminho do êxito! 🚀",
+            "Acredita em ti mesmo e tudo será possível! ⭐"
+        ];
+        
+        // Achievements
+        const achievements = [
+            { id: 'first_task', name: 'Primeira Tarefa', description: 'Completou a primeira tarefa!', points: 10, icon: '🎯' },
+            { id: 'daily_complete', name: 'Dia Completo', description: 'Completou 100% das tarefas do dia!', points: 50, icon: '🏆' },
+            { id: 'streak_3', name: 'Sequência de 3', description: '3 dias consecutivos completos!', points: 100, icon: '🔥' },
+            { id: 'streak_7', name: 'Semana Perfeita', description: '7 dias consecutivos completos!', points: 200, icon: '👑' },
+            { id: 'early_bird', name: 'Madrugador', description: 'Acordou cedo 5 vezes esta semana!', points: 75, icon: '🐣' },
+            { id: 'scholar', name: 'Estudioso', description: 'Completou todos os estudos da semana!', points: 150, icon: '🎓' },
+            { id: 'weekend_warrior', name: 'Guerreiro do Fim de Semana', description: 'Manteve a rotina no fim de semana!', points: 80, icon: '⚔️' }
+        ];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateProgress();
+            updateMotivationalQuote();
+        });
+        
+        function initializeApp() {
+            // Atualizar estatísticas iniciais
+            document.getElementById('streakCount').textContent = streakCount;
+            document.getElementById('rewardPoints').textContent = rewardPoints;
+            
+            // Carregar progresso salvo
+            loadSavedProgress();
+            
+            // Contar tarefas totais
+            countTotalTasks();
+            
+            // Configurar eventos
+            setupEventListeners();
+        }
+        
+        function setupEventListeners() {
+            // Adicionar eventos de teclado para navegação
+            document.addEventListener('keydown', function(e) {
+                const days = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
+                const currentDay = document.querySelector('.day-button.active').textContent.toLowerCase();
+                let currentIndex = days.findIndex(day => currentDay.includes(day.charAt(0)));
+                
+                if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    showDay(days[currentIndex - 1]);
+                } else if (e.key === 'ArrowRight' && currentIndex < days.length - 1) {
+                    showDay(days[currentIndex + 1]);
+                }
+            });
+        }
+        
+        function countTotalTasks() {
+            totalTasksCount = document.querySelectorAll('input[type="checkbox"]').length;
+            document.getElementById('totalTasks').textContent = totalTasksCount;
+        }
+        
+        function loadSavedProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach((checkbox, index) => {
+                const saved = localStorage.getItem(`task_${index}`);
+                if (saved === 'true') {
+                    checkbox.checked = true;
+                    checkbox.parentElement.classList.add('completed');
+                }
+            });
+        }
+        
+        function saveProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach((checkbox, index) => {
+                localStorage.setItem(`task_${index}`, checkbox.checked);
+            });
+            
+            localStorage.setItem('streakCount', streakCount);
+            localStorage.setItem('rewardPoints', rewardPoints);
+            localStorage.setItem('lastCompletedDay', lastCompletedDay);
+            localStorage.setItem('weeklyProgress', JSON.stringify(weeklyProgress));
+        }
+        
+        function toggleActivity(activityElement) {
+            const checkbox = activityElement.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            // Contar tarefas concluídas
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            completedTasksCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            // Atualizar visual das atividades
+            checkboxes.forEach(checkbox => {
+                const activity = checkbox.parentElement;
+                if (checkbox.checked) {
+                    activity.classList.add('completed');
+                } else {
+                    activity.classList.remove('completed');
+                }
+            });
+            
+            // Calcular percentual
+            const percentage = Math.round((completedTasksCount / totalTasksCount) * 100);
+            
+            // Atualizar elementos visuais
+            document.getElementById('completedTasks').textContent = completedTasksCount;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '% completado esta semana';
+            
+            // Verificar conquistas
+            checkAchievements(percentage);
+            
+            // Criar confetes se 100%
+            if (percentage === 100) {
+                createConfetti();
+            }
+            
+            // Salvar progresso
+            saveProgress();
+        }
+        
+        function checkAchievements(percentage) {
+            // Primeira tarefa
+            if (completedTasksCount === 1) {
+                unlockAchievement('first_task');
+            }
+            
+            // Dia completo
+            if (percentage === 100) {
+                unlockAchievement('daily_complete');
+                updateStreak();
+            }
+            
+            // Verificar outras conquistas baseadas em padrões
+            checkPatternAchievements();
+        }
+        
+        function checkPatternAchievements() {
+            // Madrugador (acordar cedo)
+            const earlyTasks = document.querySelectorAll('input[type="checkbox"]');
+            let earlyBirdCount = 0;
+            
+            earlyTasks.forEach(task => {
+                const timeText = task.parentElement.querySelector('.activity-time').textContent;
+                if (timeText.includes('07:30') || timeText.includes('08:00')) {
+                    if (task.checked) earlyBirdCount++;
+                }
+            });
+            
+            if (earlyBirdCount >= 5) {
+                unlockAchievement('early_bird');
+            }
+            
+            // Estudioso (completar estudos)
+            const studyTasks = Array.from(document.querySelectorAll('.activity-content')).filter(content => 
+                content.textContent.toLowerCase().includes('estudo') || 
+                content.textContent.toLowerCase().includes('trabalhos de casa')
+            );
+            
+            let completedStudies = 0;
+            studyTasks.forEach(study => {
+                const checkbox = study.parentElement.querySelector('input[type="checkbox"]');
+                if (checkbox && checkbox.checked) completedStudies++;
+            });
+            
+            if (completedStudies === studyTasks.length && studyTasks.length > 0) {
+                unlockAchievement('scholar');
+            }
+        }
+        
+        function updateStreak() {
+            const today = new Date().toDateString();
+            
+            if (lastCompletedDay === today) {
+                return; // Já contado hoje
+            }
+            
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastCompletedDay === yesterday.toDateString() || lastCompletedDay === '') {
+                streakCount++;
+            } else {
+                streakCount = 1; // Reset streak
+            }
+            
+            lastCompletedDay = today;
+            document.getElementById('streakCount').textContent = streakCount;
+            
+            // Verificar conquistas de sequência
+            if (streakCount === 3) {
+                unlockAchievement('streak_3');
+            } else if (streakCount === 7) {
+                unlockAchievement('streak_7');
+            }
+        }
+        
+        function unlockAchievement(achievementId) {
+            const achievement = achievements.find(a => a.id === achievementId);
+            if (!achievement) return;
+            
+            // Verificar se já foi desbloqueado
+            if (localStorage.getItem(`achievement_${achievementId}`) === 'true') return;
+            
+            // Marcar como desbloqueado
+            localStorage.setItem(`achievement_${achievementId}`, 'true');
+            // Adicionar pontos
+            rewardPoints += achievement.points;
+            document.getElementById('rewardPoints').textContent = rewardPoints;
+            
+            // Mostrar popup de conquista
+            showAchievementPopup(achievement);
+            
+            // Atualizar display de conquistas
+            updateAchievementsDisplay();
+        }
+        
+        function showAchievementPopup(achievement) {
+            const popup = document.getElementById('achievementPopup');
+            const achievementText = document.getElementById('achievementText');
+            
+            achievementText.innerHTML = `
+                <div style="font-size: 3em; margin-bottom: 10px;">${achievement.icon}</div>
+                <h3>${achievement.name}</h3>
+                <p>${achievement.description}</p>
+                <p style="color: #ffd700; font-weight: bold;">+${achievement.points} pontos!</p>
+            `;
+            
+            popup.classList.add('show');
+            
+            // Esconder após 3 segundos
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+            
+            // Efeito sonoro (se suportado)
+            playAchievementSound();
+        }
+        
+        function playAchievementSound() {
+            try {
+                // Criar um som simples usando Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio não suportado');
+            }
+        }
+        
+        function updateAchievementsDisplay() {
+            const achievementsContainer = document.getElementById('achievements');
+            achievementsContainer.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const isUnlocked = localStorage.getItem(`achievement_${achievement.id}`) === 'true';
+                if (isUnlocked) {
+                    const achievementDiv = document.createElement('div');
+                    achievementDiv.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        margin: 5px 0;
+                        padding: 8px;
+                        background: rgba(255,215,0,0.2);
+                        border-radius: 8px;
+                        font-size: 0.9em;
+                    `;
+                    achievementDiv.innerHTML = `
+                        <span style="margin-right: 8px; font-size: 1.2em;">${achievement.icon}</span>
+                        <span style="font-weight: bold;">${achievement.name}</span>
+                    `;
+                    achievementsContainer.appendChild(achievementDiv);
+                }
+            });
+        }
+        
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    
+                    const keyframes = `
+                        @keyframes confettiFall${i} {
+                            to {
+                                transform: translateY(100vh) rotate(720deg);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    
+                    const style = document.createElement('style');
+                    style.textContent = keyframes;
+                    document.head.appendChild(style);
+                    
+                    confetti.style.animation = `confettiFall${i} ${2 + Math.random() * 3}s linear forwards`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                        style.remove();
+                    }, 5000);
+                }, i * 50);
+            }
+        }
+        
+        function showDay(dayName) {
+            // Remover classe active de todos os botões e conteúdos
+            document.querySelectorAll('.day-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.day-content').forEach(content => content.classList.remove('active'));
+            
+            // Adicionar classe active ao botão e conteúdo selecionado
+            const dayButton = Array.from(document.querySelectorAll('.day-button')).find(btn => 
+                btn.textContent.toLowerCase().includes(dayName.charAt(0))
+            );
+            const dayContent = document.getElementById(dayName);
+            
+            if (dayButton && dayContent) {
+                dayButton.classList.add('active');
+                dayContent.classList.add('active');
+            }
+            
+            // Atualizar frase motivacional
+            updateMotivationalQuote();
+        }
+        
+        function updateMotivationalQuote() {
+            const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            document.getElementById('motivationalQuote').textContent = quote;
+        }
+        
+        function showAchievements() {
+            const unlockedAchievements = achievements.filter(achievement => 
+                localStorage.getItem(`achievement_${achievement.id}`) === 'true'
+            );
+            
+            if (unlockedAchievements.length === 0) {
+                alert('Ainda não tens conquistas desbloqueadas! Complete algumas tarefas para ganhar as tuas primeiras conquistas! 🎯');
+                return;
+            }
+            
+            let message = '🏆 As Tuas Conquistas:\n\n';
+            unlockedAchievements.forEach(achievement => {
+                message += `${achievement.icon} ${achievement.name}\n${achievement.description}\n(+${achievement.points} pontos)\n\n`;
+            });
+            
+            alert(message);
+        }
+        
+        function showTotalInfo() {
+            const percentage = Math.round((completedTasksCount / totalTasksCount) * 100);
+            alert(`📊 Informações das Tarefas:\n\nTotal de tarefas: ${totalTasksCount}\nConcluídas: ${completedTasksCount}\nProgresso: ${percentage}%\n\nContinua assim! 💪`);
+        }
+        
+        function showStreakInfo() {
+            let message = `🔥 Sequência de Dias:\n\nDias consecutivos: ${streakCount}\n\n`;
+            
+            if (streakCount === 0) {
+                message += 'Complete 100% das tarefas de um dia para começar a tua sequência! 🎯';
+            } else if (streakCount < 3) {
+                message += 'Continue assim! Chega aos 3 dias para desbloqueares uma conquista especial! 🌟';
+            } else if (streakCount < 7) {
+                message += 'Excelente! Tenta chegar aos 7 dias para a conquista máxima! 👑';
+            } else {
+                message += 'Incrível! És um verdadeiro campeão da disciplina! 🏆';
+            }
+            
+            alert(message);
+        }
+        
+        function showRewards() {
+            let message = `🎁 Sistema de Recompensas:\n\nPontos atuais: ${rewardPoints}\n\n`;
+            
+            if (rewardPoints < 50) {
+                message += 'Complete mais tarefas para ganhar pontos! 🎯';
+            } else if (rewardPoints < 200) {
+                message += 'Bom trabalho! Continue coletando pontos! ⭐';
+            } else if (rewardPoints < 500) {
+                message += 'Excelente progresso! És muito dedicado! 🌟';
+            } else {
+                message += 'Uau! És um verdadeiro mestre da organização! 👑';
+            }
+            
+            message += '\n\nIdeia: Pede aos teus pais para trocares pontos por pequenas recompensas! 🎉';
+            
+            alert(message);
+        }
+        
+        // Função para resetar progresso (para testes ou nova semana)
+        function resetProgress() {
+            if (confirm('Tens certeza que queres resetar todo o progresso? Esta ação não pode ser desfeita!')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+        
+        // Função para exportar progresso
+        function exportProgress() {
+            const data = {
+                streakCount: streakCount,
+                rewardPoints: rewardPoints,
+                completedTasks: completedTasksCount,
+                totalTasks: totalTasksCount,
+                achievements: achievements.map(a => ({
+                    ...a,
+                    unlocked: localStorage.getItem(`achievement_${a.id}`) === 'true'
+                })),
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'meu_progresso_escolar.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Adicionar eventos de teclado para funcionalidades especiais
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + R para resetar (apenas para desenvolvimento)
+            if (e.ctrlKey && e.key === 'r' && e.shiftKey) {
+                e.preventDefault();
+                resetProgress();
+            }
+            
+            // Ctrl + E para exportar
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                exportProgress();
+            }
+            
+            // Espaço para marcar/desmarcar tarefa selecionada
+            if (e.key === ' ' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                const focusedActivity = document.querySelector('.activity:hover');
+                if (focusedActivity) {
+                    toggleActivity(focusedActivity);
+                }
+            }
+        });
+        
+        // Funcionalidade de salvamento automático
+        setInterval(() => {
+            saveProgress();
+        }, 30000); // Salvar a cada 30 segundos
+        
+        // Atualizar frase motivacional a cada 2 minutos
+        setInterval(() => {
+            updateMotivationalQuote();
+        }, 120000);
+        
+        // Verificar se é um novo dia e resetar progresso diário se necessário
+        function checkNewDay() {
+            const today = new Date().toDateString();
+            const lastVisit = localStorage.getItem('lastVisit') || '';
+            
+            if (lastVisit !== today) {
+                // Novo dia - pode implementar lógica de reset diário aqui se necessário
+                localStorage.setItem('lastVisit', today);
+                
+                // Mostrar mensagem de bom dia
+                setTimeout(() => {
+                    const hour = new Date().getHours();
+                    let greeting = '';
+                    
+                    if (hour < 12) {
+                        greeting = 'Bom dia! ☀️ Pronto para mais um dia produtivo?';
+                    } else if (hour < 18) {
+                        greeting = 'Boa tarde! 🌤️ Como está a correr o teu dia?';
+                    } else {
+                        greeting = 'Boa noite! 🌙 Hora de planear o dia de amanhã!';
+                    }
+                    
+                    alert(greeting);
+                }, 1000);
+            }
+        }
+        
+        // Verificar novo dia ao carregar a página
+        checkNewDay();
+        
+        // Inicializar display de conquistas
+        updateAchievementsDisplay();
+        
+        // Adicionar suporte para PWA (Progressive Web App)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('Service Worker registration failed');
+            });
+        }
+        
+        // Adicionar funcionalidade de instalação da app
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação personalizado
+            const installButton = document.createElement('button');
+            installButton.textContent = '📱 Instalar App';
+            installButton.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                padding: 10px 15px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-weight: bold;
+                cursor: pointer;
+                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                transition: transform 0.3s ease;
+            `;
+            
+            installButton.addEventListener('mouseover', () => {
+                installButton.style.transform = 'scale(1.05)';
+            });
+            
+            installButton.addEventListener('mouseout', () => {
+                installButton.style.transform = 'scale(1)';
+            });
+            
+            installButton.addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App instalada');
+                    }
+                    deferredPrompt = null;
+                    installButton.remove();
+                });
+            });
+            
+            document.body.appendChild(installButton);
+        });
+        
+        // Notificações (se suportado)
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('🎓 Planeamento Ativado!', {
+                            body: 'Receberás lembretes para as tuas tarefas!',
+                            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>'
+                        });
+                    }
+                });
+            }
+        }
+        
+        // Solicitar permissão para notificações após 5 segundos
+        setTimeout(requestNotificationPermission, 5000);
+        
+        console.log('🎓 Planeamento Semanal carregado com sucesso!');
+        console.log('💡 Dicas:');
+        console.log('   - Use as setas ← → para navegar entre os dias');
+        console.log('   - Ctrl+E para exportar o progresso');
+        console.log('   - Clique nos cartões de estatísticas para mais informações');
+    </script>
+</body>
+</html>
