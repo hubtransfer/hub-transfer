@@ -2011,141 +2011,66 @@
         const webappUrl = getWebAppUrl();
         console.log('🔗 URL de sincronização:', webappUrl);
         
-        // Tentar múltiplas estratégias de busca
-        let result = null;
+        // URL corrigida para getAllData
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('📡 Buscando dados de:', dataUrl);
         
-        // Estratégia 1: Buscar com getAllData
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+            mode: 'cors'
+        });
+        
+        console.log('📊 Status da resposta:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const textResponse = await response.text();
+        console.log('📄 Resposta bruta (primeiros 200 chars):', textResponse.substring(0, 200));
+        
+        let result;
         try {
-            const dataUrl = `${webappUrl}?action=getAllData&sheet=Empire MARQUES-HUB&_=${Date.now()}`;
-            console.log('📡 Tentando buscar dados:', dataUrl);
-            
-            const response = await fetch(dataUrl, {
-                method: 'GET',
-                cache: 'no-cache'
-            });
-            
-            if (response.ok) {
-                result = await response.json();
-                console.log('📊 Dados recebidos (getAllData):', result);
-            }
-        } catch (e) {
-            console.log('Estratégia 1 falhou, tentando estratégia 2...');
+            result = JSON.parse(textResponse);
+        } catch (parseError) {
+            console.error('❌ Erro ao parsear JSON:', parseError);
+            throw new Error('Resposta não é um JSON válido');
         }
         
-        // Estratégia 2: POST com parâmetros
-        if (!result || !result.success) {
-            try {
-                const response = await fetch(webappUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'getAllData',
-                        sheet: 'Empire MARQUES-HUB'
-                    })
-                });
-                
-                if (response.ok) {
-                    result = await response.json();
-                    console.log('📊 Dados recebidos (POST):', result);
-                }
-            } catch (e) {
-                console.log('Estratégia 2 falhou, tentando estratégia 3...');
-            }
-        }
+        console.log('📊 Dados parseados:', result);
         
-        // Estratégia 3: Buscar dados simples
-        if (!result || !result.success) {
-            try {
-                const response = await fetch(`${webappUrl}?action=getData&_=${Date.now()}`, {
-                    method: 'GET'
-                });
-                
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log('📄 Resposta raw:', text);
-                    
-                    try {
-                        result = JSON.parse(text);
-                    } catch (parseError) {
-                        console.log('Resposta não é JSON válido');
-                        result = { success: false, error: 'Resposta inválida' };
-                    }
-                }
-            } catch (e) {
-                console.log('Todas as estratégias falharam');
-                throw new Error('Não foi possível conectar ao Google Sheets');
-            }
-        }
-        
-        // Processar resultado
-        if (result && result.success) {
-            console.log('✅ Sincronização bem-sucedida:', result);
+        if (result && result.success && result.data && Array.isArray(result.data)) {
+            console.log(`✅ ${result.data.length} registros recebidos do servidor`);
             
-            if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-                serverData = result.data;
-                console.log(`📋 ${serverData.length} registros recebidos do servidor`);
-                
-                // Converter dados do servidor para formato local
-                const convertedServices = serverData.map(convertServerDataToLocal);
-                console.log('🔄 Dados convertidos:', convertedServices.slice(0, 3)); // Mostrar apenas os 3 primeiros
-                
-                // Mesclar com dados locais sem duplicatas
-                services = mergeServicesData(services, convertedServices);
-                console.log(`📊 Total de serviços após mesclagem: ${services.length}`);
-                
-                // Atualizar interface
-                saveData();
-                renderTable();
-                updateSummary();
-                
-                // Atualizar timestamp da sincronização
-                lastSyncTime = new Date();
-                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                updateLastSyncDisplay();
-                
-                showSyncSuccess(services.length);
-            } else {
-                console.log('⚠️ Nenhum dado recebido do servidor');
-                showStatus('Sincronização realizada mas nenhum dado foi encontrado', 'warning');
-            }
+            // Converter dados do servidor para formato local
+            const convertedServices = result.data.map(convertServerDataToLocal);
+            console.log('🔄 Dados convertidos (amostra):', convertedServices.slice(0, 2));
+            
+            // Mesclar com dados locais
+            services = mergeServicesData(services, convertedServices);
+            console.log(`📊 Total após mesclagem: ${services.length}`);
+            
+            // Atualizar interface
+            saveData();
+            renderTable();
+            updateSummary();
+            
+            // Atualizar timestamp
+            lastSyncTime = new Date();
+            localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+            updateLastSyncDisplay();
+            
+            showSyncSuccess(services.length);
+            return true;
+            
         } else {
-            throw new Error(result?.error || 'Erro na resposta do servidor');
+            throw new Error(result?.error || 'Resposta inválida do servidor');
         }
-        
-        return true;
         
     } catch (error) {
-    console.error('❌ Erro na sincronização:', error);
-    
-    // Tratar diferentes tipos de erro
-    let errorMessage = 'Erro de conexão desconhecido';
-    
-    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        errorMessage = 'Erro de rede - Verifique sua conexão com a internet';
-    } else if (error.message.includes('CORS')) {
-        errorMessage = 'Erro de CORS - Problema de configuração do servidor';
-    } else if (error.message) {
-        errorMessage = error.message;
-    }
-    
-    showSyncError(errorMessage);
-        
-        // Se não há dados locais, mostrar mensagem apropriada
-        if (services.length === 0) {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="18" class="empty-state">
-                        <h3>Erro ao carregar dados</h3>
-                        <p>Não foi possível sincronizar com o Google Sheets</p>
-                        <button class="btn btn-primary" onclick="syncWithServer()">🔄 Tentar Novamente</button>
-                    </td>
-                </tr>
-            `;
-        }
-        
+        console.error('❌ Erro na sincronização:', error);
+        showSyncError(error.message);
         return false;
         
     } finally {
@@ -2157,63 +2082,17 @@
 }
 
         function getWebAppUrl() {
-            return document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
-        }
-
-        function convertServerDataToLocal(serverItem) {
-    console.log('🔄 Convertendo item do servidor:', serverItem);
+    return document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
+}
     
-    // Mapear todos os possíveis nomes de colunas
-    const fieldMapping = {
-        id: serverItem['ID'] || serverItem.id || serverItem['Id'],
-        nomeCliente: serverItem['Cliente'] || serverItem.cliente || serverItem['Client'] || serverItem.nomeCliente,
-        tipoServico: serverItem['Tipo Serviço'] || serverItem['Tipo Servico'] || serverItem.tipoServico || serverItem.tipo || 'Transfer',
-        tourSelecionado: serverItem['Tour'] || serverItem.tour || serverItem.tourSelecionado || '',
-        numeroPessoas: serverItem['Pessoas'] || serverItem.pessoas || serverItem.numeroPessoas || serverItem['Pax'] || 1,
-        numeroBagagens: serverItem['Bagagens'] || serverItem.bagagens || serverItem.numeroBagagens || serverItem['Bags'] || 0,
-        data: serverItem['Data'] || serverItem.data || serverItem['Date'],
-        contacto: serverItem['Contacto'] || serverItem.contacto || serverItem['Contact'] || serverItem['Telefone'],
-        numeroVoo: serverItem['Voo'] || serverItem.voo || serverItem.numeroVoo || serverItem['Flight'] || '',
-        origem: serverItem['Origem'] || serverItem.origem || serverItem['Origin'] || serverItem['From'],
-        destino: serverItem['Destino'] || serverItem.destino || serverItem['Destination'] || serverItem['To'],
-        horaPickup: serverItem['Hora Pick-up'] || serverItem['Hora Pickup'] || serverItem.horaPickup || serverItem['Time'],
-        valorTotal: serverItem['Preço Cliente (€)'] || serverItem['Valor Total'] || serverItem.valorTotal || serverItem['Price'] || 0,
-        valorHotel: serverItem['Valor Empire Marques Hotel (€)'] || serverItem['Valor Hotel'] || serverItem.valorHotel || 0,
-        valorHUB: serverItem['Valor HUB Transfer (€)'] || serverItem['Valor HUB'] || serverItem.valorHUB || 0,
-        comissaoRecepcao: serverItem['Comissão Recepção (€)'] || serverItem['Comissao'] || serverItem.comissaoRecepcao || 0,
-        modoPagamento: serverItem['Forma Pagamento'] || serverItem['Payment'] || serverItem.modoPagamento || 'Dinheiro',
-        pagoParaQuem: serverItem['Pago Para'] || serverItem['Paid To'] || serverItem.pagoParaQuem || 'Recepção',
-        status: serverItem['Status'] || serverItem.status || 'Solicitado',
-        observacoes: serverItem['Observações'] || serverItem['Observacoes'] || serverItem['Notes'] || serverItem.observacoes || '',
-        created: serverItem['Data Criação'] || serverItem['Created'] || serverItem.created || new Date().toISOString()
-    };
+    // Depois tentar localStorage
+    const savedUrl = localStorage.getItem('webappUrl');
+    if (savedUrl) {
+        return savedUrl;
+    }
     
-    const converted = {
-        id: parseInt(fieldMapping.id) || getNextSyncedId(),
-        nomeCliente: String(fieldMapping.nomeCliente || 'Cliente não informado'),
-        tipoServico: String(fieldMapping.tipoServico || 'Transfer'),
-        tourSelecionado: String(fieldMapping.tourSelecionado || ''),
-        numeroPessoas: parseInt(fieldMapping.numeroPessoas) || 1,
-        numeroBagagens: parseInt(fieldMapping.numeroBagagens) || 0,
-        data: formatDateFromServer(fieldMapping.data),
-        contacto: String(fieldMapping.contacto || ''),
-        numeroVoo: String(fieldMapping.numeroVoo || ''),
-        origem: String(fieldMapping.origem || ''),
-        destino: String(fieldMapping.destino || ''),
-        horaPickup: String(fieldMapping.horaPickup || ''),
-        valorTotal: parseFloat(fieldMapping.valorTotal) || 0,
-        valorHotel: parseFloat(fieldMapping.valorHotel) || 0,
-        valorHUB: parseFloat(fieldMapping.valorHUB) || 0,
-        comissaoRecepcao: parseFloat(fieldMapping.comissaoRecepcao) || 0,
-        modoPagamento: String(fieldMapping.modoPagamento || 'Dinheiro'),
-        pagoParaQuem: String(fieldMapping.pagoParaQuem || 'Recepção'),
-        status: String(fieldMapping.status || 'Solicitado'),
-        observacoes: String(fieldMapping.observacoes || ''),
-        created: String(fieldMapping.created || new Date().toISOString())
-    };
-    
-    console.log('✅ Item convertido:', converted);
-    return converted;
+    // Fallback para a URL padrão atualizada
+    return 'https://script.google.com/macros/s/AKfycbzoCrSDD2c9xOX548Nw3qXCDASpzBXxJ8Jqre2U3UcVkV16tQ_RLgDep2b2Cr_EJDs36Q/exec';
 }
 
 // FUNÇÃO PARA FORÇAR SINCRONIZAÇÃO COMPLETA
@@ -2280,67 +2159,58 @@ async function testSimpleConnection() {
 
 // Função auxiliar para tentar recuperar dados
 async function attemptDataRetrieval(webappUrl) {
-    console.log('📡 Tentando recuperar dados...');
+  console.log('📡 Tentando recuperar dados...');
+  
+  try {
+    const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+    console.log('🔄 URL de busca:', dataUrl);
     
-    const methods = [
-        { url: `${webappUrl}?action=getAllData&format=json`, method: 'GET' },
-        { url: `${webappUrl}?getData=true`, method: 'GET' },
-        { url: `${webappUrl}?test=sync`, method: 'GET' }
-    ];
+    const response = await fetch(dataUrl, {
+      method: 'GET',
+      cache: 'no-cache'
+    });
     
-    for (let i = 0; i < methods.length; i++) {
-        try {
-            console.log(`🔄 Tentativa ${i + 1}: ${methods[i].url}`);
-            
-            const response = await fetch(methods[i].url, {
-                method: methods[i].method,
-                cache: 'no-cache'
-            });
-            
-            if (response.ok) {
-                const text = await response.text();
-                console.log('📄 Resposta recebida:', text.substring(0, 200) + '...');
-                
-                try {
-                    const data = JSON.parse(text);
-                    console.log('📊 JSON parseado com sucesso:', data);
-                    
-                    if (data.success && data.data && Array.isArray(data.data)) {
-                        console.log(`✅ ${data.data.length} registros encontrados`);
-                        
-                        // Converter e salvar dados
-                        const convertedServices = data.data.map(convertServerDataToLocal);
-                        services = mergeServicesData(services, convertedServices);
-                        
-                        saveData();
-                        renderTable();
-                        updateSummary();
-                        
-                        showStatus(`✅ ${services.length} transfers sincronizados com sucesso!`, 'success');
-                        
-                        // Atualizar último sync
-                        lastSyncTime = new Date();
-                        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                        updateLastSyncDisplay();
-                        
-                        return; // Sucesso, parar tentativas
-                    }
-                } catch (parseError) {
-                    console.log(`❌ Erro ao parsear JSON da tentativa ${i + 1}:`, parseError);
-                    continue;
-                }
-            } else {
-                console.log(`❌ Resposta não OK da tentativa ${i + 1}:`, response.status);
-            }
-        } catch (error) {
-            console.log(`❌ Erro na tentativa ${i + 1}:`, error.message);
-            continue;
+    if (response.ok) {
+      const text = await response.text();
+      console.log('📄 Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
+      
+      try {
+        const data = JSON.parse(text);
+        console.log('📊 JSON parseado:', data);
+        
+        if (data.success && data.data && Array.isArray(data.data)) {
+          console.log(`✅ ${data.data.length} registros encontrados`);
+          
+          // Converter e salvar dados
+          const convertedServices = data.data.map(convertServerDataToLocal);
+          services = mergeServicesData(services, convertedServices);
+          
+          saveData();
+          renderTable();
+          updateSummary();
+          
+          showStatus(`✅ ${services.length} transfers sincronizados com sucesso!`, 'success');
+          
+          // Atualizar último sync
+          lastSyncTime = new Date();
+          localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+          updateLastSyncDisplay();
+          
+          return true;
         }
+      } catch (parseError) {
+        console.log('❌ Erro ao parsear JSON:', parseError);
+      }
+    } else {
+      console.log('❌ Resposta não OK:', response.status);
     }
-    
-    // Se chegou aqui, todas as tentativas falharam
-    console.log('❌ Todas as tentativas de recuperação falharam');
-    showStatus('Não foi possível recuperar dados. Verifique a configuração do Google Apps Script.', 'warning');
+  } catch (error) {
+    console.log('❌ Erro na requisição:', error.message);
+  }
+  
+  console.log('❌ Falha na recuperação de dados');
+  showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
+  return false;
 }
 
 // Teste básico de conectividade
@@ -3765,6 +3635,24 @@ document.getElementById('nomeCliente').value = service.nomeCliente;
                 showStatus('Sistema resetado com sucesso!', 'success');
             }
         }
+
+// Função de teste simples
+function testarConexao() {
+    console.log('🧪 Testando conexão...');
+    const url = getWebAppUrl();
+    console.log('URL:', url);
+    
+    fetch(url + '?action=test')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Teste OK:', data);
+            alert('Conexão funcionando: ' + data.message);
+        })
+        .catch(error => {
+            console.log('❌ Erro:', error);
+            alert('Erro na conexão: ' + error.message);
+        });
+}
 
         // Exposição das funções de debug para o console
 window.debugInfo = debugInfo;
