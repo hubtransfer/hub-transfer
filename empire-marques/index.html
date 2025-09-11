@@ -2140,7 +2140,9 @@ let isFiltering = false;
 
             sortedServices.forEach(service => {
                 const row = document.createElement('tr');
-                const paymentClass = service.modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
+                const modoPagamento = service.modoPagamento || 'Não informado';
+const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer'; 
                                 service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
                 
                 const tipoServico = service.tipoServico || 'Transfer';
@@ -3076,7 +3078,9 @@ function renderFilteredTable(filteredServices) {
         
         // CORREÇÃO: Adicionar verificação de null/undefined para modoPagamento
         const modoPagamento = service.modoPagamento || 'Não informado';
-        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
+        const modoPagamento = service.modoPagamento || 'Não informado';
+const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer'; 
                         modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
         
         const tipoServico = service.tipoServico || 'Transfer';
