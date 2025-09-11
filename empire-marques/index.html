@@ -2533,35 +2533,81 @@ async function syncWithServer(showLoading = true) {
 }
 
 /**
- * Converte dados do servidor para formato local
+ * Função de debug para verificar dados
+ */
+function debugSyncData() {
+    console.log('=== DEBUG SYNC DATA ===');
+    console.log('Services array:', services);
+    console.log('Server data:', serverData);
+    console.log('Filtered data:', filteredData);
+    console.log('Active filters:', activeFilters);
+    console.log('Next available ID:', nextAvailableId);
+    console.log('Last sync time:', lastSyncTime);
+    console.log('======================');
+    
+    // Testar conversão de um item
+    if (serverData.length > 0) {
+        console.log('Testando conversão do primeiro item:');
+        console.log('Original:', serverData[0]);
+        console.log('Convertido:', convertServerDataToLocal(serverData[0]));
+    }
+}
+
+// Adicionar botão de debug temporário
+function addDebugButton() {
+    const debugBtn = document.createElement('button');
+    debugBtn.textContent = 'Debug Sync';
+    debugBtn.className = 'btn btn-warning';
+    debugBtn.onclick = debugSyncData;
+    debugBtn.style.margin = '10px';
+    
+    const formActions = document.querySelector('.form-actions');
+    if (formActions) {
+        formActions.appendChild(debugBtn);
+    }
+}
+
+// Chamar na inicialização
+setTimeout(addDebugButton, 3000);
+
+/**
+ * Converte dados do servidor para formato local - VERSÃO CORRIGIDA
  * @param {Object} serverItem - Item do servidor
  * @returns {Object} - Item no formato local
  */
 function convertServerDataToLocal(serverItem) {
-    return {
-        id: serverItem['ID'] || serverItem.id,
-        nomeCliente: serverItem['Cliente'] || '',
-        tipoServico: serverItem['Tipo Serviço'] || 'Transfer',
-        numeroPessoas: parseInt(serverItem['Pessoas']) || 1,
-        numeroBagagens: parseInt(serverItem['Bagagens']) || 0,
-        data: serverItem['Data'] || '',
-        contacto: serverItem['Contacto'] || '',
-        numeroVoo: serverItem['Voo'] || '',
-        origem: serverItem['Origem'] || '',
-        destino: serverItem['Destino'] || '',
-        horaPickup: serverItem['Hora Pick-up'] || '',
-        valorTotal: parseFloat(serverItem['Preço Cliente (€)']) || 0,
-        valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)']) || 0,
-        valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)']) || 0,
-        comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)']) || 0,
-        modoPagamento: serverItem['Forma Pagamento'] || 'Dinheiro',
-        pagoParaQuem: serverItem['Pago Para'] || 'Recepção',
-        status: serverItem['Status'] || 'Solicitado',
-        observacoes: serverItem['Observações'] || '',
-        created: serverItem['Data Criação'] || new Date().toISOString()
+    // Debugar dados recebidos
+    console.log('Convertendo item do servidor:', serverItem);
+    
+    // Mapear headers exatos do backend
+    const converted = {
+        id: serverItem['ID'] || serverItem.id || 0,
+        nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+        tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+        numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
+        numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
+        data: serverItem['Data'] || serverItem.data || '',
+        contacto: serverItem['Contacto'] || serverItem.contacto || '',
+        numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
+        origem: serverItem['Origem'] || serverItem.origem || '',
+        destino: serverItem['Destino'] || serverItem.destino || '',
+        horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
+        valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+        valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+        valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+        comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+        modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+        pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
+        status: serverItem['Status'] || serverItem.status || 'Solicitado',
+        observacoes: serverItem['Observações'] || serverItem.observacoes || '',
+        created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
     };
+    
+    // Log do resultado da conversão
+    console.log('Item convertido:', converted);
+    
+    return converted;
 }
-
 /**
  * Obtém a URL do WebApp com fallback
  * @returns {string} - URL do WebApp
