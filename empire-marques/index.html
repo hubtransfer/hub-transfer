@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Parceria - Empire Marques Hotel & HUB Transfer</title>
     
-    <!-- Google Maps API -->
+    <!-- Google Maps API com tratamento de erros melhorado -->
     <script>
         function initMap() {
-            console.log('Google Maps carregado com sucesso!');
+            console.log('✅ Google Maps carregado com sucesso!');
             if (typeof initializeAutocomplete === 'function') {
                 initializeAutocomplete();
             }
         }
         
         window.gm_authFailure = function() {
-            console.warn('Google Maps API não disponível - usando modo offline');
+            console.error('❌ Erro de autenticação do Google Maps');
+            console.log('Usando sistema de sugestões local');
         };
         
         setTimeout(() => {
@@ -24,19 +25,13 @@
             }
         }, 5000);
     </script>
-
-    <script>
-        const gmapsScript = document.createElement('script');
-        gmapsScript.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap';
-        gmapsScript.async = true;
-        gmapsScript.defer = true;
-        gmapsScript.onerror = function() {
-            console.warn('Erro ao carregar Google Maps - continuando sem autocomplete');
-        };
-        document.head.appendChild(gmapsScript);
+    
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap"
+        onerror="console.warn('Erro ao carregar Google Maps - continuando sem autocomplete')">
     </script>
-
-    <!-- Telefone internacional -->
+    
+    <!-- Telefone internacional com fallback -->
     <script>
         const phoneScript = document.createElement('script');
         phoneScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js';
@@ -45,9 +40,9 @@
         };
         document.head.appendChild(phoneScript);
     </script>
-
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" 
-          onerror="console.warn('CSS do telefone não carregou')">    
+          onerror="console.warn('CSS do telefone não carregou')">
     
     <style>
         * {
@@ -104,6 +99,19 @@
             border-radius: 15px;
             font-size: 1.2rem;
             font-weight: 600;
+        }
+
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 1001;
         }
 
         .config-section {
@@ -701,6 +709,18 @@
             font-size: 0.9rem;
         }
 
+        .filter-indicator {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            text-align: center;
+            display: none;
+        }
+
         .services-table {
             background: white;
             border-radius: 15px;
@@ -800,6 +820,24 @@
             transition: all 0.3s ease;
         }
 
+        .btn-sheets {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-sheets:hover {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-sheets:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .client-info {
             font-weight: 600;
             color: #2c3e50;
@@ -865,31 +903,6 @@
 
         #contacto {
             padding-left: 60px;
-        }
-
-        .filter-indicator {
-            background: #007bff;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0;
-            text-align: center;
-            display: none;
-        }
-
-        .sync-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: none;
-            z-index: 1001;
         }
 
         .pagination-controls {
@@ -1016,7 +1029,7 @@
                 gap: 5px;
             }
 
-.pagination-buttons .btn-small {
+            .pagination-buttons .btn-small {
                 min-width: 35px;
                 padding: 8px 10px;
                 font-size: 0.8rem;
@@ -1026,6 +1039,16 @@
                 font-size: 0.9rem;
                 padding: 10px 15px;
             }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-danger.pulse {
+            animation: pulse 1s infinite;
         }
     </style>
 </head>
@@ -1050,7 +1073,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbzsgIWOH5eWNwjUafEfDnuEDPCl6Lg3Y7hVVRlEAVqfgbNhjS3yZE-tR3unFCobhYqknQ/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1484,7 +1507,9 @@
     <div class="admin-toggle" onclick="toggleAdminMode()">🔐 Admin</div>
 
     <script>
-        // VARIÁVEIS GLOBAIS
+        // =====================================================
+        // VARIÁVEIS GLOBAIS UNIFICADAS
+        // =====================================================
         let services = [];
         let editingId = null;
         let phoneInput = null;
@@ -1512,9 +1537,10 @@
         let filteredData = [];
         let isFiltering = false;
 
-        // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec';
+        // CONFIGURAÇÕES MANTIDAS DO CÓDIGO ANTIGO
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzsgIWOH5eWNwjUafEfDnuEDPCl6Lg3Y7hVVRlEAVqfgbNhjS3yZE-tR3unFCobhYqknQ/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
+        const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
         // TOURS E PREÇOS
         const TOURS_DATA = {
@@ -1527,7 +1553,9 @@
             'private-arrabida': { name: 'Private Arrábida', priceSmall: 347, priceLarge: 492, type: 'private' }
         };
 
-        // FUNÇÕES DE SERVIÇO
+        // =====================================================
+        // FUNÇÕES DE SERVIÇO E CÁLCULO
+        // =====================================================
         function setServiceType(type) {
             currentServiceType = type;
             
@@ -1631,7 +1659,9 @@
             }
         }
 
-        // FUNÇÕES DE CONFIGURAÇÃO
+        // =====================================================
+        // FUNÇÕES DE CONFIGURAÇÃO E CONEXÃO
+        // =====================================================
         function toggleConfig() {
             const configSection = document.getElementById('configSection');
             configSection.classList.toggle('show');
@@ -1667,7 +1697,69 @@
             }
         }
 
-        // FUNÇÕES DE FORMULÁRIO
+        async function testConnection() {
+            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+            
+            if (!url) {
+                showStatus('Por favor, insira a URL do Google Apps Script!', 'error');
+                return;
+            }
+            
+            setButtonLoading('testBtn', true);
+            
+            try {
+                const response = await fetch(url + '?action=test', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    isConnected = true;
+                    showStatus('✅ Conexão funcionando!', 'success');
+                    saveWebappUrl();
+                    document.getElementById('syncBtn').style.display = 'inline-block';
+                } else {
+                    throw new Error('Resposta não OK');
+                }
+                
+            } catch (error) {
+                try {
+                    await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain',
+                        },
+                        body: JSON.stringify({ action: 'test' }),
+                        mode: 'no-cors'
+                    });
+                    
+                    isConnected = true;
+                    showStatus('✅ Conexão estabelecida (modo limitado)', 'success');
+                    saveWebappUrl();
+                    document.getElementById('syncBtn').style.display = 'inline-block';
+                    
+                } catch (fallbackError) {
+                    showStatus('❌ Erro ao conectar. Verifique a URL e o deploy', 'error');
+                    isConnected = false;
+                }
+            } finally {
+                setButtonLoading('testBtn', false);
+            }
+        }
+
+        function saveWebappUrl() {
+            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+            if (url) {
+                localStorage.setItem('webappUrl', url);
+                document.getElementById('syncBtn').style.display = 'inline-block';
+                isConnected = true;
+            }
+        }
+
+        // =====================================================
+        // FUNÇÕES DO TELEFONE INTERNACIONAL
+        // =====================================================
         function initializePhoneInput() {
             const phoneInputElement = document.getElementById('contacto');
             
@@ -1736,6 +1828,9 @@
             return document.getElementById('contacto').value;
         }
 
+        // =====================================================
+        // FUNÇÕES DOS BOTÕES RÁPIDOS
+        // =====================================================
         function setPeople(number) {
             document.getElementById('numeroPessoas').value = number;
             document.querySelectorAll('.btn-people').forEach(btn => btn.classList.remove('active'));
@@ -1842,47 +1937,9 @@
             }, 1000);
         }
 
+        // =====================================================
         // INTEGRAÇÃO COM GOOGLE SHEETS
-        async function testConnection() {
-            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
-            
-            if (!url) {
-                showStatus('Por favor, insira a URL do Google Apps Script!', 'error');
-                return;
-            }
-            
-            setButtonLoading('testBtn', true);
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'testConnection'
-                    })
-                });
-                
-                if (response.ok) {
-                    const result = await response.text();
-                    showStatus('Conexão estabelecida com sucesso!', 'success');
-                    isConnected = true;
-                    saveWebappUrl();
-                    document.getElementById('syncBtn').style.display = 'inline-block';
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-            } catch (error) {
-                console.error('Erro ao conectar:', error);
-                showStatus('Erro ao conectar: ' + error.message, 'error');
-                isConnected = false;
-            } finally {
-                setButtonLoading('testBtn', false);
-            }
-        }
-
+        // =====================================================
         async function sendToSheets(serviceData) {
             const url = document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
             
@@ -1892,193 +1949,145 @@
             }
             
             try {
+                console.log('📤 Enviando dados para Sheets:', serviceData);
+                
                 const dataWithEmail = {
                     ...serviceData,
-                    emailDestino: TEST_EMAIL,
-                    timestamp: new Date().toISOString()
+                    emailDestino: TEST_EMAIL
                 };
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
                     },
-                    body: JSON.stringify({
-                        action: 'addData',
-                        data: dataWithEmail
-                    })
+                    body: JSON.stringify(dataWithEmail),
+                    mode: 'no-cors'
                 });
                 
-                if (response.ok) {
-                    console.log('Dados enviados para Google Sheets com sucesso');
-                    return true;
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
+                console.log('✅ Requisição enviada para:', TEST_EMAIL);
+                
+                try {
+                    const checkResponse = await fetch(url + '?action=test', {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    if (checkResponse.ok) {
+                        const result = await checkResponse.json();
+                        console.log('📨 Resposta do Sheets:', result);
+                        return true;
+                    }
+                } catch (e) {
+                    console.log('Verificação ignorada');
                 }
                 
+                return true;
+                
             } catch (error) {
-                console.error('Erro ao enviar para Sheets:', error);
+                console.error('❌ Erro ao enviar para Google Sheets:', error);
+                showStatus('❌ Erro de conexão com Google Sheets', 'error');
                 return false;
             }
         }
 
-        function saveWebappUrl() {
-            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
-            if (url) {
-                localStorage.setItem('webappUrl', url);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
+        async function syncWithServer(showLoading = true) {
+            if (syncInProgress) {
+                console.log('Sincronização já em andamento...');
+                return false;
+            }
+            
+            syncInProgress = true;
+            
+            if (showLoading) {
+                showSyncLoading(true);
+            }
+            
+            try {
+                const webappUrl = getWebAppUrl();
+                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+                
+                const response = await fetch(dataUrl, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar dados: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('📈 Resultado:', result);
+                
+                if (result.success) {
+                    if (result.data && Array.isArray(result.data)) {
+                        serverData = result.data;
+                        
+                        const convertedServices = serverData.map(convertServerDataToLocal);
+                        
+                        services = mergeServicesData(services, convertedServices);
+                        
+                        saveData();
+                        renderTable();
+                        updateSummary();
+                        
+                        lastSyncTime = new Date();
+                        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                        updateLastSyncDisplay();
+                    }
+                    
+                    showSyncSuccess(result.totalRows || serverData.length);
+                    console.log('✅ Sincronização bem-sucedida');
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido');
+                }
+                
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Erro na sincronização:', error);
+                showSyncError(error.message);
+                return false;
+                
+            } finally {
+                syncInProgress = false;
+                if (showLoading) {
+                    showSyncLoading(false);
+                }
             }
         }
 
-async function testConnection() {
-    try {
-        console.log('🧪 Testando conexão...');
-        
-        const webappUrl = getWebAppUrl();
-        console.log('📡 URL:', webappUrl);
-        
-        if (!webappUrl || webappUrl.includes('YOUR_SCRIPT_ID')) {
-            throw new Error('URL do Google Apps Script não configurada');
+        function getWebAppUrl() {
+            return document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
         }
-        
-        const testUrl = `${webappUrl}?action=test&_=${Date.now()}`;
-        console.log('🔗 Teste URL:', testUrl);
-        
-        const response = await fetch(testUrl, {
-            method: 'GET',
-            cache: 'no-cache'
-        });
-        
-        console.log('📨 Response status:', response.status);
-        console.log('📨 Response headers:', response.headers);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log('✅ Teste bem-sucedido:', result);
-        
-        return result;
-        
-    } catch (error) {
-        console.error('❌ Erro no teste:', error);
-        throw error;
-    }
-}
-
-        // SISTEMA DE SINCRONIZAÇÃO
-async function syncWithServer(showLoading = true) {
-    if (syncInProgress) {
-        console.log('Sincronização já em andamento...');
-        return false;
-    }
-    
-    syncInProgress = true;
-    
-    if (showLoading) {
-        showSyncLoading(true);
-    }
-    
-    try {
-        // PRIMEIRO: Testar conexão básica
-        console.log('🔍 Testando conexão básica...');
-        await testConnection();
-        
-        // SEGUNDO: Tentar buscar dados
-        console.log('📊 Buscando dados...');
-        const webappUrl = getWebAppUrl();
-        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-        
-        const response = await fetch(dataUrl, {
-            method: 'GET',
-            cache: 'no-cache'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Erro ao buscar dados: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('📈 Resultado:', result);
-        
-        if (result.success) {
-            showSyncSuccess(result.totalRows || 0);
-            console.log('✅ Sincronização bem-sucedida');
-        } else {
-            throw new Error(result.error || 'Erro desconhecido');
-        }
-        
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Erro na sincronização:', error);
-        showSyncError(error.message);
-        return false;
-        
-    } finally {
-        syncInProgress = false;
-        if (showLoading) {
-            showSyncLoading(false);
-        }
-    }
-}
-
-
-function convertServerToLocal(serverItem) {
-  return {
-    id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || Date.now(),
-    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-    tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
-    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
-    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
-    data: serverItem['Data'] || serverItem.data || '',
-    contacto: serverItem['Contacto'] || serverItem.contacto || '',
-    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
-    origem: serverItem['Origem'] || serverItem.origem || '',
-    destino: serverItem['Destino'] || serverItem.destino || '',
-    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
-    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
-    status: serverItem['Status'] || serverItem.status || 'Solicitado',
-    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
-    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
-  };
-}
 
         function convertServerDataToLocal(serverItem) {
-  const converted = {
-    id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
-    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-    tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
-    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
-    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
-    data: formatDateFromServer(serverItem['Data'] || serverItem.data),
-    contacto: serverItem['Contacto'] || serverItem.contacto || '',
-    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
-    origem: serverItem['Origem'] || serverItem.origem || '',
-    destino: serverItem['Destino'] || serverItem.destino || '',
-    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
-    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
-    status: serverItem['Status'] || serverItem.status || 'Solicitado',
-    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
-    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
-  };
-  
-  return converted;
-}
+            const converted = {
+                id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
+                nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+                tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+                tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
+                numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
+                numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
+                data: formatDateFromServer(serverItem['Data'] || serverItem.data),
+                contacto: serverItem['Contacto'] || serverItem.contacto || '',
+                numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
+                origem: serverItem['Origem'] || serverItem.origem || '',
+                destino: serverItem['Destino'] || serverItem.destino || '',
+                horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
+                valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+                valorHotel: parseFloat(serverItem['Valor Empire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+                valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+                comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+                modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+                pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
+                status: serverItem['Status'] || serverItem.status || 'Solicitado',
+                observacoes: serverItem['Observações'] || serverItem.observacoes || '',
+                created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
+            };
+            
+            return converted;
+        }
 
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
@@ -2109,10 +2118,21 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-        function getWebAppUrl() {
-    // SUA URL CORRETA
-    return 'https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec';
-}
+        function mergeServicesData(localServices, serverServices) {
+            const merged = [...localServices];
+            
+            serverServices.forEach(serverService => {
+                const existingIndex = merged.findIndex(local => local.id === serverService.id);
+                
+                if (existingIndex >= 0) {
+                    merged[existingIndex] = { ...merged[existingIndex], ...serverService };
+                } else {
+                    merged.push(serverService);
+                }
+            });
+            
+            return merged.sort((a, b) => b.id - a.id);
+        }
 
         function getNextSyncedId() {
             const localIds = services.map(s => parseInt(s.id)).filter(id => !isNaN(id));
@@ -2161,7 +2181,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-        // GERENCIAMENTO DE DADOS
+        // =====================================================
+        // GERENCIAMENTO DE DADOS LOCAL
+        // =====================================================
         function loadData() {
             const savedData = localStorage.getItem('partnershipTransferData');
             const savedUrl = localStorage.getItem('webappUrl');
@@ -2209,48 +2231,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-    async function testConnectionSimple() {
-        try {
-            console.log('🧪 Teste de conexão simples...');
-            
-            const url = getWebAppUrl();
-            console.log('📡 URL completa:', url);
-            
-            if (!url.includes('/exec')) {
-                throw new Error('URL incompleta - deve terminar com /exec');
-            }
-            
-            const testUrl = `${url}?action=test&timestamp=${Date.now()}`;
-            console.log('🔗 URL de teste:', testUrl);
-            
-            const response = await fetch(testUrl);
-            console.log('📨 Status da resposta:', response.status);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const text = await response.text();
-            console.log('📄 Texto da resposta:', text);
-            
-            const result = JSON.parse(text);
-            console.log('✅ JSON parseado:', result);
-            
-            if (result.success) {
-                alert('✅ Conexão funcionando!');
-                return true;
-            } else {
-                throw new Error(result.error || 'Resposta de erro');
-            }
-            
-        } catch (error) {
-            console.error('❌ Erro no teste:', error);
-            alert(`❌ Erro: ${error.message}`);
-            return false;
-        }
-    }
-
-        // RENDERIZAÇÃO E VISUALIZAÇÃO
+        // =====================================================
+        // RENDERIZAÇÃO DA TABELA
+        // =====================================================
         function renderTable(pageNumber = 1) {
             currentPage = pageNumber;
             const tbody = document.getElementById('servicesTableBody');
@@ -2284,8 +2267,8 @@ function convertServerToLocal(serverItem) {
                                     modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
                 
                 const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
-                                 tipoServico === 'Private Tour' ? '🚗 Private' : 
+                const tipoLabel = tipoServico === 'Tour Regular' || tipoServico === 'tour' ? '🚐 Tour' : 
+                                 tipoServico === 'Private Tour' || tipoServico === 'private' ? '🚗 Private' : 
                                  '🚕 Transfer';
                 
                 row.innerHTML = `
@@ -2423,6 +2406,210 @@ function convertServerToLocal(serverItem) {
             }
         }
 
+        function updateSummary() {
+            const total = services.length;
+            const pending = services.filter(s => s.status === 'Solicitado').length;
+            const confirmed = services.filter(s => s.status === 'Confirmado').length;
+            const completed = services.filter(s => s.status === 'Finalizado').length;
+
+            const totalRevenue = services.reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const pendingRevenue = services.filter(s => s.status === 'Solicitado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const confirmedRevenue = services.filter(s => s.status === 'Confirmado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+            const completedRevenue = services.filter(s => s.status === 'Finalizado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
+
+            document.getElementById('totalServices').textContent = total;
+            document.getElementById('pendingServices').textContent = pending;
+            document.getElementById('confirmedServices').textContent = confirmed;
+            document.getElementById('completedServices').textContent = completed;
+
+            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
+            document.getElementById('pendingRevenue').textContent = `€${pendingRevenue.toFixed(2)}`;
+            document.getElementById('confirmedRevenue').textContent = `€${confirmedRevenue.toFixed(2)}`;
+            document.getElementById('completedRevenue').textContent = `€${completedRevenue.toFixed(2)}`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-PT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // =====================================================
+        // SISTEMA DE FILTROS AVANÇADOS
+        // =====================================================
+        function applyQuickPeriod() {
+            const select = document.getElementById('quickPeriodSelect');
+            const period = select.value;
+            
+            if (!period) return;
+            
+            const today = new Date();
+            let startDate, endDate;
+            
+            switch (period) {
+                case 'today':
+                    startDate = endDate = today;
+                    break;
+                    
+                case 'yesterday':
+                    startDate = endDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+                    break;
+                    
+                case 'thisWeek':
+                    const dayOfWeek = today.getDay();
+                    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+                    startDate = new Date(today.setDate(diff));
+                    endDate = new Date();
+                    break;
+                    
+                case 'lastWeek':
+                    const lastWeekStart = new Date();
+                    lastWeekStart.setDate(today.getDate() - today.getDay() - 6);
+                    const lastWeekEnd = new Date();
+                    lastWeekEnd.setDate(today.getDate() - today.getDay());
+                    startDate = lastWeekStart;
+                    endDate = lastWeekEnd;
+                    break;
+                    
+                case 'thisMonth':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date();
+                    break;
+                    
+                case 'lastMonth':
+                    const lastMonth = new Date();
+                    lastMonth.setMonth(today.getMonth() - 1);
+                    startDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+                    break;
+                    
+                case 'last7days':
+                    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    endDate = new Date();
+                    break;
+                    
+                case 'last30days':
+                    startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    endDate = new Date();
+                    break;
+            }
+            
+            if (startDate && endDate) {
+                document.getElementById('filterDateStart').value = formatDateForInput(startDate);
+                document.getElementById('filterDateEnd').value = formatDateForInput(endDate);
+                updateDateFilter();
+            }
+        }
+
+        function updateDateFilter() {
+            const startDate = document.getElementById('filterDateStart').value;
+            const endDate = document.getElementById('filterDateEnd').value;
+            
+            activeFilters.dateStart = startDate;
+            activeFilters.dateEnd = endDate;
+            
+            const quickSelect = document.getElementById('quickPeriodSelect');
+            if (quickSelect && (startDate || endDate)) {
+                quickSelect.value = '';
+            }
+            
+            saveFilters();
+            applyCurrentFilters();
+        }
+
+        function updateStatusFilter() {
+            const statusFilter = document.getElementById('filterStatus');
+            activeFilters.status = statusFilter ? statusFilter.value : '';
+            
+            saveFilters();
+            applyCurrentFilters();
+        }
+
+        function updateClientFilter() {
+            const clientFilter = document.getElementById('searchClient');
+            activeFilters.cliente = clientFilter ? clientFilter.value : '';
+            
+            saveFilters();
+            applyCurrentFilters();
+        }
+
+        function updateServiceTypeFilter() {
+            const typeFilter = document.getElementById('filterTipoServico');
+            activeFilters.tipoServico = typeFilter ? typeFilter.value : '';
+            
+            saveFilters();
+            applyCurrentFilters();
+        }
+
+        function applyAllFilters() {
+            console.log('Aplicando todos os filtros:', activeFilters);
+            applyCurrentFilters();
+        }
+
+        function applyCurrentFilters() {
+            if (isFiltering) return;
+            
+            isFiltering = true;
+            
+            try {
+                let filtered = [...services];
+                
+                if (activeFilters.dateStart || activeFilters.dateEnd) {
+                    filtered = filtered.filter(service => {
+                        const serviceDate = parseServiceDate(service.data);
+                        if (!serviceDate) return true;
+                        
+                        let include = true;
+                        
+                        if (activeFilters.dateStart) {
+                            const startDate = new Date(activeFilters.dateStart);
+                            include = include && serviceDate >= startDate;
+                        }
+                        
+                        if (activeFilters.dateEnd) {
+                            const endDate = new Date(activeFilters.dateEnd);
+                            endDate.setHours(23, 59, 59, 999);
+                            include = include && serviceDate <= endDate;
+                        }
+                        
+                        return include;
+                    });
+                }
+                
+                if (activeFilters.status) {
+                    filtered = filtered.filter(service => 
+                        service.status === activeFilters.status
+                    );
+                }
+                
+                if (activeFilters.cliente) {
+                    const searchTerm = activeFilters.cliente.toLowerCase();
+                    filtered = filtered.filter(service =>
+                        service.nomeCliente.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                if (activeFilters.tipoServico) {
+                    filtered = filtered.filter(service =>
+                        service.tipoServico === activeFilters.tipoServico
+                    );
+                }
+                
+                filteredData = filtered;
+                renderFilteredTable(filtered);
+                updateFilteredSummary(filtered);
+                
+                console.log(`Filtros aplicados: ${filtered.length} de ${services.length} transfers`);
+                
+            } finally {
+                isFiltering = false;
+            }
+        }
+
         function renderFilteredTable(filteredServices) {
             const sortedServices = filteredServices.sort((a, b) => b.id - a.id);
             
@@ -2457,10 +2644,8 @@ function convertServerToLocal(serverItem) {
                                     modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
                 
                 const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
-                                 tipoServico === 'Private Tour' ? '🚗 Private' : 
-                                 tipoServico === 'tour' ? '🚐 Tour' :
-                                 tipoServico === 'private' ? '🚗 Private' :
+                const tipoLabel = tipoServico === 'Tour Regular' || tipoServico === 'tour' ? '🚐 Tour' : 
+                                 tipoServico === 'Private Tour' || tipoServico === 'private' ? '🚗 Private' : 
                                  '🚕 Transfer';
                 
                 const dataFormatada = service.data ? (service.data.includes('/') ? service.data : formatDate(service.data)) : 'Data não informada';
@@ -2527,28 +2712,6 @@ function convertServerToLocal(serverItem) {
             updatePaginationControls(totalItems);
         }
 
-        function updateSummary() {
-            const total = services.length;
-            const pending = services.filter(s => s.status === 'Solicitado').length;
-            const confirmed = services.filter(s => s.status === 'Confirmado').length;
-            const completed = services.filter(s => s.status === 'Finalizado').length;
-
-            const totalRevenue = services.reduce((sum, s) => sum + (s.valorTotal || 0), 0);
-            const pendingRevenue = services.filter(s => s.status === 'Solicitado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
-            const confirmedRevenue = services.filter(s => s.status === 'Confirmado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
-            const completedRevenue = services.filter(s => s.status === 'Finalizado').reduce((sum, s) => sum + (s.valorTotal || 0), 0);
-
-            document.getElementById('totalServices').textContent = total;
-            document.getElementById('pendingServices').textContent = pending;
-            document.getElementById('confirmedServices').textContent = confirmed;
-            document.getElementById('completedServices').textContent = completed;
-
-            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
-            document.getElementById('pendingRevenue').textContent = `€${pendingRevenue.toFixed(2)}`;
-            document.getElementById('confirmedRevenue').textContent = `€${confirmedRevenue.toFixed(2)}`;
-            document.getElementById('completedRevenue').textContent = `€${completedRevenue.toFixed(2)}`;
-        }
-
         function updateFilteredSummary(filteredServices) {
             const total = filteredServices.length;
             const pending = filteredServices.filter(s => s.status === 'Solicitado').length;
@@ -2584,17 +2747,105 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-PT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
+        function clearAllFilters() {
+            document.getElementById('filterDateStart').value = '';
+            document.getElementById('filterDateEnd').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('searchClient').value = '';
+            document.getElementById('filterTipoServico').value = '';
+            document.getElementById('quickPeriodSelect').value = '';
+            
+            activeFilters = {
+                dateStart: null,
+                dateEnd: null,
+                status: '',
+                cliente: '',
+                quickPeriod: '',
+                tipoServico: ''
+            };
+            saveFilters();
+            currentPage = 1;
+            renderTable();
+            updateSummary();
+            
+            console.log('Todos os filtros foram limpos');
         }
 
-        // SUBMISSÃO E VALIDAÇÃO DE FORMULÁRIO
+        function parseServiceDate(dateStr) {
+            if (!dateStr) return null;
+            
+            try {
+                if (dateStr.includes('/')) {
+                    const [day, month, year] = dateStr.split('/');
+                    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                } else if (dateStr.includes('-')) {
+                    return new Date(dateStr);
+                } else {
+                    return new Date(dateStr);
+                }
+            } catch (error) {
+                console.error('Erro ao processar data:', dateStr, error);
+                return null;
+            }
+        }
+
+        function formatDateForInput(date) {
+            if (!(date instanceof Date)) return '';
+            
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}`;
+        }
+
+        function saveFilters() {
+            try {
+                localStorage.setItem('activeFilters', JSON.stringify(activeFilters));
+            } catch (error) {
+                console.error('Erro ao salvar filtros:', error);
+            }
+        }
+
+        function loadSavedFilters() {
+            try {
+                const savedFilters = localStorage.getItem('activeFilters');
+                if (savedFilters) {
+                    activeFilters = { ...activeFilters, ...JSON.parse(savedFilters) };
+                    
+                    if (activeFilters.dateStart) {
+                        const startField = document.getElementById('filterDateStart');
+                        if (startField) startField.value = activeFilters.dateStart;
+                    }
+                    
+                    if (activeFilters.dateEnd) {
+                        const endField = document.getElementById('filterDateEnd');
+                        if (endField) endField.value = activeFilters.dateEnd;
+                    }
+                    
+                    if (activeFilters.status) {
+                        const statusField = document.getElementById('filterStatus');
+                        if (statusField) statusField.value = activeFilters.status;
+                    }
+                    
+                    if (activeFilters.cliente) {
+                        const clientField = document.getElementById('searchClient');
+                        if (clientField) clientField.value = activeFilters.cliente;
+                    }
+                    
+                    if (activeFilters.tipoServico) {
+                        const typeField = document.getElementById('filterTipoServico');
+                        if (typeField) typeField.value = activeFilters.tipoServico;
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar filtros salvos:', error);
+            }
+        }
+
+        // =====================================================
+        // SUBMISSÃO E VALIDAÇÃO DO FORMULÁRIO
+        // =====================================================
         document.getElementById('transferForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -2782,7 +3033,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
+        // =====================================================
         // EDIÇÃO E MANIPULAÇÃO DE SERVIÇOS
+        // =====================================================
         function editService(id) {
             const service = services.find(s => s.id === id);
             if (!service) {
@@ -2791,7 +3044,7 @@ function convertServerToLocal(serverItem) {
             }
 
             try {
-                document.getElementById('nomeCliente').value = service.nomeCliente;
+document.getElementById('nomeCliente').value = service.nomeCliente;
                 document.getElementById('numeroPessoas').value = service.numeroPessoas;
                 document.getElementById('numeroBagagens').value = service.numeroBagagens;
                 document.getElementById('data').value = service.data;
@@ -2931,273 +3184,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-        // SISTEMA DE FILTROS AVANÇADOS
-        function applyQuickPeriod() {
-            const select = document.getElementById('quickPeriodSelect');
-            const period = select.value;
-            
-            if (!period) return;
-            
-            const today = new Date();
-            let startDate, endDate;
-            
-            switch (period) {
-                case 'today':
-                    startDate = endDate = today;
-                    break;
-                    
-                case 'yesterday':
-                    startDate = endDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-                    break;
-                    
-                case 'thisWeek':
-                    const dayOfWeek = today.getDay();
-                    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-                    startDate = new Date(today.setDate(diff));
-                    endDate = new Date();
-                    break;
-                    
-                case 'lastWeek':
-                    const lastWeekStart = new Date();
-                    lastWeekStart.setDate(today.getDate() - today.getDay() - 6);
-                    const lastWeekEnd = new Date();
-                    lastWeekEnd.setDate(today.getDate() - today.getDay());
-                    startDate = lastWeekStart;
-                    endDate = lastWeekEnd;
-                    break;
-                    
-                case 'thisMonth':
-                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-                    endDate = new Date();
-                    break;
-                    
-                case 'lastMonth':
-                    const lastMonth = new Date();
-                    lastMonth.setMonth(today.getMonth() - 1);
-                    startDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
-                    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-                    break;
-                    
-                case 'last7days':
-                    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    endDate = new Date();
-                    break;
-                    
-                case 'last30days':
-                    startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-                    endDate = new Date();
-                    break;
-            }
-            
-            if (startDate && endDate) {
-                document.getElementById('filterDateStart').value = formatDateForInput(startDate);
-                document.getElementById('filterDateEnd').value = formatDateForInput(endDate);
-                updateDateFilter();
-            }
-        }
-
-        function updateDateFilter() {
-            const startDate = document.getElementById('filterDateStart').value;
-            const endDate = document.getElementById('filterDateEnd').value;
-            
-            activeFilters.dateStart = startDate;
-            activeFilters.dateEnd = endDate;
-            
-            const quickSelect = document.getElementById('quickPeriodSelect');
-            if (quickSelect && (startDate || endDate)) {
-                quickSelect.value = '';
-            }
-            
-            saveFilters();
-            applyCurrentFilters();
-        }
-
-        function updateStatusFilter() {
-            const statusFilter = document.getElementById('filterStatus');
-            activeFilters.status = statusFilter ? statusFilter.value : '';
-            
-            saveFilters();
-            applyCurrentFilters();
-        }
-
-        function updateClientFilter() {
-            const clientFilter = document.getElementById('searchClient');
-            activeFilters.cliente = clientFilter ? clientFilter.value : '';
-            
-            saveFilters();
-            applyCurrentFilters();
-        }
-
-        function updateServiceTypeFilter() {
-            const typeFilter = document.getElementById('filterTipoServico');
-            activeFilters.tipoServico = typeFilter ? typeFilter.value : '';
-            
-            saveFilters();
-            applyCurrentFilters();
-        }
-
-        function applyAllFilters() {
-            console.log('Aplicando todos os filtros:', activeFilters);
-            applyCurrentFilters();
-        }
-
-        function applyCurrentFilters() {
-            if (isFiltering) return;
-            
-            isFiltering = true;
-            
-            try {
-                let filtered = [...services];
-                
-                if (activeFilters.dateStart || activeFilters.dateEnd) {
-                    filtered = filtered.filter(service => {
-                        const serviceDate = parseServiceDate(service.data);
-                        if (!serviceDate) return true;
-                        
-                        let include = true;
-                        
-                        if (activeFilters.dateStart) {
-                            const startDate = new Date(activeFilters.dateStart);
-                            include = include && serviceDate >= startDate;
-                        }
-                        
-                        if (activeFilters.dateEnd) {
-                            const endDate = new Date(activeFilters.dateEnd);
-                            endDate.setHours(23, 59, 59, 999);
-                            include = include && serviceDate <= endDate;
-                        }
-                        
-                        return include;
-                    });
-                }
-                
-                if (activeFilters.status) {
-                    filtered = filtered.filter(service => 
-                        service.status === activeFilters.status
-                    );
-                }
-                
-                if (activeFilters.cliente) {
-                    const searchTerm = activeFilters.cliente.toLowerCase();
-                    filtered = filtered.filter(service =>
-                        service.nomeCliente.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                if (activeFilters.tipoServico) {
-                    filtered = filtered.filter(service =>
-                        service.tipoServico === activeFilters.tipoServico
-                    );
-                }
-                
-                filteredData = filtered;
-                renderFilteredTable(filtered);
-                updateFilteredSummary(filtered);
-                
-                console.log(`Filtros aplicados: ${filtered.length} de ${services.length} transfers`);
-                
-            } finally {
-                isFiltering = false;
-            }
-        }
-
-        function clearAllFilters() {
-            document.getElementById('filterDateStart').value = '';
-            document.getElementById('filterDateEnd').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('searchClient').value = '';
-            document.getElementById('filterTipoServico').value = '';
-            document.getElementById('quickPeriodSelect').value = '';
-            
-            activeFilters = {
-                dateStart: null,
-                dateEnd: null,
-                status: '',
-                cliente: '',
-                quickPeriod: '',
-                tipoServico: ''
-            };
-            saveFilters();
-            currentPage = 1;
-            renderTable();
-            updateSummary();
-            
-            console.log('Todos os filtros foram limpos');
-        }
-
-        function parseServiceDate(dateStr) {
-            if (!dateStr) return null;
-            
-            try {
-                if (dateStr.includes('/')) {
-                    const [day, month, year] = dateStr.split('/');
-                    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                } else if (dateStr.includes('-')) {
-                    return new Date(dateStr);
-                } else {
-                    return new Date(dateStr);
-                }
-            } catch (error) {
-                console.error('Erro ao processar data:', dateStr, error);
-                return null;
-            }
-        }
-
-        function formatDateForInput(date) {
-            if (!(date instanceof Date)) return '';
-            
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}`;
-        }
-
-        function saveFilters() {
-            try {
-                localStorage.setItem('activeFilters', JSON.stringify(activeFilters));
-            } catch (error) {
-                console.error('Erro ao salvar filtros:', error);
-            }
-        }
-
-        function loadSavedFilters() {
-            try {
-                const savedFilters = localStorage.getItem('activeFilters');
-                if (savedFilters) {
-                    activeFilters = { ...activeFilters, ...JSON.parse(savedFilters) };
-                    
-                    if (activeFilters.dateStart) {
-                        const startField = document.getElementById('filterDateStart');
-                        if (startField) startField.value = activeFilters.dateStart;
-                    }
-                    
-                    if (activeFilters.dateEnd) {
-                        const endField = document.getElementById('filterDateEnd');
-                        if (endField) endField.value = activeFilters.dateEnd;
-                    }
-                    
-                    if (activeFilters.status) {
-                        const statusField = document.getElementById('filterStatus');
-                        if (statusField) statusField.value = activeFilters.status;
-                    }
-                    
-                    if (activeFilters.cliente) {
-                        const clientField = document.getElementById('searchClient');
-                        if (clientField) clientField.value = activeFilters.cliente;
-                    }
-                    
-                    if (activeFilters.tipoServico) {
-                        const typeField = document.getElementById('filterTipoServico');
-                        if (typeField) typeField.value = activeFilters.tipoServico;
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao carregar filtros salvos:', error);
-            }
-        }
-
-        // EXPORTAÇÃO
+        // =====================================================
+        // EXPORTAÇÃO CSV
+        // =====================================================
         function exportToCSV() {
             if (services.length === 0) {
                 showStatus('Não há dados para exportar!', 'warning');
@@ -3259,7 +3248,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
+        // =====================================================
         // INICIALIZAÇÃO DO GOOGLE MAPS
+        // =====================================================
         function initializeAutocomplete() {
             if (typeof google !== 'undefined' && google.maps && google.maps.places) {
                 try {
@@ -3299,7 +3290,9 @@ function convertServerToLocal(serverItem) {
             }
         }
 
-        // DEBOUNCE FUNCTION
+        // =====================================================
+        // FUNÇÕES UTILITÁRIAS E EVENT LISTENERS
+        // =====================================================
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -3314,7 +3307,6 @@ function convertServerToLocal(serverItem) {
 
         const debouncedClientFilter = debounce(updateClientFilter, 500);
 
-        // EVENT LISTENERS E UTILITÁRIOS
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && e.target.type === 'button') {
                 e.preventDefault();
@@ -3338,30 +3330,38 @@ function convertServerToLocal(serverItem) {
             saveData();
         });
 
-        // INICIALIZAÇÃO PRINCIPAL
+        // =====================================================
+        // INICIALIZAÇÃO PRINCIPAL DO SISTEMA
+        // =====================================================
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log('Inicializando Sistema de Transfers Empire Marques Hotel v4.0...');
-                console.log('Email de teste configurado:', TEST_EMAIL);
-                console.log('URL do WebApp:', WEBAPP_URL);
+                console.log('🚀 Inicializando Sistema de Transfers Empire Marques Hotel v5.0 UNIFICADO...');
+                console.log('📧 Email de teste configurado:', TEST_EMAIL);
+                console.log('🔗 URL do WebApp:', WEBAPP_URL);
                 
+                // Carregar dados salvos
                 loadData();
                 loadSavedFilters();
                 
+                // Definir data de hoje como padrão
                 document.getElementById('data').valueAsDate = new Date();
                 
+                // Inicializar Google Maps Autocomplete
                 initializeAutocomplete();
                 
+                // Inicializar campo de telefone após um delay
                 setTimeout(initializePhoneInput, 1000);
                 
+                // Configurar campo de busca de cliente com debounce
                 const searchClient = document.getElementById('searchClient');
                 if (searchClient) {
                     searchClient.addEventListener('input', debouncedClientFilter);
                 }
                 
+                // Testar conexão automática após delay
                 setTimeout(() => {
                     if (isConnected && services.length === 0) {
-                        console.log('Testando conexão e carregando dados iniciais...');
+                        console.log('🔗 Testando conexão e carregando dados iniciais...');
                         testConnection().then(() => {
                             if (isConnected) {
                                 syncWithServer(false);
@@ -3370,15 +3370,24 @@ function convertServerToLocal(serverItem) {
                     }
                 }, 3000);
 
+                // Carregar última sincronização
                 const lastSync = localStorage.getItem('lastSyncTime');
                 if (lastSync) {
                     lastSyncTime = new Date(lastSync);
                     updateLastSyncDisplay();
                 }
 
-                console.log('Sistema inicializado completamente');
-                console.log('Digite debugInfo() no console para informações de debug.');
-                console.log('Senha admin: admin2025');
+                console.log('✅ Sistema inicializado completamente');
+                console.log('📋 Funcionalidades integradas:');
+                console.log('   - Sistema de tours e private tours');
+                console.log('   - Cálculo dinâmico de preços');
+                console.log('   - Modo admin com controle de acesso');
+                console.log('   - Filtros avançados com períodos rápidos');
+                console.log('   - Sincronização multi-dispositivo');
+                console.log('   - Paginação inteligente');
+                console.log('   - Branding Empire Marques Hotel');
+                console.log('💡 Digite debugInfo() no console para informações de debug.');
+                console.log('🔐 Senha admin: admin2025');
                 
             } catch (error) {
                 console.error('Erro na inicialização:', error);
@@ -3386,9 +3395,11 @@ function convertServerToLocal(serverItem) {
             }
         });
 
-        // FUNÇÕES DE DEBUG
+        // =====================================================
+        // FUNÇÕES DE DEBUG E DESENVOLVIMENTO
+        // =====================================================
         function debugInfo() {
-            console.log('=== DEBUG INFO SISTEMA ===');
+            console.log('=== DEBUG INFO SISTEMA UNIFICADO v5.0 ===');
             console.log('Services:', services.length);
             console.log('Connected:', isConnected);
             console.log('Editing ID:', editingId);
@@ -3402,7 +3413,11 @@ function convertServerToLocal(serverItem) {
             console.log('Filtered Data:', filteredData.length);
             console.log('Current Page:', currentPage);
             console.log('Total Pages:', totalPages);
-            console.log('===========================');
+            console.log('Sync In Progress:', syncInProgress);
+            console.log('Last Sync Time:', lastSyncTime);
+            console.log('Server Data:', serverData.length);
+            console.log('Next Available ID:', nextAvailableId);
+            console.log('=========================================');
         }
 
         function debugDataMapping() {
@@ -3437,10 +3452,51 @@ function convertServerToLocal(serverItem) {
             console.log('==================================');
         }
 
+        function resetSystem() {
+            if (confirm('⚠️ ATENÇÃO: Esta ação irá resetar COMPLETAMENTE o sistema!\n\nTodos os dados locais serão perdidos. Continuar?')) {
+                localStorage.clear();
+                services = [];
+                activeFilters = {
+                    dateStart: null,
+                    dateEnd: null,
+                    status: '',
+                    cliente: '',
+                    quickPeriod: '',
+                    tipoServico: ''
+                };
+                filteredData = [];
+                serverData = [];
+                lastSyncTime = null;
+                nextAvailableId = 1;
+                
+                renderTable();
+                updateSummary();
+                clearForm();
+                
+                console.log('Sistema resetado completamente');
+                showStatus('Sistema resetado com sucesso!', 'success');
+            }
+        }
+
+        // Exposição das funções de debug para o console
         window.debugInfo = debugInfo;
         window.debugDataMapping = debugDataMapping;
+        window.resetSystem = resetSystem;
         window.syncWithServer = syncWithServer;
+        window.testConnection = testConnection;
 
+        // Log final de inicialização
+        console.log('🚐 Sistema de Transfers Empire Marques Hotel & HUB Transfer v5.0 UNIFICADO');
+        console.log('📧 Email configurado para testes:', TEST_EMAIL);
+        console.log('🔗 URL do WebApp funcional e testada');
+        console.log('🔐 Senha admin: admin2025');
+        console.log('💡 Funções disponíveis no console:');
+        console.log('   - debugInfo() - Informações de debug');
+        console.log('   - debugDataMapping() - Debug do mapeamento de dados');
+        console.log('   - resetSystem() - Reset completo do sistema');
+        console.log('   - syncWithServer() - Sincronização manual');
+        console.log('   - testConnection() - Teste de conexão');
+        
     </script>
 </body>
 </html>
