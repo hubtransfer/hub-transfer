@@ -1456,16 +1456,17 @@
                 </div>
                 
                 <div class="filter-actions" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                    <button type="button" class="btn btn-primary" onclick="applyAllFilters()">
-                        🔍 Aplicar Filtros
-                    </button>
-                    <button type="button" class="btn btn-clear" onclick="clearAllFilters()">
-                        🔄 Limpar Filtros
-                    </button>
-                    <span id="lastSyncDisplay" style="font-size: 12px; color: #666; margin-left: 10px;"></span>
-                </div>
-            </div>
-
+    <button type="button" class="btn btn-primary" onclick="applyAllFilters()">
+        🔍 Aplicar Filtros
+    </button>
+    <button type="button" class="btn btn-clear" onclick="clearAllFilters()">
+        🔄 Limpar Filtros
+    </button>
+    <button type="button" class="btn btn-success" onclick="forceSyncFromSheets()">
+        📡 Sincronizar do Sheets
+    </button>
+    <span id="lastSyncDisplay" style="font-size: 12px; color: #666; margin-left: 10px;"></span>
+</div>
             <div class="services-table">
                 <table id="servicesTable">
                     <thead>
@@ -1992,102 +1993,235 @@
         }
 
         async function syncWithServer(showLoading = true) {
-            if (syncInProgress) {
-                console.log('Sincronização já em andamento...');
-                return false;
+    if (syncInProgress) {
+        console.log('Sincronização já em andamento...');
+        return false;
+    }
+    
+    syncInProgress = true;
+    
+    if (showLoading) {
+        showSyncLoading(true);
+    }
+    
+    try {
+        const webappUrl = getWebAppUrl();
+        console.log('🔗 URL de sincronização:', webappUrl);
+        
+        // Tentar múltiplas estratégias de busca
+        let result = null;
+        
+        // Estratégia 1: Buscar com getAllData
+        try {
+            const dataUrl = `${webappUrl}?action=getAllData&sheet=Empire MARQUES-HUB&_=${Date.now()}`;
+            console.log('📡 Tentando buscar dados:', dataUrl);
+            
+            const response = await fetch(dataUrl, {
+                method: 'GET',
+                cache: 'no-cache'
+            });
+            
+            if (response.ok) {
+                result = await response.json();
+                console.log('📊 Dados recebidos (getAllData):', result);
             }
-            
-            syncInProgress = true;
-            
-            if (showLoading) {
-                showSyncLoading(true);
-            }
-            
+        } catch (e) {
+            console.log('Estratégia 1 falhou, tentando estratégia 2...');
+        }
+        
+        // Estratégia 2: POST com parâmetros
+        if (!result || !result.success) {
             try {
-                const webappUrl = getWebAppUrl();
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    cache: 'no-cache'
+                const response = await fetch(webappUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'getAllData',
+                        sheet: 'Empire MARQUES-HUB'
+                    })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`Erro ao buscar dados: ${response.status}`);
+                if (response.ok) {
+                    result = await response.json();
+                    console.log('📊 Dados recebidos (POST):', result);
                 }
-                
-                const result = await response.json();
-                console.log('📈 Resultado:', result);
-                
-                if (result.success) {
-                    if (result.data && Array.isArray(result.data)) {
-                        serverData = result.data;
-                        
-                        const convertedServices = serverData.map(convertServerDataToLocal);
-                        
-                        services = mergeServicesData(services, convertedServices);
-                        
-                        saveData();
-                        renderTable();
-                        updateSummary();
-                        
-                        lastSyncTime = new Date();
-                        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                        updateLastSyncDisplay();
-                    }
-                    
-                    showSyncSuccess(result.totalRows || serverData.length);
-                    console.log('✅ Sincronização bem-sucedida');
-                } else {
-                    throw new Error(result.error || 'Erro desconhecido');
-                }
-                
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Erro na sincronização:', error);
-                showSyncError(error.message);
-                return false;
-                
-            } finally {
-                syncInProgress = false;
-                if (showLoading) {
-                    showSyncLoading(false);
-                }
+            } catch (e) {
+                console.log('Estratégia 2 falhou, tentando estratégia 3...');
             }
         }
+        
+        // Estratégia 3: Buscar dados simples
+        if (!result || !result.success) {
+            try {
+                const response = await fetch(`${webappUrl}?action=getData&_=${Date.now()}`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('📄 Resposta raw:', text);
+                    
+                    try {
+                        result = JSON.parse(text);
+                    } catch (parseError) {
+                        console.log('Resposta não é JSON válido');
+                        result = { success: false, error: 'Resposta inválida' };
+                    }
+                }
+            } catch (e) {
+                console.log('Todas as estratégias falharam');
+                throw new Error('Não foi possível conectar ao Google Sheets');
+            }
+        }
+        
+        // Processar resultado
+        if (result && result.success) {
+            console.log('✅ Sincronização bem-sucedida:', result);
+            
+            if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+                serverData = result.data;
+                console.log(`📋 ${serverData.length} registros recebidos do servidor`);
+                
+                // Converter dados do servidor para formato local
+                const convertedServices = serverData.map(convertServerDataToLocal);
+                console.log('🔄 Dados convertidos:', convertedServices.slice(0, 3)); // Mostrar apenas os 3 primeiros
+                
+                // Mesclar com dados locais sem duplicatas
+                services = mergeServicesData(services, convertedServices);
+                console.log(`📊 Total de serviços após mesclagem: ${services.length}`);
+                
+                // Atualizar interface
+                saveData();
+                renderTable();
+                updateSummary();
+                
+                // Atualizar timestamp da sincronização
+                lastSyncTime = new Date();
+                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                updateLastSyncDisplay();
+                
+                showSyncSuccess(services.length);
+            } else {
+                console.log('⚠️ Nenhum dado recebido do servidor');
+                showStatus('Sincronização realizada mas nenhum dado foi encontrado', 'warning');
+            }
+        } else {
+            throw new Error(result?.error || 'Erro na resposta do servidor');
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização:', error);
+        showSyncError(error.message);
+        
+        // Se não há dados locais, mostrar mensagem apropriada
+        if (services.length === 0) {
+            const tbody = document.getElementById('servicesTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="18" class="empty-state">
+                        <h3>Erro ao carregar dados</h3>
+                        <p>Não foi possível sincronizar com o Google Sheets</p>
+                        <button class="btn btn-primary" onclick="syncWithServer()">🔄 Tentar Novamente</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        return false;
+        
+    } finally {
+        syncInProgress = false;
+        if (showLoading) {
+            showSyncLoading(false);
+        }
+    }
+}
 
         function getWebAppUrl() {
             return document.getElementById('webappUrl').value.trim() || localStorage.getItem('webappUrl') || WEBAPP_URL;
         }
 
         function convertServerDataToLocal(serverItem) {
-            const converted = {
-                id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
-                nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-                tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-                tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
-                numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
-                numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
-                data: formatDateFromServer(serverItem['Data'] || serverItem.data),
-                contacto: serverItem['Contacto'] || serverItem.contacto || '',
-                numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
-                origem: serverItem['Origem'] || serverItem.origem || '',
-                destino: serverItem['Destino'] || serverItem.destino || '',
-                horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
-                valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-                valorHotel: parseFloat(serverItem['Valor Empire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-                valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-                comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-                modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-                pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
-                status: serverItem['Status'] || serverItem.status || 'Solicitado',
-                observacoes: serverItem['Observações'] || serverItem.observacoes || '',
-                created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
-            };
-            
-            return converted;
-        }
+    console.log('🔄 Convertendo item do servidor:', serverItem);
+    
+    // Mapear todos os possíveis nomes de colunas
+    const fieldMapping = {
+        id: serverItem['ID'] || serverItem.id || serverItem['Id'],
+        nomeCliente: serverItem['Cliente'] || serverItem.cliente || serverItem['Client'] || serverItem.nomeCliente,
+        tipoServico: serverItem['Tipo Serviço'] || serverItem['Tipo Servico'] || serverItem.tipoServico || serverItem.tipo || 'Transfer',
+        tourSelecionado: serverItem['Tour'] || serverItem.tour || serverItem.tourSelecionado || '',
+        numeroPessoas: serverItem['Pessoas'] || serverItem.pessoas || serverItem.numeroPessoas || serverItem['Pax'] || 1,
+        numeroBagagens: serverItem['Bagagens'] || serverItem.bagagens || serverItem.numeroBagagens || serverItem['Bags'] || 0,
+        data: serverItem['Data'] || serverItem.data || serverItem['Date'],
+        contacto: serverItem['Contacto'] || serverItem.contacto || serverItem['Contact'] || serverItem['Telefone'],
+        numeroVoo: serverItem['Voo'] || serverItem.voo || serverItem.numeroVoo || serverItem['Flight'] || '',
+        origem: serverItem['Origem'] || serverItem.origem || serverItem['Origin'] || serverItem['From'],
+        destino: serverItem['Destino'] || serverItem.destino || serverItem['Destination'] || serverItem['To'],
+        horaPickup: serverItem['Hora Pick-up'] || serverItem['Hora Pickup'] || serverItem.horaPickup || serverItem['Time'],
+        valorTotal: serverItem['Preço Cliente (€)'] || serverItem['Valor Total'] || serverItem.valorTotal || serverItem['Price'] || 0,
+        valorHotel: serverItem['Valor Empire Marques Hotel (€)'] || serverItem['Valor Hotel'] || serverItem.valorHotel || 0,
+        valorHUB: serverItem['Valor HUB Transfer (€)'] || serverItem['Valor HUB'] || serverItem.valorHUB || 0,
+        comissaoRecepcao: serverItem['Comissão Recepção (€)'] || serverItem['Comissao'] || serverItem.comissaoRecepcao || 0,
+        modoPagamento: serverItem['Forma Pagamento'] || serverItem['Payment'] || serverItem.modoPagamento || 'Dinheiro',
+        pagoParaQuem: serverItem['Pago Para'] || serverItem['Paid To'] || serverItem.pagoParaQuem || 'Recepção',
+        status: serverItem['Status'] || serverItem.status || 'Solicitado',
+        observacoes: serverItem['Observações'] || serverItem['Observacoes'] || serverItem['Notes'] || serverItem.observacoes || '',
+        created: serverItem['Data Criação'] || serverItem['Created'] || serverItem.created || new Date().toISOString()
+    };
+    
+    const converted = {
+        id: parseInt(fieldMapping.id) || getNextSyncedId(),
+        nomeCliente: String(fieldMapping.nomeCliente || 'Cliente não informado'),
+        tipoServico: String(fieldMapping.tipoServico || 'Transfer'),
+        tourSelecionado: String(fieldMapping.tourSelecionado || ''),
+        numeroPessoas: parseInt(fieldMapping.numeroPessoas) || 1,
+        numeroBagagens: parseInt(fieldMapping.numeroBagagens) || 0,
+        data: formatDateFromServer(fieldMapping.data),
+        contacto: String(fieldMapping.contacto || ''),
+        numeroVoo: String(fieldMapping.numeroVoo || ''),
+        origem: String(fieldMapping.origem || ''),
+        destino: String(fieldMapping.destino || ''),
+        horaPickup: String(fieldMapping.horaPickup || ''),
+        valorTotal: parseFloat(fieldMapping.valorTotal) || 0,
+        valorHotel: parseFloat(fieldMapping.valorHotel) || 0,
+        valorHUB: parseFloat(fieldMapping.valorHUB) || 0,
+        comissaoRecepcao: parseFloat(fieldMapping.comissaoRecepcao) || 0,
+        modoPagamento: String(fieldMapping.modoPagamento || 'Dinheiro'),
+        pagoParaQuem: String(fieldMapping.pagoParaQuem || 'Recepção'),
+        status: String(fieldMapping.status || 'Solicitado'),
+        observacoes: String(fieldMapping.observacoes || ''),
+        created: String(fieldMapping.created || new Date().toISOString())
+    };
+    
+    console.log('✅ Item convertido:', converted);
+    return converted;
+}
+
+// FUNÇÃO PARA FORÇAR SINCRONIZAÇÃO COMPLETA
+async function forceSyncFromSheets() {
+    console.log('🔄 Forçando sincronização completa do Google Sheets...');
+    
+    // Limpar dados locais primeiro
+    services = [];
+    serverData = [];
+    
+    // Tentar sincronizar
+    const success = await syncWithServer(true);
+    
+    if (success) {
+        console.log('✅ Sincronização forçada concluída');
+        showStatus(`Sincronização completa realizada! ${services.length} transfers carregados.`, 'success');
+    } else {
+        console.log('❌ Falha na sincronização forçada');
+        showStatus('Erro na sincronização. Verifique a conexão e tente novamente.', 'error');
+    }
+    
+    return success;
+}
 
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
@@ -3334,66 +3468,59 @@ document.getElementById('nomeCliente').value = service.nomeCliente;
         // INICIALIZAÇÃO PRINCIPAL DO SISTEMA
         // =====================================================
         document.addEventListener('DOMContentLoaded', function() {
-            try {
-                console.log('🚀 Inicializando Sistema de Transfers Empire Marques Hotel v5.0 UNIFICADO...');
-                console.log('📧 Email de teste configurado:', TEST_EMAIL);
-                console.log('🔗 URL do WebApp:', WEBAPP_URL);
-                
-                // Carregar dados salvos
-                loadData();
-                loadSavedFilters();
-                
-                // Definir data de hoje como padrão
-                document.getElementById('data').valueAsDate = new Date();
-                
-                // Inicializar Google Maps Autocomplete
-                initializeAutocomplete();
-                
-                // Inicializar campo de telefone após um delay
-                setTimeout(initializePhoneInput, 1000);
-                
-                // Configurar campo de busca de cliente com debounce
-                const searchClient = document.getElementById('searchClient');
-                if (searchClient) {
-                    searchClient.addEventListener('input', debouncedClientFilter);
-                }
-                
-                // Testar conexão automática após delay
-                setTimeout(() => {
-                    if (isConnected && services.length === 0) {
-                        console.log('🔗 Testando conexão e carregando dados iniciais...');
-                        testConnection().then(() => {
-                            if (isConnected) {
-                                syncWithServer(false);
-                            }
-                        });
-                    }
-                }, 3000);
-
-                // Carregar última sincronização
-                const lastSync = localStorage.getItem('lastSyncTime');
-                if (lastSync) {
-                    lastSyncTime = new Date(lastSync);
-                    updateLastSyncDisplay();
-                }
-
-                console.log('✅ Sistema inicializado completamente');
-                console.log('📋 Funcionalidades integradas:');
-                console.log('   - Sistema de tours e private tours');
-                console.log('   - Cálculo dinâmico de preços');
-                console.log('   - Modo admin com controle de acesso');
-                console.log('   - Filtros avançados com períodos rápidos');
-                console.log('   - Sincronização multi-dispositivo');
-                console.log('   - Paginação inteligente');
-                console.log('   - Branding Empire Marques Hotel');
-                console.log('💡 Digite debugInfo() no console para informações de debug.');
-                console.log('🔐 Senha admin: admin2025');
-                
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                showStatus('Erro na inicialização do sistema', 'error');
+    try {
+        console.log('🚀 Inicializando Sistema de Transfers Empire Marques Hotel v5.1...');
+        
+        // Carregar dados salvos primeiro
+        loadData();
+        loadSavedFilters();
+        
+        // Definir data de hoje como padrão
+        document.getElementById('data').valueAsDate = new Date();
+        
+        // Inicializar componentes
+        initializeAutocomplete();
+        setTimeout(initializePhoneInput, 1000);
+        
+        // Campo de busca com debounce
+        const searchClient = document.getElementById('searchClient');
+        if (searchClient) {
+            searchClient.addEventListener('input', debouncedClientFilter);
+        }
+        
+        // TENTAR SINCRONIZAÇÃO AUTOMÁTICA MAIS AGRESSIVA
+        setTimeout(async () => {
+            console.log('🔄 Iniciando sincronização automática...');
+            
+            // Se não há dados locais ou dados são antigos, forçar sincronização
+            const shouldSync = services.length === 0 || 
+                              !lastSyncTime || 
+                              (new Date() - lastSyncTime) > (30 * 60 * 1000); // 30 minutos
+            
+            if (shouldSync) {
+                console.log('📡 Executando sincronização inicial...');
+                await forceSyncFromSheets();
+            } else {
+                console.log('📊 Usando dados locais existentes');
+                renderTable();
+                updateSummary();
             }
-        });
+        }, 1000);
+        
+        // Carregar última sincronização
+        const lastSync = localStorage.getItem('lastSyncTime');
+        if (lastSync) {
+            lastSyncTime = new Date(lastSync);
+            updateLastSyncDisplay();
+        }
+
+        console.log('✅ Sistema inicializado completamente');
+        
+    } catch (error) {
+        console.error('Erro na inicialização:', error);
+        showStatus('Erro na inicialização do sistema', 'error');
+    }
+});
 
         // =====================================================
         // FUNÇÕES DE DEBUG E DESENVOLVIMENTO
@@ -3479,11 +3606,12 @@ document.getElementById('nomeCliente').value = service.nomeCliente;
         }
 
         // Exposição das funções de debug para o console
-        window.debugInfo = debugInfo;
-        window.debugDataMapping = debugDataMapping;
-        window.resetSystem = resetSystem;
-        window.syncWithServer = syncWithServer;
-        window.testConnection = testConnection;
+window.debugInfo = debugInfo;
+window.debugDataMapping = debugDataMapping;
+window.resetSystem = resetSystem;
+window.syncWithServer = syncWithServer;
+window.testConnection = testConnection;
+window.forceSyncFromSheets = forceSyncFromSheets;
 
         // Log final de inicialização
         console.log('🚐 Sistema de Transfers Empire Marques Hotel & HUB Transfer v5.0 UNIFICADO');
