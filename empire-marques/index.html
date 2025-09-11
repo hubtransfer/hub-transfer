@@ -1462,9 +1462,12 @@
     <button type="button" class="btn btn-clear" onclick="clearAllFilters()">
         🔄 Limpar Filtros
     </button>
-    <button type="button" class="btn btn-success" onclick="forceSyncFromSheets()">
-        📡 Sincronizar do Sheets
-    </button>
+    <button type="button" class="btn btn-success" onclick="testSimpleConnection()">
+    📡 Sincronizar do Sheets
+</button>
+<button type="button" class="btn btn-warning" onclick="forceSyncFromSheets()">
+    🔄 Sincronização Completa
+</button>
     <span id="lastSyncDisplay" style="font-size: 12px; color: #666; margin-left: 10px;"></span>
 </div>
             <div class="services-table">
@@ -2114,8 +2117,20 @@
         return true;
         
     } catch (error) {
-        console.error('❌ Erro na sincronização:', error);
-        showSyncError(error.message);
+    console.error('❌ Erro na sincronização:', error);
+    
+    // Tratar diferentes tipos de erro
+    let errorMessage = 'Erro de conexão desconhecido';
+    
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        errorMessage = 'Erro de rede - Verifique sua conexão com a internet';
+    } else if (error.message.includes('CORS')) {
+        errorMessage = 'Erro de CORS - Problema de configuração do servidor';
+    } else if (error.message) {
+        errorMessage = error.message;
+    }
+    
+    showSyncError(errorMessage);
         
         // Se não há dados locais, mostrar mensagem apropriada
         if (services.length === 0) {
@@ -2221,6 +2236,60 @@ async function forceSyncFromSheets() {
     }
     
     return success;
+}
+
+// Função de teste simplificada para Google Sheets
+async function testSimpleConnection() {
+    console.log('🧪 Testando conexão simples...');
+    
+    const webappUrl = getWebAppUrl();
+    console.log('📡 URL:', webappUrl);
+    
+    try {
+        // Teste básico
+        const response = await fetch(webappUrl + '?test=true', {
+            method: 'GET',
+            mode: 'no-cors'
+        });
+        
+        console.log('✅ Requisição enviada com sucesso');
+        showStatus('Teste de conexão enviado (modo no-cors)', 'success');
+        
+        // Tentar buscar dados de forma mais simples
+        setTimeout(async () => {
+            try {
+                const dataResponse = await fetch(webappUrl + '?action=getAllData', {
+                    method: 'GET'
+                });
+                
+                if (dataResponse.ok) {
+                    const result = await dataResponse.text();
+                    console.log('📄 Resposta recebida:', result);
+                    
+                    try {
+                        const data = JSON.parse(result);
+                        console.log('📊 Dados parseados:', data);
+                        
+                        if (data.data && Array.isArray(data.data)) {
+                            services = data.data.map(convertServerDataToLocal);
+                            saveData();
+                            renderTable();
+                            updateSummary();
+                            showStatus(`${services.length} transfers carregados!`, 'success');
+                        }
+                    } catch (parseError) {
+                        console.log('❌ Erro ao parsear JSON:', parseError);
+                    }
+                }
+            } catch (e) {
+                console.log('❌ Erro na segunda tentativa:', e);
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('❌ Erro no teste:', error);
+        showStatus('Erro no teste de conexão: ' + error.message, 'error');
+    }
 }
 
         function formatDateFromServer(dateStr) {
@@ -3612,6 +3681,7 @@ window.resetSystem = resetSystem;
 window.syncWithServer = syncWithServer;
 window.testConnection = testConnection;
 window.forceSyncFromSheets = forceSyncFromSheets;
+window.testSimpleConnection = testSimpleConnection;
 
         // Log final de inicialização
         console.log('🚐 Sistema de Transfers Empire Marques Hotel & HUB Transfer v5.0 UNIFICADO');
