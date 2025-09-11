@@ -3073,8 +3073,8 @@ function renderFilteredTable(filteredServices) {
     sortedServices.forEach(service => {
         // Usar o mesmo código de renderização da função renderTable() existente
         const row = document.createElement('tr');
-        const paymentClass = service.modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
-                        service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        const paymentClass = (service.modoPagamento || '').toLowerCase().includes('dinheiro') ? 'payment-cash' : 
+                        (service.modoPagamento || '').toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
         
         const tipoServico = service.tipoServico || 'Transfer';
         const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
