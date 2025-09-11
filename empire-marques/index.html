@@ -3222,12 +3222,10 @@ function renderFilteredTable(filteredServices) {
         // Usar o mesmo código de renderização da função renderTable() existente
         const row = document.createElement('tr');
         
-        // CORREÇÃO: Adicionar verificação de null/undefined para modoPagamento
+        // Verificação corrigida para modoPagamento
         const modoPagamento = service.modoPagamento || 'Não informado';
-        const modoPagamento = service.modoPagamento || 'Não informado';
-const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
-                modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer'; 
-                        modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                            modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
         
         const tipoServico = service.tipoServico || 'Transfer';
         const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
