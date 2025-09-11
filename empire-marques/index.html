@@ -1050,7 +1050,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1513,7 +1513,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // TOURS E PREÇOS
@@ -2110,9 +2110,8 @@ function convertServerToLocal(serverItem) {
         }
 
         function getWebAppUrl() {
-    // CORREÇÃO: Use a URL exata do seu Google Apps Script
-    // Substitua pela URL que aparece quando você implanta o script
-    return 'https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec';
+    // SUA URL CORRETA
+    return 'https://script.google.com/macros/s/AKfycbyyriG--dHTcSMZtSO3irsvVBggM3_bSHc8TMbYOLTPGjqyCTHjfPRtE52N21Y-pFJiZA/exec';
 }
 
         function getNextSyncedId() {
@@ -2209,6 +2208,47 @@ function convertServerToLocal(serverItem) {
                 showStatus('Erro ao salvar dados localmente', 'error');
             }
         }
+
+    async function testConnectionSimple() {
+        try {
+            console.log('🧪 Teste de conexão simples...');
+            
+            const url = getWebAppUrl();
+            console.log('📡 URL completa:', url);
+            
+            if (!url.includes('/exec')) {
+                throw new Error('URL incompleta - deve terminar com /exec');
+            }
+            
+            const testUrl = `${url}?action=test&timestamp=${Date.now()}`;
+            console.log('🔗 URL de teste:', testUrl);
+            
+            const response = await fetch(testUrl);
+            console.log('📨 Status da resposta:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const text = await response.text();
+            console.log('📄 Texto da resposta:', text);
+            
+            const result = JSON.parse(text);
+            console.log('✅ JSON parseado:', result);
+            
+            if (result.success) {
+                alert('✅ Conexão funcionando!');
+                return true;
+            } else {
+                throw new Error(result.error || 'Resposta de erro');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro no teste:', error);
+            alert(`❌ Erro: ${error.message}`);
+            return false;
+        }
+    }
 
         // RENDERIZAÇÃO E VISUALIZAÇÃO
         function renderTable(pageNumber = 1) {
