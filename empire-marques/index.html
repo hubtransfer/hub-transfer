@@ -2142,8 +2142,7 @@ let isFiltering = false;
                 const row = document.createElement('tr');
                 const modoPagamento = service.modoPagamento || 'Não informado';
 const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
-                modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer'; 
-                                service.modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+                modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
                 
                 const tipoServico = service.tipoServico || 'Transfer';
                 const tipoLabel = tipoServico === 'tour' ? '🚐 Tour' : 
