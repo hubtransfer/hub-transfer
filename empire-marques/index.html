@@ -1050,7 +1050,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyCze5lvkQJHg6ZjQ3ZY-bZML7oSoasH-n20QqJawmLU_SwRzA94SS2z4CjtvNgvTIOdA/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxjCTbZox8GKQjmzZSNPAfjZK7KlF2SrgMeIg-KF6B-xeld07yI2lYGUr3hNglmUgjC5Q/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1513,7 +1513,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyCze5lvkQJHg6ZjQ3ZY-bZML7oSoasH-n20QqJawmLU_SwRzA94SS2z4CjtvNgvTIOdA/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxjCTbZox8GKQjmzZSNPAfjZK7KlF2SrgMeIg-KF6B-xeld07yI2lYGUr3hNglmUgjC5Q/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // TOURS E PREÇOS
@@ -1933,88 +1933,133 @@
 
         // SISTEMA DE SINCRONIZAÇÃO
         async function syncWithServer(showLoading = true) {
-            if (syncInProgress) {
-                console.log('Sincronização já em andamento...');
-                return false;
-            }
-            
-            syncInProgress = true;
-            
-            if (showLoading) {
-                showSyncLoading(true);
-            }
-            
-            try {
-                const webappUrl = getWebAppUrl();
-                console.log('Iniciando sincronização com:', webappUrl);
-                
-                const response = await fetch(webappUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'getAllData',
-                        sheetName: 'Empire MARQUES-HUB'
-                    })
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    if (result.success && result.data) {
-                        const convertedServices = result.data.map(item => convertServerDataToLocal(item));
-                        
-                        const existingIds = services.map(s => s.id);
-                        const newServices = convertedServices.filter(s => !existingIds.includes(s.id));
-                        
-                        if (newServices.length > 0) {
-                            services = [...services, ...newServices];
-                            saveData();
-                        }
-                        
-                        renderTable();
-                        updateSummary();
-                        
-                        lastSyncTime = new Date();
-                        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                        
-                        showSyncSuccess(services.length);
-                        console.log('Sincronização concluída com sucesso');
-                        return true;
-                    } else {
-                        throw new Error(result.error || 'Erro desconhecido');
-                    }
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showSyncError(error.message);
-                
-                const localData = localStorage.getItem('partnershipTransferData');
-                if (localData) {
-                    try {
-                        services = JSON.parse(localData);
-                        renderTable();
-                        updateSummary();
-                        console.log('Usando dados locais como fallback:', services.length, 'transfers');
-                    } catch (localError) {
-                        console.error('Erro ao carregar dados locais:', localError);
-                    }
-                }
-                
-                return false;
-                
-            } finally {
-                syncInProgress = false;
-                if (showLoading) {
-                    showSyncLoading(false);
-                }
-            }
+  if (syncInProgress) {
+    console.log('Sincronização já em andamento...');
+    return false;
+  }
+  
+  syncInProgress = true;
+  
+  if (showLoading) {
+    showSyncLoading(true);
+  }
+  
+  try {
+    const webappUrl = getWebAppUrl();
+    console.log('Iniciando sincronização com:', webappUrl);
+    
+    // Tentar várias vezes com diferentes approaches
+    let response;
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      console.log(`Tentativa ${attempts}/${maxAttempts}`);
+      
+      try {
+        // Primeira tentativa: POST
+        if (attempts === 1) {
+          response = await fetch(webappUrl, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'getAllData',
+              sheetName: 'Empire MARQUES-HUB'
+            })
+          });
         }
-
+        // Segunda tentativa: GET com parâmetros
+        else if (attempts === 2) {
+          const urlWithParams = `${webappUrl}?action=getAllData&sheetName=Empire MARQUES-HUB&t=${Date.now()}`;
+          response = await fetch(urlWithParams, {
+            method: 'GET',
+            mode: 'cors'
+          });
+        }
+        // Terceira tentativa: GET simples
+        else {
+          const urlSimple = `${webappUrl}?action=getAllData`;
+          response = await fetch(urlSimple, {
+            method: 'GET'
+          });
+        }
+        
+        if (response.ok) {
+          break; // Sucesso, sair do loop
+        }
+        
+      } catch (fetchError) {
+        console.log(`Erro na tentativa ${attempts}:`, fetchError.message);
+        if (attempts === maxAttempts) {
+          throw fetchError;
+        }
+        // Aguardar antes da próxima tentativa
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    
+    if (!response || !response.ok) {
+      throw new Error(`HTTP ${response?.status || 'Erro de rede'}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.data) {
+      const convertedServices = result.data.map(item => convertServerDataToLocal(item));
+      
+      // Mesclar com dados locais
+      const existingIds = services.map(s => s.id);
+      const newServices = convertedServices.filter(s => !existingIds.includes(s.id));
+      
+      if (newServices.length > 0) {
+        services = [...services, ...newServices];
+        saveData();
+      }
+      
+      renderTable();
+      updateSummary();
+      
+      lastSyncTime = new Date();
+      localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+      
+      showSyncSuccess(services.length);
+      console.log('Sincronização concluída com sucesso');
+      return true;
+      
+    } else {
+      throw new Error(result.error || 'Erro desconhecido na resposta');
+    }
+    
+  } catch (error) {
+    console.error('Erro na sincronização:', error);
+    showSyncError(error.message);
+    
+    // Usar dados locais como fallback
+    const localData = localStorage.getItem('partnershipTransferData');
+    if (localData) {
+      try {
+        services = JSON.parse(localData);
+        renderTable();
+        updateSummary();
+        console.log('Usando dados locais como fallback:', services.length, 'transfers');
+      } catch (localError) {
+        console.error('Erro ao carregar dados locais:', localError);
+      }
+    }
+    
+    return false;
+    
+  } finally {
+    syncInProgress = false;
+    if (showLoading) {
+      showSyncLoading(false);
+    }
+  }
+}
         function convertServerDataToLocal(serverItem) {
             const converted = {
                 id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
