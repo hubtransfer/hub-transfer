@@ -3057,39 +3057,39 @@ function renderFilteredTable(filteredServices) {
                          tipoServico === 'Private Tour' ? '🚗 Private' : 
                          '🚕 Transfer';
         
-        // Mesmo HTML da renderTable() existente
-row.innerHTML = `
-            <td><strong>#${service.id}</strong></td>
+        // HTML completo da linha da tabela - VERSÃO CORRIGIDA
+        row.innerHTML = `
+            <td><strong>#${service.id || 'N/A'}</strong></td>
             <td>
-                <div class="client-info">${service.nomeCliente}</div>
-                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
+                <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto || 'Sem contacto'}</div>
             </td>
             <td>${tipoLabel}</td>
             <td>
                 <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                    👥 ${service.numeroPessoas}
+                    👥 ${service.numeroPessoas || 0}
                 </span>
             </td>
             <td>
                 <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                    🧳 ${service.numeroBagagens}
+                    🧳 ${service.numeroBagagens || 0}
                 </span>
             </td>
-            <td><strong>${service.data}</strong></td>
+            <td><strong>${service.data || 'Data não informada'}</strong></td>
             <td>
                 <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
-                    ${service.horaPickup}
+                    ${service.horaPickup || 'Hora não informada'}
                 </div>
             </td>
-            <td>${service.contacto}</td>
+            <td>${service.contacto || 'Sem contacto'}</td>
             <td>${service.numeroVoo || '-'}</td>
             <td>
                 <div style="font-size: 0.9rem;">
-                    <div><strong>De:</strong> ${service.origem}</div>
-                    <div><strong>Para:</strong> ${service.destino}</div>
+                    <div><strong>De:</strong> ${service.origem || 'Origem não informada'}</div>
+                    <div><strong>Para:</strong> ${service.destino || 'Destino não informado'}</div>
                 </div>
             </td>
-            <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
+            <td><span class="value-highlight">€${(service.valorTotal || 0).toFixed(2)}</span></td>
             <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
                 €${(service.valorHotel || 0).toFixed(2)}
             </td>
@@ -3099,13 +3099,13 @@ row.innerHTML = `
             <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
                 €${(service.comissaoRecepcao || 0).toFixed(2)}
             </td>
-            <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
+            <td><span class="payment-method ${paymentClass}">${service.modoPagamento || 'Não informado'}</span></td>
             <td>
                 <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
-                    ${service.pagoParaQuem}
+                    ${service.pagoParaQuem || 'Não informado'}
                 </span>
             </td>
-            <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
+            <td><span class="status status-${(service.status || 'solicitado').toLowerCase()}">${service.status || 'Solicitado'}</span></td>
             <td>
                 <div class="action-buttons">
                     <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
