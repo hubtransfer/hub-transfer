@@ -2490,9 +2490,24 @@ async function syncWithServer(showLoading = true) {
         const syncData = await dataResponse.json();
         
         if (syncData.status === 'success') {
-            // Atualizar dados globais
+            // Atualizar dados globais com debug melhorado
             serverData = syncData.data || [];
-            services = serverData.map(convertServerDataToLocal);
+            console.log('📊 Dados recebidos do servidor:', serverData.length, 'registros');
+
+            if (serverData.length > 0) {
+              console.log('📋 Exemplo de dados do servidor:', serverData[0]);
+              console.log('📋 Headers disponíveis:', Object.keys(serverData[0]));
+            }
+
+            // Converter para formato local
+            services = serverData.map((item, index) => {
+              console.log(`🔄 Convertendo item ${index + 1}:`, item);
+              const converted = convertServerDataToLocal(item);
+              console.log(`✅ Resultado ${index + 1}:`, converted);
+              return converted;
+            });
+
+            console.log('📊 Total convertido:', services.length, 'transfers');
             
             // Manter dados locais como backup
             saveData();
@@ -2576,38 +2591,44 @@ setTimeout(addDebugButton, 3000);
  * @returns {Object} - Item no formato local
  */
 function convertServerDataToLocal(serverItem) {
-    // Debugar dados recebidos
-    console.log('Convertendo item do servidor:', serverItem);
-    
-    // Mapear headers exatos do backend
-    const converted = {
-        id: serverItem['ID'] || serverItem.id || 0,
-        nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-        tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-        numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
-        numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
-        data: serverItem['Data'] || serverItem.data || '',
-        contacto: serverItem['Contacto'] || serverItem.contacto || '',
-        numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
-        origem: serverItem['Origem'] || serverItem.origem || '',
-        destino: serverItem['Destino'] || serverItem.destino || '',
-        horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
-        valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-        valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-        valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-        comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-        modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-        pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
-        status: serverItem['Status'] || serverItem.status || 'Solicitado',
-        observacoes: serverItem['Observações'] || serverItem.observacoes || '',
-        created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
-    };
-    
-    // Log do resultado da conversão
-    console.log('Item convertido:', converted);
-    
-    return converted;
+  // Debug detalhado
+  console.log('🔍 Convertendo item do servidor:', serverItem);
+  console.log('🔍 Chaves disponíveis:', Object.keys(serverItem));
+  
+  // Mapear headers EXATOS do Google Sheets
+  const converted = {
+    id: serverItem['ID'] || serverItem.id || 0,
+    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
+    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
+    data: serverItem['Data'] || serverItem.data || '',
+    contacto: serverItem['Contacto'] || serverItem.contacto || '',
+    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
+    origem: serverItem['Origem'] || serverItem.origem || '',
+    destino: serverItem['Destino'] || serverItem.destino || '',
+    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
+    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
+    status: serverItem['Status'] || serverItem.status || 'Solicitado',
+    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
+    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
+  };
+  
+  // Log do resultado
+  console.log('✅ Item convertido:', {
+    id: converted.id,
+    cliente: converted.nomeCliente,
+    status: converted.status
+  });
+  
+  return converted;
 }
+
 /**
  * Obtém a URL do WebApp com fallback
  * @returns {string} - URL do WebApp
@@ -2757,6 +2778,9 @@ function createFilterElements() {
             </button>
             <button type="button" class="btn btn-success" id="syncBtn" onclick="syncWithServer()" style="display: none;">
                 📤 Atualizar Dados
+            </button>
+            <button type="button" class="btn btn-warning" onclick="debugSyncData()" style="margin-left: 10px;">
+              🐛 Debug Sync
             </button>
             <span id="lastSyncDisplay" style="font-size: 12px; color: #666; margin-left: 10px;"></span>
         </div>
@@ -3707,7 +3731,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         });
 
-        // Função de debug para desenvolvimento
+// Função de debug para desenvolvimento
         function debugInfo() {
             console.log('=== DEBUG INFO SISTEMA UNIFICADO ===');
             console.log('Services:', services.length);
@@ -3721,6 +3745,40 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Service Type:', currentServiceType);
             console.log('Admin Mode:', isAdminMode);
             console.log('===================================');
+        }
+
+        /**
+         * Função de debug para verificar dados de sincronização
+         */
+        function debugSyncData() {
+          console.log('=== 🐛 DEBUG COMPLETO DOS DADOS ===');
+          console.log('📊 Services locais:', services.length);
+          console.log('📊 Server data:', serverData.length);
+          console.log('📊 Filtered data:', filteredData.length);
+          
+          if (services.length > 0) {
+            console.log('📋 Primeiro service local:', services[0]);
+          }
+          
+          if (serverData.length > 0) {
+            console.log('📋 Primeiro server data:', serverData[0]);
+            console.log('📋 Headers do servidor:', Object.keys(serverData[0]));
+          }
+          
+          // Testar conversão
+          if (serverData.length > 0) {
+            console.log('🧪 TESTE DE CONVERSÃO:');
+            const original = serverData[0];
+            const convertido = convertServerDataToLocal(original);
+            console.log('📥 Original:', original);
+            console.log('📤 Convertido:', convertido);
+          }
+          
+          // Verificar estado dos filtros
+          console.log('🔍 Estado dos filtros:', activeFilters);
+          console.log('🔍 Próximo ID disponível:', nextAvailableId);
+          console.log('🔍 Última sincronização:', lastSyncTime);
+          console.log('=====================================');
         }
 
         window.debugInfo = debugInfo;
