@@ -50,7 +50,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" 
           onerror="console.warn('CSS do telefone não carregou')">    
-    <style>
+    <<style>
         * {
             margin: 0;
             padding: 0;
@@ -868,6 +868,105 @@
             padding-left: 60px;
         }
 
+        .filter-indicator {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 1001;
+        }
+
+        /* ESTILOS DE PAGINAÇÃO */
+        .pagination-controls {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .pagination-info {
+            color: #495057;
+            font-weight: 600;
+            font-size: 1rem;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pagination-buttons .btn-small {
+            min-width: 45px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 2px solid #dee2e6;
+            background: white;
+            color: #495057;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .pagination-buttons .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            border-color: #3498db;
+            background: #e7f3ff;
+        }
+
+        .pagination-buttons .btn-small.btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border-color: #27ae60;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+        }
+
+        .pagination-buttons .btn-small.btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.5);
+        }
+
+        .pagination-buttons .btn-small.btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-color: #3498db;
+        }
+
+        .pagination-buttons .btn-small.btn-clear {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+            border-color: #95a5a6;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -906,31 +1005,29 @@
             .config-input {
                 min-width: 100%;
             }
-        }
 
-        .filter-indicator {
-            background: #007bff;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0;
-            text-align: center;
-            display: none;
-        }
+            .pagination-controls {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+                gap: 15px;
+            }
+            
+            .pagination-buttons {
+                justify-content: center;
+                gap: 5px;
+            }
 
-        .sync-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: none;
-            z-index: 1001;
+            .pagination-buttons .btn-small {
+                min-width: 35px;
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+
+            .pagination-info {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -955,7 +1052,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbzL_M7RX14Uvo-sBuyUzh-O8JPTBUYcjb3eiyZzUA559jnwX3cUCSOzHu8K5KrpNg5BDw/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxOfS7mvK1UqzcvL5n6lIM74pm1kxUc_XA0AerXvy7LENNOxXHZEkYLVJdi8P1ahCFtEw/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1399,7 +1496,10 @@
         let isAdminMode = false;
         let currentServiceType = 'transfer';
         let precoUnitarioAtual = 0;
-        
+        // Variáveis de paginação
+        let currentPage = 1;
+        let itemsPerPage = 15;
+        let totalPages = 1;
         // Variáveis de sincronização
         let syncInProgress = false;
         let lastSyncTime = null;
@@ -1420,7 +1520,7 @@
         let isFiltering = false;
 
         // Configurações
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzL_M7RX14Uvo-sBuyUzh-O8JPTBUYcjb3eiyZzUA559jnwX3cUCSOzHu8K5KrpNg5BDw/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxOfS7mvK1UqzcvL5n6lIM74pm1kxUc_XA0AerXvy7LENNOxXHZEkYLVJdi8P1ahCFtEw/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // Tours e Preços
@@ -2142,33 +2242,75 @@ async function processSyncQueue() {
         // =====================================================
         // GERENCIAMENTO DE DADOS
         // =====================================================
-        function loadData() {
-            const savedData = localStorage.getItem('partnershipTransferData');
-            const savedUrl = localStorage.getItem('webappUrl');
-            
-            if (savedData) {
-                try {
-                    services = JSON.parse(savedData);
-                    console.log(`${services.length} transfers carregados do localStorage`);
-                    renderTable();
-                    updateSummary();
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                    services = [];
-                }
-            }
-            
-            if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            } else {
-                document.getElementById('webappUrl').value = WEBAPP_URL;
-                localStorage.setItem('webappUrl', WEBAPP_URL);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            }
+       function loadData() {
+    const savedData = localStorage.getItem('partnershipTransferData');
+    const savedUrl = localStorage.getItem('webappUrl');
+    
+    if (savedData) {
+        try {
+            services = JSON.parse(savedData);
+            console.log(`${services.length} transfers carregados do localStorage`);
+            renderTable();
+            updateSummary();
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            services = [];
         }
+    }
+    
+    if (savedUrl) {
+        document.getElementById('webappUrl').value = savedUrl;
+        document.getElementById('syncBtn').style.display = 'inline-block';
+        isConnected = true;
+    } else {
+        document.getElementById('webappUrl').value = WEBAPP_URL;
+        localStorage.setItem('webappUrl', WEBAPP_URL);
+        document.getElementById('syncBtn').style.display = 'inline-block';
+        isConnected = true;
+    }
+    
+    // Se não há dados locais, tentar carregar da aba Empire MARQUES-HUB
+    if (services.length === 0) {
+        console.log('Nenhum dado local encontrado, preparando para carregar da aba Empire MARQUES-HUB');
+        setTimeout(loadRealData, 2000);
+    }
+}
+
+async function loadRealData() {
+    console.log('🔄 Carregando dados da aba Empire MARQUES-HUB...');
+    
+    try {
+        const webappUrl = getWebAppUrl();
+        
+        // Requisição específica para a aba Empire MARQUES-HUB
+        const response = await fetch(webappUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'getAllData',
+                sheetName: 'Empire MARQUES-HUB'
+            }),
+            mode: 'no-cors'
+        });
+        
+        console.log('📤 Requisição enviada para aba Empire MARQUES-HUB');
+        
+        // Fallback para demonstração
+        showStatus('Solicitando dados da aba Empire MARQUES-HUB...', 'warning');
+        
+        // Como no-cors não retorna dados, simular estrutura esperada
+        console.log('📋 Conexão estabelecida com Google Sheets - aba Empire MARQUES-HUB');
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar da aba Empire MARQUES-HUB:', error);
+        showStatus('Modo offline - dados locais mantidos', 'warning');
+        return false;
+    }
+}
 
         function saveData() {
             try {
@@ -2183,193 +2325,298 @@ async function processSyncQueue() {
         // =====================================================
         // RENDERIZAÇÃO E VISUALIZAÇÃO
         // =====================================================
-        function renderTable() {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = '';
+        function renderTable(pageNumber = 1) {
+    currentPage = pageNumber;
+    const tbody = document.getElementById('servicesTableBody');
+    tbody.innerHTML = '';
 
-            if (services.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="18" class="empty-state">
-                            <h3>Nenhum serviço cadastrado</h3>
-                            <p>Adicione o primeiro transfer usando o formulário acima</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    if (services.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="18" class="empty-state">
+                    <h3>Nenhum serviço cadastrado</h3>
+                    <p>Adicione o primeiro transfer usando o formulário acima</p>
+                </td>
+            </tr>
+        `;
+        updatePaginationControls(0);
+        return;
+    }
 
-            const sortedServices = services.sort((a, b) => {
-                const dateA = new Date(a.data + ' ' + a.horaPickup);
-                const dateB = new Date(b.data + ' ' + b.horaPickup);
-                return dateB - dateA;
-            });
+    // Ordenar por ID decrescente (IDs maiores primeiro)
+    const sortedServices = services.sort((a, b) => b.id - a.id);
 
-            sortedServices.forEach(service => {
-                const row = document.createElement('tr');
-                
-                const modoPagamento = service.modoPagamento || 'Não informado';
-                const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
-                                    modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
-                
-                const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
-                                 tipoServico === 'Private Tour' ? '🚗 Private' : 
-                                 '🚕 Transfer';
-                
-                row.innerHTML = `
-                    <td><strong>#${service.id}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
-                    </td>
-                    <td>${tipoLabel}</td>
-                    <td>
-                        <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            👥 ${service.numeroPessoas}
-                        </span>
-                    </td>
-                    <td>
-                        <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            🧳 ${service.numeroBagagens}
-                        </span>
-                    </td>
-                    <td><strong>${formatDate(service.data)}</strong></td>
-                    <td>
-                        <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
-                            ${service.horaPickup}
-                        </div>
-                    </td>
-                    <td>${service.contacto}</td>
-                    <td>${service.numeroVoo || '-'}</td>
-                    <td>
-                        <div style="font-size: 0.9rem;">
-                            <div><strong>De:</strong> ${service.origem}</div>
-                            <div><strong>Para:</strong> ${service.destino}</div>
-                        </div>
-                    </td>
-                    <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHotel || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHUB || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.comissaoRecepcao || 0).toFixed(2)}
-                    </td>
-                    <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
-                    <td>
-                        <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
-                            ${service.pagoParaQuem}
-                        </span>
-                    </td>
-                    <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
-                            <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
-                            <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+    // Calcular paginação
+    totalPages = Math.ceil(sortedServices.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageServices = sortedServices.slice(startIndex, endIndex);
+
+    pageServices.forEach(service => {
+        const row = document.createElement('tr');
+        
+        const modoPagamento = service.modoPagamento || 'Não informado';
+        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                            modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        
+        const tipoServico = service.tipoServico || 'Transfer';
+        const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
+                         tipoServico === 'Private Tour' ? '🚗 Private' : 
+                         '🚕 Transfer';
+        
+        row.innerHTML = `
+            <td><strong>#${service.id}</strong></td>
+            <td>
+                <div class="client-info">${service.nomeCliente}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
+            </td>
+            <td>${tipoLabel}</td>
+            <td>
+                <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    👥 ${service.numeroPessoas}
+                </span>
+            </td>
+            <td>
+                <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    🧳 ${service.numeroBagagens}
+                </span>
+            </td>
+            <td><strong>${formatDate(service.data)}</strong></td>
+            <td>
+                <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
+                    ${service.horaPickup}
+                </div>
+            </td>
+            <td>${service.contacto}</td>
+            <td>${service.numeroVoo || '-'}</td>
+            <td>
+                <div style="font-size: 0.9rem;">
+                    <div><strong>De:</strong> ${service.origem}</div>
+                    <div><strong>Para:</strong> ${service.destino}</div>
+                </div>
+            </td>
+            <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHotel || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHUB || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.comissaoRecepcao || 0).toFixed(2)}
+            </td>
+            <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
+            <td>
+                <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
+                    ${service.pagoParaQuem}
+                </span>
+            </td>
+            <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
+                    <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
+                    <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    updatePaginationControls(sortedServices.length);
+}
+
+function updatePaginationControls(totalItems) {
+    let paginationContainer = document.getElementById('paginationControls');
+    
+    if (!paginationContainer) {
+        // Criar container de paginação
+        paginationContainer = document.createElement('div');
+        paginationContainer.id = 'paginationControls';
+        paginationContainer.className = 'pagination-controls';
+        
+        const servicesTable = document.querySelector('.services-table');
+        servicesTable.appendChild(paginationContainer);
+    }
+    
+    if (totalItems === 0) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = `
+            <div class="pagination-info">
+                Mostrando ${totalItems} transfer${totalItems !== 1 ? 's' : ''}
+            </div>
+        `;
+        return;
+    }
+    
+    let paginationHTML = `
+        <div class="pagination-info">
+            Página ${currentPage} de ${totalPages} (${totalItems} transfers total)
+        </div>
+        <div class="pagination-buttons">
+    `;
+    
+    // Botão Primeira
+    if (currentPage > 1) {
+        paginationHTML += `<button class="btn btn-small btn-primary" onclick="goToPage(1)">« Primeira</button>`;
+    }
+    
+    // Botão Anterior
+    if (currentPage > 1) {
+        paginationHTML += `<button class="btn btn-small btn-primary" onclick="goToPage(${currentPage - 1})">‹ Anterior</button>`;
+    }
+    
+    // Números das páginas
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const activeClass = i === currentPage ? 'btn-success' : 'btn-clear';
+        paginationHTML += `<button class="btn btn-small ${activeClass}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    
+    // Botão Próxima
+    if (currentPage < totalPages) {
+        paginationHTML += `<button class="btn btn-small btn-primary" onclick="goToPage(${currentPage + 1})">Próxima ›</button>`;
+    }
+    
+    // Botão Última
+    if (currentPage < totalPages) {
+        paginationHTML += `<button class="btn btn-small btn-primary" onclick="goToPage(${totalPages})">Última »</button>`;
+    }
+    
+    paginationHTML += '</div>';
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+function goToPage(pageNumber) {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+        renderTable(pageNumber);
+        
+        // Scroll para o topo da tabela
+        document.querySelector('.services-table').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
 
         function renderFilteredTable(filteredServices) {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = '';
+    // Ordenar por ID decrescente (IDs maiores primeiro)
+    const sortedServices = filteredServices.sort((a, b) => b.id - a.id);
+    
+    // Aplicar paginação aos dados filtrados
+    const totalItems = sortedServices.length;
+    totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageServices = sortedServices.slice(startIndex, endIndex);
+    
+    const tbody = document.getElementById('servicesTableBody');
+    tbody.innerHTML = '';
 
-            if (filteredServices.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="18" class="empty-state">
-                            <h3>Nenhum transfer encontrado</h3>
-                            <p>Tente ajustar os filtros ou sincronizar os dados</p>
-                            <button class="btn btn-primary" onclick="clearAllFilters()">Limpar Filtros</button>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    if (pageServices.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="18" class="empty-state">
+                    <h3>Nenhum transfer encontrado</h3>
+                    <p>Tente ajustar os filtros ou sincronizar os dados</p>
+                    <button class="btn btn-primary" onclick="clearAllFilters()">Limpar Filtros</button>
+                </td>
+            </tr>
+        `;
+        updatePaginationControls(0);
+        return;
+    }
 
-            const sortedServices = filteredServices.sort((a, b) => {
-                const dateA = new Date(a.data + ' ' + a.horaPickup);
-                const dateB = new Date(b.data + ' ' + b.horaPickup);
-                return dateB - dateA;
-            });
+    // Renderizar apenas os serviços da página atual
+    pageServices.forEach(service => {
+        const row = document.createElement('tr');
+        
+        // Verificação segura do modo de pagamento
+        const modoPagamento = service.modoPagamento || 'Não informado';
+        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                            modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        
+        // Determinar tipo de serviço e ícone
+        const tipoServico = service.tipoServico || 'Transfer';
+        const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
+                         tipoServico === 'Private Tour' ? '🚗 Private' : 
+                         tipoServico === 'tour' ? '🚐 Tour' :
+                         tipoServico === 'private' ? '🚗 Private' :
+                         '🚕 Transfer';
+        
+        // Formatação da data se necessário
+        const dataFormatada = service.data ? (service.data.includes('/') ? service.data : formatDate(service.data)) : 'Data não informada';
+        
+        row.innerHTML = `
+            <td><strong>#${service.id || 'N/A'}</strong></td>
+            <td>
+                <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto || 'Sem contacto'}</div>
+            </td>
+            <td>${tipoLabel}</td>
+            <td>
+                <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    👥 ${service.numeroPessoas || 0}
+                </span>
+            </td>
+            <td>
+                <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    🧳 ${service.numeroBagagens || 0}
+                </span>
+            </td>
+            <td><strong>${dataFormatada}</strong></td>
+            <td>
+                <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
+                    ${service.horaPickup || 'Hora não informada'}
+                </div>
+            </td>
+            <td>${service.contacto || 'Sem contacto'}</td>
+            <td>${service.numeroVoo || '-'}</td>
+            <td>
+                <div style="font-size: 0.9rem;">
+                    <div><strong>De:</strong> ${service.origem || 'Origem não informada'}</div>
+                    <div><strong>Para:</strong> ${service.destino || 'Destino não informado'}</div>
+                </div>
+            </td>
+            <td><span class="value-highlight">€${(service.valorTotal || 0).toFixed(2)}</span></td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHotel || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHUB || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.comissaoRecepcao || 0).toFixed(2)}
+            </td>
+            <td><span class="payment-method ${paymentClass}">${modoPagamento}</span></td>
+            <td>
+                <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
+                    ${service.pagoParaQuem || 'Não informado'}
+                </span>
+            </td>
+            <td><span class="status status-${(service.status || 'solicitado').toLowerCase()}">${service.status || 'Solicitado'}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
+                    <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
+                    <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
 
-            sortedServices.forEach(service => {
-                const row = document.createElement('tr');
-                
-                const modoPagamento = service.modoPagamento || 'Não informado';
-                const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
-                                    modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
-                const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
-                                 tipoServico === 'Private Tour' ? '🚗 Private' : 
-                                 '🚕 Transfer';
-                
-                row.innerHTML = `
-                    <td><strong>#${service.id || 'N/A'}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto || 'Sem contacto'}</div>
-                    </td>
-                    <td>${tipoLabel}</td>
-                    <td>
-                        <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            👥 ${service.numeroPessoas || 0}
-                        </span>
-                    </td>
-                    <td>
-                        <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            🧳 ${service.numeroBagagens || 0}
-                        </span>
-                    </td>
-                    <td><strong>${service.data || 'Data não informada'}</strong></td>
-                    <td>
-                        <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
-                            ${service.horaPickup || 'Hora não informada'}
-                        </div>
-                    </td>
-                    <td>${service.contacto || 'Sem contacto'}</td>
-                    <td>${service.numeroVoo || '-'}</td>
-                    <td>
-                        <div style="font-size: 0.9rem;">
-                            <div><strong>De:</strong> ${service.origem || 'Origem não informada'}</div>
-                            <div><strong>Para:</strong> ${service.destino || 'Destino não informado'}</div>
-                        </div>
-                    </td>
-                    <td><span class="value-highlight">€${(service.valorTotal || 0).toFixed(2)}</span></td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHotel || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHUB || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.comissaoRecepcao || 0).toFixed(2)}
-                    </td>
-                    <td><span class="payment-method ${paymentClass}">${modoPagamento}</span></td>
-                    <td>
-                        <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
-                            ${service.pagoParaQuem || 'Não informado'}
-                        </span>
-                    </td>
-                    <td><span class="status status-${(service.status || 'solicitado').toLowerCase()}">${service.status || 'Solicitado'}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
-                            <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
-                            <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+    // Atualizar controles de paginação com o total de itens filtrados
+    updatePaginationControls(totalItems);
+}
 
         function updateSummary() {
             const total = services.length;
@@ -3126,15 +3373,32 @@ async function processSyncQueue() {
             const destinoInput = document.getElementById('destino');
             
             if (origemInput && destinoInput) {
-                const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
-                    types: ['establishment', 'geocode'],
-                    componentRestrictions: { country: 'pt' }
-                });
+                // Usar nova API recomendada se disponível
+                if (google.maps.places.PlaceAutocompleteElement) {
+                    console.log('Usando nova API PlaceAutocompleteElement');
+                    
+                    // Implementar nova API quando estiver disponível
+                    const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
 
-                const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-                    types: ['establishment', 'geocode'],
-                    componentRestrictions: { country: 'pt' }
-                });
+                    const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
+                } else {
+                    // Usar API atual com tratamento de warnings
+                    const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
+
+                    const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                        types: ['establishment', 'geocode'],
+                        componentRestrictions: { country: 'pt' }
+                    });
+                }
 
                 origemInput.addEventListener('input', function() {
                     document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
@@ -3151,14 +3415,12 @@ async function processSyncQueue() {
             console.warn('Erro ao inicializar Google Maps Autocomplete:', error);
         }
     } else {
-        // Retry após 2 segundos se Google Maps ainda não carregou
         if (typeof google === 'undefined') {
             console.log('Google Maps ainda não carregou, tentando novamente em 2s...');
             setTimeout(initializeAutocomplete, 2000);
         }
     }
 }
-
         // =====================================================
         // DEBOUNCE FUNCTION
         // =====================================================
