@@ -1331,7 +1331,7 @@
                     <button type="submit" class="btn btn-primary" id="submitBtn">✅ Solicitar Transfer</button>
                     <button type="button" class="btn btn-clear" onclick="clearForm()">🔄 Limpar</button>
                     <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
-                    <button type="button" class="btn btn-success" onclick="manualSync()" id="syncBtn">📤 Atualizar Dados</button>
+                    <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">📤 Atualizar Dados</button>
                     <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
                 </div>
             </form>
@@ -1953,32 +1953,33 @@
         }
 
         // Nova função para sincronização manual controlada
-        async function manualSync() {
-            const lastManualSync = localStorage.getItem('lastManualSync');
-            const now = Date.now();
-            
-            // Limitar sincronização manual a uma vez por minuto
-            if (lastManualSync && (now - parseInt(lastManualSync)) < 60000) {
-                showStatus('Aguarde 1 minuto entre sincronizações para evitar sobrecarga', 'warning');
-                return;
-            }
-            
-            localStorage.setItem('lastManualSync', now.toString());
-            
-            showSyncLoading(true);
-            
-            // Processar fila pendente
-            await processSyncQueue();
-            
-            // Simular sincronização
-            setTimeout(() => {
-                showSyncLoading(false);
-                lastSyncTime = new Date();
-                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                updateLastSyncDisplay();
-                showStatus('Sincronização manual concluída!', 'success');
-            }, 3000);
-        }
+        // Função para sincronização manual controlada
+async function manualSync() {
+    const lastManualSync = localStorage.getItem('lastManualSync');
+    const now = Date.now();
+    
+    // Limitar sincronização manual a uma vez por minuto
+    if (lastManualSync && (now - parseInt(lastManualSync)) < 60000) {
+        showStatus('Aguarde 1 minuto entre sincronizações para evitar sobrecarga', 'warning');
+        return;
+    }
+    
+    localStorage.setItem('lastManualSync', now.toString());
+    
+    showSyncLoading(true);
+    
+    // Processar fila pendente
+    await processSyncQueue();
+    
+    // Simular sincronização
+    setTimeout(() => {
+        showSyncLoading(false);
+        lastSyncTime = new Date();
+        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+        updateLastSyncDisplay();
+        showStatus('Sincronização manual concluída!', 'success');
+    }, 3000);
+}
 
 // Nova função para processar fila de sincronização
 async function processSyncQueue() {
