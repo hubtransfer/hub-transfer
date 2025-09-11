@@ -3073,8 +3073,11 @@ function renderFilteredTable(filteredServices) {
     sortedServices.forEach(service => {
         // Usar o mesmo código de renderização da função renderTable() existente
         const row = document.createElement('tr');
-        const paymentClass = (service.modoPagamento || '').toLowerCase().includes('dinheiro') ? 'payment-cash' : 
-                        (service.modoPagamento || '').toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        
+        // CORREÇÃO: Adicionar verificação de null/undefined para modoPagamento
+        const modoPagamento = service.modoPagamento || 'Não informado';
+        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' : 
+                        modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
         
         const tipoServico = service.tipoServico || 'Transfer';
         const tipoLabel = tipoServico === 'Tour Regular' ? '🚐 Tour' : 
@@ -3123,7 +3126,7 @@ function renderFilteredTable(filteredServices) {
             <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
                 €${(service.comissaoRecepcao || 0).toFixed(2)}
             </td>
-            <td><span class="payment-method ${paymentClass}">${service.modoPagamento || 'Não informado'}</span></td>
+            <td><span class="payment-method ${paymentClass}">${modoPagamento}</span></td>
             <td>
                 <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
                     ${service.pagoParaQuem || 'Não informado'}
