@@ -1050,7 +1050,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxUjOVh0YNptoSQCu53soSH1SfZ7f03g-4DBfDLqTqchH9BtxroEg8FnWB21D7EA8h1nA/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyUXtpl_t1jU20NkHOrrgLuhrYJ9cP8y9Khshc9FR4Hs-X49o6GOVPdGrVOe9UGEMik1Q/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1513,7 +1513,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxUjOVh0YNptoSQCu53soSH1SfZ7f03g-4DBfDLqTqchH9BtxroEg8FnWB21D7EA8h1nA/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyUXtpl_t1jU20NkHOrrgLuhrYJ9cP8y9Khshc9FR4Hs-X49o6GOVPdGrVOe9UGEMik1Q/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // TOURS E PREÇOS
@@ -1946,65 +1946,71 @@ async function syncWithServer(showLoading = true) {
   
   try {
     const webappUrl = getWebAppUrl();
-    console.log('Iniciando sincronização com:', webappUrl);
+    console.log('🔄 Iniciando sincronização com:', webappUrl);
     
-    // CORREÇÃO: Usar método GET simples para getAllData
-    const urlWithParams = `${webappUrl}?action=getAllData&t=${Date.now()}`;
+    // CORREÇÃO: URL simples para evitar CORS
+    const syncUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
     
-    const response = await fetch(urlWithParams, {
+    console.log('📡 Fazendo requisição para:', syncUrl);
+    
+    const response = await fetch(syncUrl, {
       method: 'GET',
-      cache: 'no-cache'
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Accept': 'application/json'
+      }
     });
     
+    console.log('📨 Resposta recebida:', response.status, response.statusText);
+    
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
     }
     
     const result = await response.json();
-    console.log('Resposta da sincronização:', result);
+    console.log('📊 Dados recebidos:', result);
     
-    if (result.success && result.data) {
-      const convertedServices = result.data.map(item => convertServerDataToLocal(item));
+    if (result.success && Array.isArray(result.data)) {
+      console.log(`✅ Sincronização bem-sucedida: ${result.data.length} transfers`);
       
-      // Mesclar com dados locais
+      // Converter dados do servidor
+      const convertedServices = result.data.map(item => convertServerToLocal(item));
+      
+      // Atualizar dados locais
       const existingIds = services.map(s => s.id);
       const newServices = convertedServices.filter(s => !existingIds.includes(s.id));
       
       if (newServices.length > 0) {
         services = [...services, ...newServices];
         saveData();
+        console.log(`➕ ${newServices.length} novos transfers adicionados`);
       }
       
+      // Atualizar interface
       renderTable();
       updateSummary();
       
+      // Salvar timestamp da sincronização
       lastSyncTime = new Date();
       localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
       
       showSyncSuccess(services.length);
-      console.log('Sincronização concluída com sucesso');
       return true;
       
     } else {
-      throw new Error(result.error || 'Erro na resposta do servidor');
+      throw new Error(result.error || 'Resposta inválida do servidor');
     }
     
   } catch (error) {
-    console.error('Erro na sincronização:', error);
+    console.error('❌ Erro na sincronização:', error);
     showSyncError(error.message);
     
-    // Usar dados locais como fallback
-    const localData = localStorage.getItem('partnershipTransferData');
-    if (localData) {
-      try {
-        services = JSON.parse(localData);
-        renderTable();
-        updateSummary();
-        console.log('Usando dados locais como fallback:', services.length, 'transfers');
-      } catch (localError) {
-        console.error('Erro ao carregar dados locais:', localError);
-      }
-    }
+    // Fallback para dados locais
+    console.log('🔄 Usando dados locais como fallback');
+    loadData();
+    renderTable();
+    updateSummary();
     
     return false;
     
@@ -2015,6 +2021,33 @@ async function syncWithServer(showLoading = true) {
     }
   }
 }
+
+function convertServerToLocal(serverItem) {
+  return {
+    id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || Date.now(),
+    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+    tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
+    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
+    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
+    data: serverItem['Data'] || serverItem.data || '',
+    contacto: serverItem['Contacto'] || serverItem.contacto || '',
+    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
+    origem: serverItem['Origem'] || serverItem.origem || '',
+    destino: serverItem['Destino'] || serverItem.destino || '',
+    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
+    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
+    status: serverItem['Status'] || serverItem.status || 'Solicitado',
+    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
+    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
+  };
+}
+
         function convertServerDataToLocal(serverItem) {
   const converted = {
     id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
