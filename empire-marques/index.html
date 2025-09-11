@@ -2438,7 +2438,7 @@ document.getElementById('transferForm').addEventListener('submit', async functio
 // ===================================================
 
 /**
- * Sincroniza dados com o servidor (Google Sheets)
+ * Sincroniza dados com o servidor (Google Sheets) - VERSÃO CORRIGIDA
  * @param {boolean} showLoading - Se deve mostrar indicador de loading
  * @returns {Promise<boolean>} - Sucesso da sincronização
  */
@@ -2455,80 +2455,129 @@ async function syncWithServer(showLoading = true) {
     }
     
     try {
-        console.log('🔄 Iniciando sincronização com servidor...');
+        const webappUrl = getWebAppUrl();
+        console.log('🔄 Iniciando sincronização com:', webappUrl);
         
-        // 1. Verificar conectividade
-        const connectivityCheck = await fetch(getWebAppUrl() + '?action=checkSync', {
-            method: 'GET',
-            mode: 'cors'
-        });
-        
-        if (!connectivityCheck.ok) {
-            throw new Error('Servidor não está respondendo');
+        // 1. Verificar conectividade básica
+        try {
+            const testResponse = await fetch(webappUrl + '?action=test', {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!testResponse.ok) {
+                throw new Error('Servidor não está respondendo');
+            }
+            
+            console.log('✅ Conectividade verificada');
+            
+        } catch (connectError) {
+            console.warn('⚠️ Teste de conectividade falhou, tentando sincronização direta');
         }
         
         // 2. Obter próximo ID disponível
-        const idResponse = await fetch(getWebAppUrl() + '?action=getLastId', {
-            method: 'GET',
-            mode: 'cors'
-        });
-        
-        if (idResponse.ok) {
-            const idData = await idResponse.json();
-            nextAvailableId = idData.nextId || 1;
-            console.log('📊 Próximo ID disponível:', nextAvailableId);
+        try {
+            const idResponse = await fetch(webappUrl + '?action=getLastId', {
+                method: 'GET',
+                mode: 'cors'
+            });
+            
+            if (idResponse.ok) {
+                const idData = await idResponse.json();
+                if (idData.nextId) {
+                    nextAvailableId = parseInt(idData.nextId);
+                    console.log('📊 Próximo ID disponível:', nextAvailableId);
+                }
+            }
+        } catch (idError) {
+            console.warn('⚠️ Não foi possível obter próximo ID:', idError.message);
         }
         
-        // 3. Baixar todos os dados
-        const dataResponse = await fetch(getWebAppUrl() + '?action=getAllData', {
+        // 3. Baixar todos os dados do Google Sheets
+        const dataResponse = await fetch(webappUrl + '?action=getAllData', {
             method: 'GET',
-            mode: 'cors'
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
         
         if (!dataResponse.ok) {
-            throw new Error(`Erro do servidor: ${dataResponse.status}`);
+            throw new Error(`Erro do servidor: ${dataResponse.status} - ${dataResponse.statusText}`);
         }
         
-        const syncData = await dataResponse.json();
+        const responseText = await dataResponse.text();
+        console.log('📥 Resposta bruta do servidor:', responseText.substring(0, 500) + '...');
         
-        if (syncData.status === 'success') {
-            // Atualizar dados globais com debug melhorado
-            serverData = syncData.data || [];
+        let syncData;
+        try {
+            syncData = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('❌ Erro ao fazer parse da resposta:', parseError);
+            throw new Error('Resposta do servidor não é um JSON válido');
+        }
+        
+        if (syncData.status === 'success' && Array.isArray(syncData.data)) {
+            serverData = syncData.data;
             console.log('📊 Dados recebidos do servidor:', serverData.length, 'registros');
 
             if (serverData.length > 0) {
-              console.log('📋 Exemplo de dados do servidor:', serverData[0]);
-              console.log('📋 Headers disponíveis:', Object.keys(serverData[0]));
+                console.log('📋 Primeiro item do servidor:', serverData[0]);
+                console.log('📋 Headers disponíveis:', Object.keys(serverData[0]));
+                
+                // Testar conversão do primeiro item
+                const testeConversao = convertServerDataToLocal(serverData[0]);
+                console.log('🧪 Teste de conversão:', testeConversao);
             }
 
-            // Converter para formato local
-            services = serverData.map((item, index) => {
-              console.log(`🔄 Convertendo item ${index + 1}:`, item);
-              const converted = convertServerDataToLocal(item);
-              console.log(`✅ Resultado ${index + 1}:`, converted);
-              return converted;
-            });
-
-            console.log('📊 Total convertido:', services.length, 'transfers');
+            // Converter todos os dados para formato local
+            const convertedServices = [];
             
-            // Manter dados locais como backup
+            for (let i = 0; i < serverData.length; i++) {
+                try {
+                    const converted = convertServerDataToLocal(serverData[i]);
+                    
+                    // Validar dados essenciais
+                    if (converted.id && converted.nomeCliente) {
+                        convertedServices.push(converted);
+                    } else {
+                        console.warn(`⚠️ Item ${i + 1} ignorado - dados incompletos:`, converted);
+                    }
+                } catch (conversionError) {
+                    console.error(`❌ Erro ao converter item ${i + 1}:`, conversionError, serverData[i]);
+                }
+            }
+
+            console.log(`✅ Conversão concluída: ${convertedServices.length} de ${serverData.length} itens`);
+            
+            // Atualizar serviços globais
+            services = convertedServices;
+            
+            // Salvar backup local
             saveData();
             
             // Atualizar interface
-            applyCurrentFilters();
+            if (filteredData.length > 0) {
+                applyCurrentFilters();
+            } else {
+                renderTable();
+            }
             updateSummary();
             
-            // Registrar sincronização
+            // Registrar sincronização bem-sucedida
             lastSyncTime = new Date();
             localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
             
-            showSyncSuccess(serverData.length);
+            showSyncSuccess(convertedServices.length);
             
-            console.log(`✅ Sincronização concluída: ${serverData.length} transfers baixados`);
+            console.log(`🎉 Sincronização concluída com sucesso: ${convertedServices.length} transfers carregados`);
             return true;
             
         } else {
-            throw new Error(syncData.message || 'Erro desconhecido do servidor');
+            throw new Error(syncData.message || 'Formato de resposta inválido do servidor');
         }
         
     } catch (error) {
@@ -2536,8 +2585,17 @@ async function syncWithServer(showLoading = true) {
         showSyncError(error.message);
         
         // Fallback para dados locais
-        console.log('📱 Usando dados locais como fallback');
-        loadData();
+        const localData = localStorage.getItem('partnershipTransferData');
+        if (localData) {
+            try {
+                services = JSON.parse(localData);
+                renderTable();
+                updateSummary();
+                console.log('📱 Usando dados locais como fallback:', services.length, 'transfers');
+            } catch (localError) {
+                console.error('❌ Erro ao carregar dados locais:', localError);
+            }
+        }
         
         return false;
         
@@ -2547,6 +2605,44 @@ async function syncWithServer(showLoading = true) {
             showSyncLoading(false);
         }
     }
+}
+
+/**
+ * Função de debug melhorada para verificar mapeamento de dados
+ */
+function debugDataMapping() {
+    console.log('=== 🔍 DEBUG MAPEAMENTO DE DADOS ===');
+    
+    if (serverData.length > 0) {
+        const firstItem = serverData[0];
+        console.log('📊 Primeiro item do servidor:', firstItem);
+        console.log('📊 Headers disponíveis:', Object.keys(firstItem));
+        
+        // Testar mapeamento atual
+        const converted = convertServerDataToLocal(firstItem);
+        console.log('🔄 Resultado da conversão:', converted);
+        
+        // Verificar campos críticos
+        const criticalFields = ['ID', 'Cliente', 'Data', 'Status', 'Valor Total'];
+        console.log('🔍 Verificação de campos críticos:');
+        
+        criticalFields.forEach(field => {
+            const serverValue = firstItem[field];
+            console.log(`   ${field}: "${serverValue}" (tipo: ${typeof serverValue})`);
+        });
+        
+        // Sugerir mapeamentos se necessário
+        console.log('🛠️ Campos não mapeados:');
+        Object.keys(firstItem).forEach(key => {
+            if (!['ID', 'Cliente', 'Data', 'Status', 'Valor Total', 'Contacto', 'Origem', 'Destino'].includes(key)) {
+                console.log(`   Campo não reconhecido: "${key}" = "${firstItem[key]}"`);
+            }
+        });
+    }
+    
+    console.log('📊 Total services locais:', services.length);
+    console.log('📊 Total server data:', serverData.length);
+    console.log('=====================================');
 }
 
 /**
@@ -2570,18 +2666,29 @@ function debugSyncData() {
     }
 }
 
-// Adicionar botão de debug temporário
+/**
+ * Adiciona botões de debug à interface
+ */
 function addDebugButton() {
-    const debugBtn = document.createElement('button');
-    debugBtn.textContent = 'Debug Sync';
-    debugBtn.className = 'btn btn-warning';
-    debugBtn.onclick = debugSyncData;
-    debugBtn.style.margin = '10px';
-    
     const formActions = document.querySelector('.form-actions');
-    if (formActions) {
-        formActions.appendChild(debugBtn);
-    }
+    if (!formActions) return;
+    
+    // Botão de debug de dados
+    const debugBtn = document.createElement('button');
+    debugBtn.textContent = '🔍 Debug Dados';
+    debugBtn.className = 'btn btn-warning';
+    debugBtn.onclick = debugDataMapping;
+    debugBtn.style.margin = '5px';
+    
+    // Botão de sincronização forçada
+    const forceSyncBtn = document.createElement('button');
+    forceSyncBtn.textContent = '🔄 Forçar Sync';
+    forceSyncBtn.className = 'btn btn-primary';
+    forceSyncBtn.onclick = () => syncWithServer(true);
+    forceSyncBtn.style.margin = '5px';
+    
+    formActions.appendChild(debugBtn);
+    formActions.appendChild(forceSyncBtn);
 }
 
 // Chamar na inicialização
@@ -2593,42 +2700,81 @@ setTimeout(addDebugButton, 3000);
  * @returns {Object} - Item no formato local
  */
 function convertServerDataToLocal(serverItem) {
-  // Debug detalhado
-  console.log('🔍 Convertendo item do servidor:', serverItem);
-  console.log('🔍 Chaves disponíveis:', Object.keys(serverItem));
-  
-  // Mapear headers EXATOS do Google Sheets
-  const converted = {
-    id: serverItem['ID'] || serverItem.id || 0,
-    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
-    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
-    data: serverItem['Data'] || serverItem.data || '',
-    contacto: serverItem['Contacto'] || serverItem.contacto || '',
-    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
-    origem: serverItem['Origem'] || serverItem.origem || '',
-    destino: serverItem['Destino'] || serverItem.destino || '',
-    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
-    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
-    status: serverItem['Status'] || serverItem.status || 'Solicitado',
-    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
-    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
-  };
-  
-  // Log do resultado
-  console.log('✅ Item convertido:', {
-    id: converted.id,
-    cliente: converted.nomeCliente,
-    status: converted.status
-  });
-  
-  return converted;
+    // Debug detalhado
+    console.log('🔍 Convertendo item do servidor:', serverItem);
+    console.log('🔍 Chaves disponíveis:', Object.keys(serverItem));
+    
+    // Mapear headers EXATOS do Google Sheets baseado na estrutura real
+    const converted = {
+        id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
+        nomeCliente: serverItem['Cliente'] || serverItem['Nome Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+        tipoServico: serverItem['Tipo Serviço'] || serverItem['Tipo de Serviço'] || serverItem.tipoServico || 'Transfer',
+        tourSelecionado: serverItem['Tour'] || serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
+        numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem['Número de Pessoas'] || serverItem.numeroPessoas) || 1,
+        numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem['Número de Bagagens'] || serverItem.numeroBagagens) || 0,
+        data: formatDateFromServer(serverItem['Data'] || serverItem['Data do Transfer'] || serverItem.data),
+        contacto: serverItem['Contacto'] || serverItem['Contacto Cliente'] || serverItem.contacto || '',
+        numeroVoo: serverItem['Voo'] || serverItem['Número do Voo'] || serverItem.numeroVoo || '',
+        origem: serverItem['Origem'] || serverItem['Local de Origem'] || serverItem.origem || '',
+        destino: serverItem['Destino'] || serverItem['Local de Destino'] || serverItem.destino || '',
+        horaPickup: serverItem['Hora Pick-up'] || serverItem['Hora de Pick-up'] || serverItem.horaPickup || '',
+        valorTotal: parseFloat(serverItem['Valor Total'] || serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+        valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem['Valor Empire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+        valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+        comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+        modoPagamento: serverItem['Pagamento'] || serverItem['Forma de Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+        pagoParaQuem: serverItem['Pago Para'] || serverItem['Pago Para Quem'] || serverItem.pagoParaQuem || 'Recepção',
+        status: serverItem['Status'] || serverItem.status || 'Solicitado',
+        observacoes: serverItem['Observações'] || serverItem['Observacoes'] || serverItem.observacoes || '',
+        created: serverItem['Data Criação'] || serverItem['Criado em'] || serverItem.created || new Date().toISOString()
+    };
+    
+    // Log do resultado para debug
+    console.log('✅ Item convertido:', {
+        id: converted.id,
+        cliente: converted.nomeCliente,
+        status: converted.status,
+        valor: converted.valorTotal
+    });
+    
+    return converted;
+}
+
+/**
+ * Formata data recebida do servidor
+ * @param {string} dateStr - Data do servidor
+ * @returns {string} - Data formatada para o sistema
+ */
+function formatDateFromServer(dateStr) {
+    if (!dateStr) return '';
+    
+    try {
+        // Se a data já está no formato YYYY-MM-DD, manter
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            return dateStr;
+        }
+        
+        // Se está no formato DD/MM/YYYY, converter para YYYY-MM-DD
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+            const [day, month, year] = dateStr.split('/');
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        
+        // Tentar converter outras variações
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        return dateStr; // Retornar original se não conseguir converter
+        
+    } catch (error) {
+        console.error('Erro ao formatar data do servidor:', dateStr, error);
+        return dateStr;
+    }
 }
 
 /**
@@ -3620,17 +3766,30 @@ document.addEventListener('DOMContentLoaded', function() {
             // Inicializar filtros avançados
             initializeAdvancedFilters();
             
-            // Sincronização inicial opcional
-            const lastSync = localStorage.getItem('lastSyncTime');
-            if (!lastSync || (new Date() - new Date(lastSync)) > 300000) { // 5 minutos
-                console.log('📥 Executando sincronização inicial...');
-                syncWithServer(false);
-            } else {
-                console.log('📱 Usando dados locais (sincronização recente)');
-                updateLastSyncDisplay();
-            }
-            
+            // Sincronização inicial obrigatória com debug
+const lastSync = localStorage.getItem('lastSyncTime');
+const shouldSync = !lastSync || (new Date() - new Date(lastSync)) > 300000; // 5 minutos
+
+if (shouldSync) {
+    console.log('📥 Executando sincronização inicial obrigatória...');
+    setTimeout(async () => {
+        const syncSuccess = await syncWithServer(true);
+        if (!syncSuccess) {
+            console.log('⚠️ Sincronização inicial falhou, carregando dados locais');
+            loadData();
+        }
+        
+        // Debug automático após sincronização
+        setTimeout(() => {
+            console.log('🔍 Executando debug automático...');
+            debugDataMapping();
         }, 2000);
+    }, 1000);
+} else {
+    console.log('📱 Usando dados locais (sincronização recente)');
+    loadData();
+    updateLastSyncDisplay();
+}
         
         // Definir data de hoje como padrão
         document.getElementById('data').valueAsDate = new Date();
