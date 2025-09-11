@@ -1050,7 +1050,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbyUXtpl_t1jU20NkHOrrgLuhrYJ9cP8y9Khshc9FR4Hs-X49o6GOVPdGrVOe9UGEMik1Q/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1513,7 +1513,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyUXtpl_t1jU20NkHOrrgLuhrYJ9cP8y9Khshc9FR4Hs-X49o6GOVPdGrVOe9UGEMik1Q/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // TOURS E PREÇOS
@@ -1931,96 +1931,100 @@
             }
         }
 
+async function testConnection() {
+    try {
+        console.log('🧪 Testando conexão...');
+        
+        const webappUrl = getWebAppUrl();
+        console.log('📡 URL:', webappUrl);
+        
+        if (!webappUrl || webappUrl.includes('YOUR_SCRIPT_ID')) {
+            throw new Error('URL do Google Apps Script não configurada');
+        }
+        
+        const testUrl = `${webappUrl}?action=test&_=${Date.now()}`;
+        console.log('🔗 Teste URL:', testUrl);
+        
+        const response = await fetch(testUrl, {
+            method: 'GET',
+            cache: 'no-cache'
+        });
+        
+        console.log('📨 Response status:', response.status);
+        console.log('📨 Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Teste bem-sucedido:', result);
+        
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Erro no teste:', error);
+        throw error;
+    }
+}
+
         // SISTEMA DE SINCRONIZAÇÃO
 async function syncWithServer(showLoading = true) {
-  if (syncInProgress) {
-    console.log('Sincronização já em andamento...');
-    return false;
-  }
-  
-  syncInProgress = true;
-  
-  if (showLoading) {
-    showSyncLoading(true);
-  }
-  
-  try {
-    const webappUrl = getWebAppUrl();
-    console.log('🔄 Iniciando sincronização com:', webappUrl);
-    
-    // CORREÇÃO: URL simples para evitar CORS
-    const syncUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-    
-    console.log('📡 Fazendo requisição para:', syncUrl);
-    
-    const response = await fetch(syncUrl, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-    
-    console.log('📨 Resposta recebida:', response.status, response.statusText);
-    
-    if (!response.ok) {
-      throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+    if (syncInProgress) {
+        console.log('Sincronização já em andamento...');
+        return false;
     }
     
-    const result = await response.json();
-    console.log('📊 Dados recebidos:', result);
+    syncInProgress = true;
     
-    if (result.success && Array.isArray(result.data)) {
-      console.log(`✅ Sincronização bem-sucedida: ${result.data.length} transfers`);
-      
-      // Converter dados do servidor
-      const convertedServices = result.data.map(item => convertServerToLocal(item));
-      
-      // Atualizar dados locais
-      const existingIds = services.map(s => s.id);
-      const newServices = convertedServices.filter(s => !existingIds.includes(s.id));
-      
-      if (newServices.length > 0) {
-        services = [...services, ...newServices];
-        saveData();
-        console.log(`➕ ${newServices.length} novos transfers adicionados`);
-      }
-      
-      // Atualizar interface
-      renderTable();
-      updateSummary();
-      
-      // Salvar timestamp da sincronização
-      lastSyncTime = new Date();
-      localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-      
-      showSyncSuccess(services.length);
-      return true;
-      
-    } else {
-      throw new Error(result.error || 'Resposta inválida do servidor');
-    }
-    
-  } catch (error) {
-    console.error('❌ Erro na sincronização:', error);
-    showSyncError(error.message);
-    
-    // Fallback para dados locais
-    console.log('🔄 Usando dados locais como fallback');
-    loadData();
-    renderTable();
-    updateSummary();
-    
-    return false;
-    
-  } finally {
-    syncInProgress = false;
     if (showLoading) {
-      showSyncLoading(false);
+        showSyncLoading(true);
     }
-  }
+    
+    try {
+        // PRIMEIRO: Testar conexão básica
+        console.log('🔍 Testando conexão básica...');
+        await testConnection();
+        
+        // SEGUNDO: Tentar buscar dados
+        console.log('📊 Buscando dados...');
+        const webappUrl = getWebAppUrl();
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            cache: 'no-cache'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar dados: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('📈 Resultado:', result);
+        
+        if (result.success) {
+            showSyncSuccess(result.totalRows || 0);
+            console.log('✅ Sincronização bem-sucedida');
+        } else {
+            throw new Error(result.error || 'Erro desconhecido');
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização:', error);
+        showSyncError(error.message);
+        return false;
+        
+    } finally {
+        syncInProgress = false;
+        if (showLoading) {
+            showSyncLoading(false);
+        }
+    }
 }
+
 
 function convertServerToLocal(serverItem) {
   return {
@@ -2106,10 +2110,10 @@ function convertServerToLocal(serverItem) {
         }
 
         function getWebAppUrl() {
-            return document.getElementById('webappUrl')?.value || 
-                   localStorage.getItem('webappUrl') || 
-                   WEBAPP_URL;
-        }
+    // CORREÇÃO: Use a URL exata do seu Google Apps Script
+    // Substitua pela URL que aparece quando você implanta o script
+    return 'https://script.google.com/macros/s/AKfycbzx273UbWtabTkSonyJop96y5eX9bD5YQIX0jrS0_L43zXSPeo2ZyjF6ERkK3OmsKZvFw/exec';
+}
 
         function getNextSyncedId() {
             const localIds = services.map(s => parseInt(s.id)).filter(id => !isNaN(id));
