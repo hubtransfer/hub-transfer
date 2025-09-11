@@ -1050,7 +1050,7 @@
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
-                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxjCTbZox8GKQjmzZSNPAfjZK7KlF2SrgMeIg-KF6B-xeld07yI2lYGUr3hNglmUgjC5Q/exec" placeholder="https://script.google.com/macros/s/...">
+                    <input type="url" id="webappUrl" value="https://script.google.com/macros/s/AKfycbxUjOVh0YNptoSQCu53soSH1SfZ7f03g-4DBfDLqTqchH9BtxroEg8FnWB21D7EA8h1nA/exec" placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     🔗 Testar Conexão
@@ -1513,7 +1513,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxjCTbZox8GKQjmzZSNPAfjZK7KlF2SrgMeIg-KF6B-xeld07yI2lYGUr3hNglmUgjC5Q/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxUjOVh0YNptoSQCu53soSH1SfZ7f03g-4DBfDLqTqchH9BtxroEg8FnWB21D7EA8h1nA/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         
         // TOURS E PREÇOS
@@ -1932,7 +1932,7 @@
         }
 
         // SISTEMA DE SINCRONIZAÇÃO
-        async function syncWithServer(showLoading = true) {
+async function syncWithServer(showLoading = true) {
   if (syncInProgress) {
     console.log('Sincronização já em andamento...');
     return false;
@@ -1948,65 +1948,20 @@
     const webappUrl = getWebAppUrl();
     console.log('Iniciando sincronização com:', webappUrl);
     
-    // Tentar várias vezes com diferentes approaches
-    let response;
-    let attempts = 0;
-    const maxAttempts = 3;
+    // CORREÇÃO: Usar método GET simples para getAllData
+    const urlWithParams = `${webappUrl}?action=getAllData&t=${Date.now()}`;
     
-    while (attempts < maxAttempts) {
-      attempts++;
-      console.log(`Tentativa ${attempts}/${maxAttempts}`);
-      
-      try {
-        // Primeira tentativa: POST
-        if (attempts === 1) {
-          response = await fetch(webappUrl, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'getAllData',
-              sheetName: 'Empire MARQUES-HUB'
-            })
-          });
-        }
-        // Segunda tentativa: GET com parâmetros
-        else if (attempts === 2) {
-          const urlWithParams = `${webappUrl}?action=getAllData&sheetName=Empire MARQUES-HUB&t=${Date.now()}`;
-          response = await fetch(urlWithParams, {
-            method: 'GET',
-            mode: 'cors'
-          });
-        }
-        // Terceira tentativa: GET simples
-        else {
-          const urlSimple = `${webappUrl}?action=getAllData`;
-          response = await fetch(urlSimple, {
-            method: 'GET'
-          });
-        }
-        
-        if (response.ok) {
-          break; // Sucesso, sair do loop
-        }
-        
-      } catch (fetchError) {
-        console.log(`Erro na tentativa ${attempts}:`, fetchError.message);
-        if (attempts === maxAttempts) {
-          throw fetchError;
-        }
-        // Aguardar antes da próxima tentativa
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
+    const response = await fetch(urlWithParams, {
+      method: 'GET',
+      cache: 'no-cache'
+    });
     
-    if (!response || !response.ok) {
-      throw new Error(`HTTP ${response?.status || 'Erro de rede'}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const result = await response.json();
+    console.log('Resposta da sincronização:', result);
     
     if (result.success && result.data) {
       const convertedServices = result.data.map(item => convertServerDataToLocal(item));
@@ -2031,7 +1986,7 @@
       return true;
       
     } else {
-      throw new Error(result.error || 'Erro desconhecido na resposta');
+      throw new Error(result.error || 'Erro na resposta do servidor');
     }
     
   } catch (error) {
@@ -2061,32 +2016,32 @@
   }
 }
         function convertServerDataToLocal(serverItem) {
-            const converted = {
-                id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
-                nomeCliente: serverItem['Cliente'] || serverItem['Nome Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
-                tipoServico: serverItem['Tipo Serviço'] || serverItem['Tipo de Serviço'] || serverItem.tipoServico || 'Transfer',
-                tourSelecionado: serverItem['Tour'] || serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
-                numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem['Número de Pessoas'] || serverItem.numeroPessoas) || 1,
-                numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem['Número de Bagagens'] || serverItem.numeroBagagens) || 0,
-                data: formatDateFromServer(serverItem['Data'] || serverItem['Data do Transfer'] || serverItem.data),
-                contacto: serverItem['Contacto'] || serverItem['Contacto Cliente'] || serverItem.contacto || '',
-                numeroVoo: serverItem['Voo'] || serverItem['Número do Voo'] || serverItem.numeroVoo || '',
-                origem: serverItem['Origem'] || serverItem['Local de Origem'] || serverItem.origem || '',
-                destino: serverItem['Destino'] || serverItem['Local de Destino'] || serverItem.destino || '',
-                horaPickup: serverItem['Hora Pick-up'] || serverItem['Hora de Pick-up'] || serverItem.horaPickup || '',
-                valorTotal: parseFloat(serverItem['Valor Total'] || serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
-                valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem['Valor Empire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
-                valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
-                comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
-                modoPagamento: serverItem['Pagamento'] || serverItem['Forma de Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
-                pagoParaQuem: serverItem['Pago Para'] || serverItem['Pago Para Quem'] || serverItem.pagoParaQuem || 'Recepção',
-                status: serverItem['Status'] || serverItem.status || 'Solicitado',
-                observacoes: serverItem['Observações'] || serverItem['Observacoes'] || serverItem.observacoes || '',
-                created: serverItem['Data Criação'] || serverItem['Criado em'] || serverItem.created || new Date().toISOString()
-            };
-            
-            return converted;
-        }
+  const converted = {
+    id: parseInt(serverItem['ID']) || parseInt(serverItem.id) || getNextSyncedId(),
+    nomeCliente: serverItem['Cliente'] || serverItem.nomeCliente || 'Cliente não informado',
+    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+    tourSelecionado: serverItem['Tour'] || serverItem.tourSelecionado || '',
+    numeroPessoas: parseInt(serverItem['Pessoas'] || serverItem.numeroPessoas) || 1,
+    numeroBagagens: parseInt(serverItem['Bagagens'] || serverItem.numeroBagagens) || 0,
+    data: formatDateFromServer(serverItem['Data'] || serverItem.data),
+    contacto: serverItem['Contacto'] || serverItem.contacto || '',
+    numeroVoo: serverItem['Voo'] || serverItem.numeroVoo || '',
+    origem: serverItem['Origem'] || serverItem.origem || '',
+    destino: serverItem['Destino'] || serverItem.destino || '',
+    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '',
+    valorTotal: parseFloat(serverItem['Preço Cliente (€)'] || serverItem.valorTotal) || 0,
+    valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)'] || serverItem.valorHotel) || 0,
+    valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)'] || serverItem.valorHUB) || 0,
+    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)'] || serverItem.comissaoRecepcao) || 0,
+    modoPagamento: serverItem['Forma Pagamento'] || serverItem.modoPagamento || 'Dinheiro',
+    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Recepção',
+    status: serverItem['Status'] || serverItem.status || 'Solicitado',
+    observacoes: serverItem['Observações'] || serverItem.observacoes || '',
+    created: serverItem['Data Criação'] || serverItem.created || new Date().toISOString()
+  };
+  
+  return converted;
+}
 
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
