@@ -1006,7 +1006,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycby4UE9kM_XMz4aPmbtHkwSEdsra2MYNKbpAat0p2Nyq8CsnbrEEN_U4iQKVd6-n6hK9dg/exec" 
+                           value="https://script.google.com/macros/s/AKfycbx99UkF8keZfKskCo7F18YtYGbQyd3zG_LQbv8FCZT8CFeIIONunjMKkZRantlP4dhfWg/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1496,7 +1496,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby4UE9kM_XMz4aPmbtHkwSEdsra2MYNKbpAat0p2Nyq8CsnbrEEN_U4iQKVd6-n6hK9dg/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx99UkF8keZfKskCo7F18YtYGbQyd3zG_LQbv8FCZT8CFeIIONunjMKkZRantlP4dhfWg/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -1957,86 +1957,122 @@
             }
         }
 
-        async function syncWithServer(showLoading = true) {
-            if (syncInProgress) {
-                console.log('Sincronização já em andamento...');
-                return false;
-            }
-            
-            syncInProgress = true;
-            
-            if (showLoading) {
-                showSyncLoading(true);
-            }
-            
-            try {
-                const webappUrl = getWebAppUrl();
-                console.log('URL de sincronização:', webappUrl);
-                
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('Buscando dados de:', dataUrl);
-                
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    mode: 'cors'
-                });
-                
-                console.log('Status da resposta:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const textResponse = await response.text();
-                console.log('Resposta bruta (primeiros 200 chars):', textResponse.substring(0, 200));
-                
-                let result;
-                try {
-                    result = JSON.parse(textResponse);
-                } catch (parseError) {
-                    console.error('Erro ao parsear JSON:', parseError);
-                    throw new Error('Resposta não é um JSON válido');
-                }
-                
-                console.log('Dados parseados:', result);
-                
-                if (result && result.success && result.data && Array.isArray(result.data)) {
-                    console.log(`${result.data.length} registros recebidos do servidor`);
-                    
-                    const convertedServices = result.data.map(convertServerDataToLocal);
-                    console.log('Dados convertidos (amostra):', convertedServices.slice(0, 2));
-                    
-                    services = mergeServicesData(services, convertedServices);
-                    console.log(`Total após mesclagem: ${services.length}`);
-                    
-                    saveData();
-                    renderTable();
-                    updateSummary();
-                    
-                    lastSyncTime = new Date();
-                    localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                    updateLastSyncDisplay();
-                    
-                    showSyncSuccess(services.length);
-                    return true;
-                    
-                } else {
-                    throw new Error(result?.error || 'Resposta inválida do servidor');
-                }
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showSyncError(error.message);
-                return false;
-                
-            } finally {
-                syncInProgress = false;
-                if (showLoading) {
-                    showSyncLoading(false);
-                }
-            }
-        }
+        /**
+ * Sincroniza com servidor usando método GET mais compatível - VERSÃO CORRIGIDA
+ */
+async function syncWithServer(showLoading = true) {
+  if (syncInProgress) {
+    console.log('Sincronização já em andamento...');
+    return false;
+  }
+  
+  syncInProgress = true;
+  
+  if (showLoading) {
+    showSyncLoading(true);
+  }
+  
+  try {
+    const webappUrl = getWebAppUrl();
+    console.log('URL de sincronização:', webappUrl);
+    
+    // URL para buscar todos os dados
+    const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+    console.log('Buscando dados de:', dataUrl);
+    
+    // Fazer requisição GET para buscar dados
+    const response = await fetch(dataUrl, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const textResponse = await response.text();
+    console.log('Resposta bruta recebida (primeiros 200 chars):', textResponse.substring(0, 200));
+    
+    let result;
+    try {
+      result = JSON.parse(textResponse);
+    } catch (parseError) {
+      console.error('Erro ao parsear JSON:', parseError);
+      throw new Error('Resposta não é um JSON válido: ' + textResponse.substring(0, 100));
+    }
+    
+    console.log('Dados parseados:', result);
+    
+    if (result && result.success && result.data && Array.isArray(result.data)) {
+      console.log(`${result.data.length} registros recebidos do servidor`);
+      
+      // Converter dados do servidor para formato local
+      const convertedServices = result.data.map(serverItem => {
+        return {
+          id: serverItem.ID || nextAvailableId++,
+          nomeCliente: serverItem.Cliente || 'Cliente não informado',
+          tipoServico: serverItem['Tipo Serviço'] || 'Transfer',
+          numeroPessoas: parseInt(serverItem.Pessoas) || 1,
+          numeroBagagens: parseInt(serverItem.Bagagens) || 0,
+          data: serverItem.Data || '',
+          contacto: serverItem.Contacto || 'Sem contacto',
+          numeroVoo: serverItem.Voo || '',
+          origem: serverItem.Origem || 'Origem não informada',
+          destino: serverItem.Destino || 'Destino não informado',
+          horaPickup: serverItem['Hora Pick-up'] || '00:00',
+          valorTotal: parseFloat(serverItem['Preço Cliente (€)']) || 0,
+          valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)']) || 0,
+          valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)']) || 0,
+          comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)']) || 0,
+          modoPagamento: serverItem['Forma Pagamento'] || 'Não informado',
+          pagoParaQuem: serverItem['Pago Para'] || 'Não informado',
+          status: serverItem.Status || 'Solicitado',
+          observacoes: serverItem.Observações || '',
+          created: serverItem['Data Criação'] || new Date().toISOString()
+        };
+      });
+      
+      console.log('Dados convertidos (primeira entrada):', convertedServices[0]);
+      
+      // Substituir dados locais pelos do servidor
+      services = convertedServices;
+      console.log(`Total após sincronização: ${services.length} transfers`);
+      
+      // Salvar e atualizar interface
+      saveData();
+      renderTable();
+      updateSummary();
+      
+      // Atualizar indicadores
+      lastSyncTime = new Date();
+      localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+      updateLastSyncDisplay();
+      
+      showSyncSuccess(services.length);
+      return true;
+      
+    } else {
+      throw new Error(result?.error || result?.message || 'Resposta inválida do servidor');
+    }
+    
+  } catch (error) {
+    console.error('Erro na sincronização:', error);
+    showSyncError(error.message);
+    return false;
+    
+  } finally {
+    syncInProgress = false;
+    if (showLoading) {
+      showSyncLoading(false);
+    }
+  }
+}
 
         function getWebAppUrl() {
             const inputUrl = document.getElementById('webappUrl').value.trim();
@@ -2053,41 +2089,104 @@
         }
 
         async function testSimpleConnection() {
-            console.log('Iniciando sincronização compatível com CORS...');
-            
-            const webappUrl = getWebAppUrl();
-            console.log('URL:', webappUrl);
-            
-            try {
-                console.log('Enviando dados via POST no-cors...');
-                
-                const postData = {
-                    action: 'getAllData',
-                    timestamp: new Date().toISOString(),
-                    source: 'empire-marques-system'
-                };
-                
-                await fetch(webappUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(postData),
-                    mode: 'no-cors'
-                });
-                
-                console.log('Requisição POST enviada com sucesso');
-                showStatus('Requisição de sincronização enviada...', 'success');
-                
-                setTimeout(async () => {
-                    await attemptDataRetrieval(webappUrl);
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showStatus('Erro na sincronização: ' + error.message, 'error');
-            }
-        }
+  console.log('Iniciando carregamento de transfers...');
+  
+  const webappUrl = getWebAppUrl();
+  console.log('URL:', webappUrl);
+  
+  try {
+    console.log('Buscando dados dos transfers...');
+    
+    // Fazer requisição GET para buscar dados
+    const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+    console.log('URL completa:', dataUrl);
+    
+    const response = await fetch(dataUrl, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const textResponse = await response.text();
+    console.log('Resposta recebida (primeiros 200 chars):', textResponse.substring(0, 200));
+    
+    let result;
+    try {
+      result = JSON.parse(textResponse);
+    } catch (parseError) {
+      console.error('Erro ao parsear JSON:', parseError);
+      throw new Error('Resposta não é válida');
+    }
+    
+    console.log('Dados parseados:', result);
+    
+    if (result && result.success && result.data && Array.isArray(result.data)) {
+      console.log(`${result.data.length} transfers encontrados`);
+      
+      // Converter dados para formato local
+      const convertedServices = result.data.map(serverItem => {
+        return {
+          id: serverItem.ID || Date.now() + Math.random(),
+          nomeCliente: serverItem.Cliente || 'Cliente não informado',
+          tipoServico: serverItem['Tipo Serviço'] || 'Transfer',
+          numeroPessoas: parseInt(serverItem.Pessoas) || 1,
+          numeroBagagens: parseInt(serverItem.Bagagens) || 0,
+          data: serverItem.Data || '',
+          contacto: serverItem.Contacto || 'Sem contacto',
+          numeroVoo: serverItem.Voo || '',
+          origem: serverItem.Origem || 'Origem não informada',
+          destino: serverItem.Destino || 'Destino não informado',
+          horaPickup: serverItem['Hora Pick-up'] || '00:00',
+          valorTotal: parseFloat(serverItem['Preço Cliente (€)']) || 0,
+          valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)']) || 0,
+          valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)']) || 0,
+          comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)']) || 0,
+          modoPagamento: serverItem['Forma Pagamento'] || 'Não informado',
+          pagoParaQuem: serverItem['Pago Para'] || 'Não informado',
+          status: serverItem.Status || 'Solicitado',
+          observacoes: serverItem.Observações || '',
+          created: serverItem['Data Criação'] || new Date().toISOString()
+        };
+      });
+      
+      console.log('Dados convertidos (amostra):', convertedServices[0]);
+      
+      // Atualizar dados locais
+      services = convertedServices;
+      console.log(`Total: ${services.length} transfers carregados`);
+      
+      // Salvar e atualizar interface
+      saveData();
+      renderTable();
+      updateSummary();
+      
+      // Atualizar indicador de sincronização
+      lastSyncTime = new Date();
+      localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+      updateLastSyncDisplay();
+      
+      showStatus(`${services.length} transfers carregados com sucesso!`, 'success');
+      return true;
+      
+    } else {
+      throw new Error(result?.error || 'Nenhum dado encontrado');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar transfers:', error);
+    showStatus('Erro ao carregar: ' + error.message, 'error');
+    return false;
+  }
+}
 
         async function attemptDataRetrieval(webappUrl) {
             console.log('Tentando recuperar dados...');
