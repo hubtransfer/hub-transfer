@@ -2081,43 +2081,43 @@ function updateCalculation() {
     return 'https://script.google.com/macros/s/AKfycbzoCrSDD2c9xOX548Nw3qXCDASpzBXxJ8Jqre2U3UcVkV16tQ_RLgDep2b2Cr_EJDs36Q/exec';
 }
         async function testSimpleConnection() {
-            console.log('Iniciando sincronização compatível com CORS...');
-            
-            const webappUrl = getWebAppUrl();
-            console.log('URL:', webappUrl);
-            
-            try {
-                console.log('Enviando dados via POST no-cors...');
-                
-                const postData = {
-                    action: 'getAllData',
-                    timestamp: new Date().toISOString(),
-                    source: 'empire-marques-system'
-                };
-                
-                await fetch(webappUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(postData),
-                    mode: 'no-cors'
-                });
-                
-                console.log('Requisição POST enviada com sucesso');
-                showStatus('Requisição de sincronização enviada...', 'success');
-                
-                setTimeout(async () => {
-                    await attemptDataRetrieval(webappUrl);
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showStatus('Erro na sincronização: ' + error.message, 'error');
-            }
-        }
+    console.log('Iniciando sincronização compatível com CORS...');
+    
+    const webappUrl = getWebAppUrl();
+    console.log('URL:', webappUrl);
+    
+    try {
+        console.log('Enviando dados via POST no-cors...');
+        
+        const postData = {
+            action: 'getAllData',
+            timestamp: new Date().toISOString(),
+            source: 'empire-marques-system'
+        };
+        
+        await fetch(webappUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(postData),
+            mode: 'no-cors'
+        });
+        
+        console.log('Requisição POST enviada com sucesso');
+        showStatus('Requisição de sincronização enviada...', 'success');
+        
+        setTimeout(async () => {
+            await attemptDataRetrieval(webappUrl);
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Erro na sincronização:', error);
+        showStatus('Erro na sincronização: ' + error.message, 'error');
+    }
+}
 
-        async function attemptDataRetrieval(webappUrl) {
+async function attemptDataRetrieval(webappUrl) {
     console.log('Tentando recuperar dados...');
     
     try {
@@ -2169,7 +2169,8 @@ function updateCalculation() {
     showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
     return false;
 }
-        async function testBasicConnectivity() {
+
+async function testBasicConnectivity() {
     console.log('Testando conectividade básica...');
     
     const webappUrl = getWebAppUrl();
@@ -2207,89 +2208,102 @@ function updateCalculation() {
     }
 }
 
-        function convertServerDataToLocal(serverItem) {
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn('Item inválido do servidor:', serverItem);
-                return null;
-            }
+function convertServerDataToLocal(serverItem) {
+    if (!serverItem || typeof serverItem !== 'object') {
+        console.warn('Item inválido do servidor:', serverItem);
+        return null;
+    }
+    
+    try {
+        return {
+            id: parseInt(serverItem.ID) || parseInt(serverItem.id) || nextAvailableId++,
+            nomeCliente: serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado',
+            tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+            tourSelecionado: serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
+            numeroPessoas: parseInt(serverItem.Pessoas) || parseInt(serverItem.numeroPessoas) || 1,
+            numeroBagagens: parseInt(serverItem.Bagagens) || parseInt(serverItem.numeroBagagens) || 0,
+            data: formatDateFromServer(serverItem.Data || serverItem.data),
+            contacto: serverItem.Contacto || serverItem.contacto || 'Sem contacto',
+            numeroVoo: serverItem.Voo || serverItem.numeroVoo || '',
+            origem: serverItem.Origem || serverItem.origem || 'Origem não informada',
+            destino: serverItem.Destino || serverItem.destino || 'Destino não informado',
+            horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00',
+            valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal) || 0,
+            valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel) || 0,
+            valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB) || 0,
+            comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao) || 0,
+            modoPagamento: serverItem.Pagamento || serverItem.modoPagamento || 'Não informado',
+            pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado',
+            status: serverItem.Status || serverItem.status || 'Solicitado',
+            observacoes: serverItem.Observações || serverItem.observacoes || '',
+            created: serverItem.created || new Date().toISOString()
+        };
+    } catch (error) {
+        console.error('Erro ao converter dados do servidor:', error, serverItem);
+        return null;
+    }
+}
+
+function formatDateFromServer(dateStr) {
+    if (!dateStr) return '';
+    
+    try {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            return dateStr;
+        }
+        
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+            const [day, month, year] = dateStr.split('/');
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        return dateStr;
+        
+    } catch (error) {
+        console.error('Erro ao formatar data do servidor:', dateStr, error);
+        return dateStr;
+    }
+}
+
+function mergeServicesData(localServices, serverServices) {
+    const merged = [...localServices];
+    
+    serverServices.forEach(serverService => {
+        if (serverService) {
+            const existingIndex = merged.findIndex(local => local.id === serverService.id);
             
-            try {
-                return {
-                    id: parseInt(serverItem.ID) || parseInt(serverItem.id) || nextAvailableId++,
-                    nomeCliente: serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado',
-                    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-                    tourSelecionado: serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
-                    numeroPessoas: parseInt(serverItem.Pessoas) || parseInt(serverItem.numeroPessoas) || 1,
-                    numeroBagagens: parseInt(serverItem.Bagagens) || parseInt(serverItem.numeroBagagens) || 0,
-                    data: formatDateFromServer(serverItem.Data || serverItem.data),
-                    contacto: serverItem.Contacto || serverItem.contacto || 'Sem contacto',
-                    numeroVoo: serverItem.Voo || serverItem.numeroVoo || '',
-                    origem: serverItem.Origem || serverItem.origem || 'Origem não informada',
-                    destino: serverItem.Destino || serverItem.destino || 'Destino não informado',
-                    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00',
-                    valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal) || 0,
-                    valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel) || 0,
-                    valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB) || 0,
-                    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao) || 0,
-                    modoPagamento: serverItem.Pagamento || serverItem.modoPagamento || 'Não informado',
-                    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado',
-                    status: serverItem.Status || serverItem.status || 'Solicitado',
-                    observacoes: serverItem.Observações || serverItem.observacoes || '',
-                    created: serverItem.created || new Date().toISOString()
-                };
-            } catch (error) {
-                console.error('Erro ao converter dados do servidor:', error, serverItem);
-                return null;
+            if (existingIndex >= 0) {
+                merged[existingIndex] = { ...merged[existingIndex], ...serverService };
+            } else {
+                merged.push(serverService);
             }
         }
+    });
+    
+    return merged.sort((a, b) => b.id - a.id);
+}
 
-        function formatDateFromServer(dateStr) {
-            if (!dateStr) return '';
-            
-            try {
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                    return dateStr;
-                }
-                
-                if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                    const [day, month, year] = dateStr.split('/');
-                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                }
-                
-                const date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                
-                return dateStr;
-                
-            } catch (error) {
-                console.error('Erro ao formatar data do servidor:', dateStr, error);
-                return dateStr;
-            }
-        }
-
-        function mergeServicesData(localServices, serverServices) {
-            const merged = [...localServices];
-            
-            serverServices.forEach(serverService => {
-                if (serverService) {
-                    const existingIndex = merged.findIndex(local => local.id === serverService.id);
-                    
-                    if (existingIndex >= 0) {
-                        merged[existingIndex] = { ...merged[existingIndex], ...serverService };
-                    } else {
-                        merged.push(serverService);
-                    }
-                }
-            });
-            
-            return merged.sort((a, b) => b.id - a.id);
-        }
-
+function getWebAppUrl() {
+    const inputUrl = document.getElementById('webappUrl').value.trim();
+    if (inputUrl) {
+        return inputUrl;
+    }
+    
+    const savedUrl = localStorage.getItem('webappUrl');
+    if (savedUrl) {
+        return savedUrl;
+    }
+    
+    return 'https://script.google.com/macros/s/AKfycbzoCrSDD2c9xOX548Nw3qXCDASpzBXxJ8Jqre2U3UcVkV16tQ_RLgDep2b2Cr_EJDs36Q/exec';
+}
         function getNextSyncedId() {
             const localIds = services.map(s => parseInt(s.id)).filter(id => !isNaN(id));
             const maxLocalId = localIds.length > 0 ? Math.max(...localIds) : 0;
