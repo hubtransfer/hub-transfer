@@ -1988,86 +1988,85 @@ function updateCalculation() {
         }
 
         async function syncWithServer(showLoading = true) {
-            if (syncInProgress) {
-                console.log('Sincronização já em andamento...');
-                return false;
-            }
-            
-            syncInProgress = true;
-            
-            if (showLoading) {
-                showSyncLoading(true);
-            }
-            
-            try {
-                const webappUrl = getWebAppUrl();
-                console.log('URL de sincronização:', webappUrl);
-                
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('Buscando dados de:', dataUrl);
-                
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    mode: 'cors'
-                });
-                
-                console.log('Status da resposta:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const textResponse = await response.text();
-                console.log('Resposta bruta (primeiros 200 chars):', textResponse.substring(0, 200));
-                
-                let result;
-                try {
-                    result = JSON.parse(textResponse);
-                } catch (parseError) {
-                    console.error('Erro ao parsear JSON:', parseError);
-                    throw new Error('Resposta não é um JSON válido');
-                }
-                
-                console.log('Dados parseados:', result);
-                
-                if (result && result.success && result.data && Array.isArray(result.data)) {
-                    console.log(`${result.data.length} registros recebidos do servidor`);
-                    
-                    const convertedServices = result.data.map(convertServerDataToLocal);
-                    console.log('Dados convertidos (amostra):', convertedServices.slice(0, 2));
-                    
-                    services = mergeServicesData(services, convertedServices);
-                    console.log(`Total após mesclagem: ${services.length}`);
-                    
-                    saveData();
-                    renderTable();
-                    updateSummary();
-                    
-                    lastSyncTime = new Date();
-                    localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                    updateLastSyncDisplay();
-                    
-                    showSyncSuccess(services.length);
-                    return true;
-                    
-                } else {
-                    throw new Error(result?.error || 'Resposta inválida do servidor');
-                }
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showSyncError(error.message);
-                return false;
-                
-            } finally {
-                syncInProgress = false;
-                if (showLoading) {
-                    showSyncLoading(false);
-                }
-            }
+    if (syncInProgress) {
+        console.log('Sincronização já em andamento...');
+        return false;
+    }
+    
+    syncInProgress = true;
+    
+    if (showLoading) {
+        showSyncLoading(true);
+    }
+    
+    try {
+        const webappUrl = getWebAppUrl();
+        console.log('URL de sincronização:', webappUrl);
+        
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('Buscando dados de:', dataUrl);
+        
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+            mode: 'cors'
+        });
+        
+        console.log('Status da resposta:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-
+        
+        const textResponse = await response.text();
+        console.log('Resposta bruta (primeiros 200 chars):', textResponse.substring(0, 200));
+        
+        let result;
+        try {
+            result = JSON.parse(textResponse);
+        } catch (parseError) {
+            console.error('Erro ao parsear JSON:', parseError);
+            throw new Error('Resposta não é um JSON válido');
+        }
+        
+        console.log('Dados parseados:', result);
+        
+        if (result && result.success && result.data && Array.isArray(result.data)) {
+            console.log(`${result.data.length} registros recebidos do servidor`);
+            
+            const convertedServices = result.data.map(convertServerDataToLocal);
+            console.log('Dados convertidos (amostra):', convertedServices.slice(0, 2));
+            
+            services = mergeServicesData(services, convertedServices);
+            console.log(`Total após mesclagem: ${services.length}`);
+            
+            saveData();
+            renderTable();
+            updateSummary();
+            
+            lastSyncTime = new Date();
+            localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+            updateLastSyncDisplay();
+            
+            showSyncSuccess(services.length);
+            return true;
+            
+        } else {
+            throw new Error(result?.error || 'Resposta inválida do servidor');
+        }
+        
+    } catch (error) {
+        console.error('Erro na sincronização:', error);
+        showSyncError(error.message);
+        return false;
+        
+    } finally {
+        syncInProgress = false;
+        if (showLoading) {
+            showSyncLoading(false);
+        }
+    }
+}
         function getWebAppUrl() {
     const inputUrl = document.getElementById('webappUrl').value.trim();
     if (inputUrl) {
