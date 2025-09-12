@@ -2479,11 +2479,10 @@
                 }, 2000);
                 
             } catch (error) {
-                console.error('Erro ao limpar dados de teste:', error);
-                showStatus('Erro ao limpar dados de teste: ' + error.message, 'error');
-            } finally {
-                setButtonLoading('clearTestBtn', false);
-            }
+            console.error('Erro ao limpar dados de teste:', error);
+            showStatus('Erro ao limpar dados de teste: ' + error.message, 'error');
+        } finally {
+            setButtonLoading('clearTestBtn', false);
         }
 
         // =====================================================
