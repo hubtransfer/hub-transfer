@@ -2090,29 +2090,58 @@
         }
 
         async function attemptDataRetrieval(webappUrl) {
-            console.log('Tentando recuperar dados...');
+    console.log('Tentando recuperar dados...');
+    
+    try {
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('URL de busca:', dataUrl);
+        
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const text = await response.text();
+            console.log('Resposta recebida (primeiros 300 chars):', text.substring(0, 300));
+            
+            // Tentar limpar a resposta se houver caracteres extras
+            let cleanText = text.trim();
+            
+            // Remover possíveis caracteres de controle no início
+            cleanText = cleanText.replace(/^\ufeff/, ''); // BOM
+            cleanText = cleanText.replace(/^[^{\[]*/, ''); // Remove tudo antes do primeiro { ou [
             
             try {
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('URL de busca:', dataUrl);
+                const data = JSON.parse(cleanText);
+                console.log('JSON parseado com sucesso:', data);
                 
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    cache: 'no-cache'
-                });
-                
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log('Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
+                if (data && typeof data === 'object') {
+                    let dataArray = [];
                     
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('JSON parseado:', data);
+                    // Diferentes formatos de resposta possíveis
+                    if (data.success && Array.isArray(data.data)) {
+                        dataArray = data.data;
+                    } else if (Array.isArray(data)) {
+                        dataArray = data;
+                    } else if (data.values && Array.isArray(data.values)) {
+                        dataArray = data.values;
+                    } else {
+                        console.log('Formato de dados não reconhecido:', data);
+                        return false;
+                    }
+                    
+                    console.log(`${dataArray.length} registros encontrados`);
+                    
+                    if (dataArray.length > 0) {
+                        const convertedServices = dataArray.map(convertServerDataToLocal).filter(item => item !== null);
+                        console.log(`${convertedServices.length} registros convertidos com sucesso`);
                         
-                        if (data.success && data.data && Array.isArray(data.data)) {
-                            console.log(`${data.data.length} registros encontrados`);
-                            
-                            const convertedServices = data.data.map(convertServerDataToLocal);
+                        if (convertedServices.length > 0) {
                             services = mergeServicesData(services, convertedServices);
                             
                             saveData();
@@ -2127,21 +2156,31 @@
                             
                             return true;
                         }
-                    } catch (parseError) {
-                        console.log('Erro ao parsear JSON:', parseError);
                     }
-                } else {
-                    console.log('Resposta não OK:', response.status);
                 }
-            } catch (error) {
-                console.log('Erro na requisição:', error.message);
+            } catch (parseError) {
+                console.log('Erro ao parsear JSON:', parseError);
+                console.log('Texto que causou erro:', cleanText.substring(0, 500));
+                
+                // Tentar extrair dados mesmo com JSON malformado
+                const matches = cleanText.match(/"Cliente"[^}]+}/g);
+                if (matches && matches.length > 0) {
+                    console.log('Tentando extrair dados de JSON malformado...');
+                    showStatus('Dados parciais recuperados, mas com problemas de formato', 'warning');
+                    return false;
+                }
             }
-            
-            console.log('Falha na recuperação de dados');
-            showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
-            return false;
+        } else {
+            console.log('Resposta não OK:', response.status, response.statusText);
         }
-
+    } catch (error) {
+        console.log('Erro na requisição:', error.message);
+    }
+    
+    console.log('Falha na recuperação de dados');
+    showStatus('Não foi possível carregar dados. Verifique o Google Apps Script.', 'warning');
+    return false;
+}
         async function testBasicConnectivity() {
             console.log('Testando conectividade básica...');
             
@@ -2181,41 +2220,50 @@
         }
 
         function convertServerDataToLocal(serverItem) {
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn('Item inválido do servidor:', serverItem);
-                return null;
-            }
-            
+    if (!serverItem || typeof serverItem !== 'object') {
+        console.warn('Item inválido do servidor:', serverItem);
+        return null;
+    }
+    
+    try {
+        // Se o item vier como string, tentar parsear
+        if (typeof serverItem === 'string') {
             try {
-                return {
-                    id: parseInt(serverItem.ID) || parseInt(serverItem.id) || nextAvailableId++,
-                    nomeCliente: serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado',
-                    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-                    tourSelecionado: serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
-                    numeroPessoas: parseInt(serverItem.Pessoas) || parseInt(serverItem.numeroPessoas) || 1,
-                    numeroBagagens: parseInt(serverItem.Bagagens) || parseInt(serverItem.numeroBagagens) || 0,
-                    data: formatDateFromServer(serverItem.Data || serverItem.data),
-                    contacto: serverItem.Contacto || serverItem.contacto || 'Sem contacto',
-                    numeroVoo: serverItem.Voo || serverItem.numeroVoo || '',
-                    origem: serverItem.Origem || serverItem.origem || 'Origem não informada',
-                    destino: serverItem.Destino || serverItem.destino || 'Destino não informado',
-                    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00',
-                    valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal) || 0,
-                    valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel) || 0,
-                    valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB) || 0,
-                    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao) || 0,
-                    modoPagamento: serverItem.Pagamento || serverItem.modoPagamento || 'Não informado',
-                    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado',
-                    status: serverItem.Status || serverItem.status || 'Solicitado',
-                    observacoes: serverItem.Observações || serverItem.observacoes || '',
-                    created: serverItem.created || new Date().toISOString()
-                };
-            } catch (error) {
-                console.error('Erro ao converter dados do servidor:', error, serverItem);
+                serverItem = JSON.parse(serverItem);
+            } catch (e) {
+                console.warn('Não foi possível parsear item como JSON:', serverItem);
                 return null;
             }
         }
 
+        return {
+            id: parseInt(serverItem.ID || serverItem.id || 0) || nextAvailableId++,
+            nomeCliente: String(serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado'),
+            tipoServico: String(serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer'),
+            tourSelecionado: String(serverItem['Tour Selecionado'] || serverItem.tourSelecionado || ''),
+            numeroPessoas: parseInt(serverItem.Pessoas || serverItem.numeroPessoas || 1) || 1,
+            numeroBagagens: parseInt(serverItem.Bagagens || serverItem.numeroBagagens || 0) || 0,
+            data: formatDateFromServer(serverItem.Data || serverItem.data || ''),
+            contacto: String(serverItem.Contacto || serverItem.contacto || 'Sem contacto'),
+            numeroVoo: String(serverItem.Voo || serverItem.numeroVoo || ''),
+            origem: String(serverItem.Origem || serverItem.origem || 'Origem não informada'),
+            destino: String(serverItem.Destino || serverItem.destino || 'Destino não informado'),
+            horaPickup: String(serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00'),
+            valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal || 0) || 0,
+            valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel || 0) || 0,
+            valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB || 0) || 0,
+            comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao || 0) || 0,
+            modoPagamento: String(serverItem.Pagamento || serverItem.modoPagamento || 'Não informado'),
+            pagoParaQuem: String(serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado'),
+            status: String(serverItem.Status || serverItem.status || 'Solicitado'),
+            observacoes: String(serverItem.Observações || serverItem.observacoes || ''),
+            created: String(serverItem.created || new Date().toISOString())
+        };
+    } catch (error) {
+        console.error('Erro ao converter dados do servidor:', error, serverItem);
+        return null;
+    }
+}
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
             
