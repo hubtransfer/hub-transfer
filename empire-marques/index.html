@@ -1006,7 +1006,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbzwCbEjNqZ_0Bh4o4ztgUwSaHq8seYHPYzD1nroUqp7EEYgmci9ssbWi1omcEe4a3YyZQ/exec" 
+                           value="https://script.google.com/macros/s/AKfycbyWPnoKtBue-9KD9m2xFnuj7BmQkvDYYuJy45PxL9Vh8vyIC9761siUqUT95v8CCfawhQ/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1496,7 +1496,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzwCbEjNqZ_0Bh4o4ztgUwSaHq8seYHPYzD1nroUqp7EEYgmci9ssbWi1omcEe4a3YyZQ/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyWPnoKtBue-9KD9m2xFnuj7BmQkvDYYuJy45PxL9Vh8vyIC9761siUqUT95v8CCfawhQ/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2074,31 +2074,26 @@ async function syncWithServer(showLoading = true) {
   }
 }
 
-        function getWebAppUrl() {
-            const inputUrl = document.getElementById('webappUrl').value.trim();
-            if (inputUrl) {
-                return inputUrl;
-            }
-            
-            const savedUrl = localStorage.getItem('webappUrl');
-            if (savedUrl) {
-                return savedUrl;
-            }
-            
-            return WEBAPP_URL;
-        }
-
-        async function testSimpleConnection() {
-  console.log('Iniciando carregamento de transfers...');
+        /**
+ * Carrega transfers do Google Sheets - VERSÃO CORRIGIDA
+ */
+async function testSimpleConnection() {
+  console.log('🔍 Iniciando carregamento de transfers...');
   
   const webappUrl = getWebAppUrl();
-  console.log('URL:', webappUrl);
+  console.log('🌐 URL configurada:', webappUrl);
+  
+  if (!webappUrl) {
+    showStatus('URL do Google Apps Script não configurada', 'error');
+    return false;
+  }
   
   try {
-    console.log('Buscando dados dos transfers...');
+    showStatus('Carregando transfers...', 'warning');
     
-    const dataUrl = webappUrl + '?action=getAllData&_=' + Date.now();
-    console.log('URL completa:', dataUrl);
+    // URL para buscar todos os dados
+    const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+    console.log('📡 Fazendo requisição para:', dataUrl);
     
     const response = await fetch(dataUrl, {
       method: 'GET',
@@ -2109,76 +2104,96 @@ async function syncWithServer(showLoading = true) {
       }
     });
     
-    console.log('Status da resposta:', response.status);
+    console.log('📊 Status da resposta:', response.status, response.statusText);
     
     if (!response.ok) {
-      throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const textResponse = await response.text();
-    console.log('Resposta recebida (primeiros 200 chars):', textResponse.substring(0, 200));
+    console.log('📄 Resposta recebida (tamanho):', textResponse.length, 'caracteres');
+    console.log('📄 Início da resposta:', textResponse.substring(0, 200));
     
     let result;
     try {
       result = JSON.parse(textResponse);
     } catch (parseError) {
-      console.error('Erro ao parsear JSON:', parseError);
-      throw new Error('Resposta não é válida');
+      console.error('❌ Erro ao fazer parse do JSON:', parseError);
+      console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
+      throw new Error('Resposta do servidor não é um JSON válido');
     }
     
-    console.log('Dados parseados:', result);
+    console.log('✅ Dados parseados:', result);
     
-    if (result && result.success && result.data && Array.isArray(result.data)) {
-      console.log(result.data.length + ' transfers encontrados');
+    if (result && result.success) {
+      console.log(`📋 ${result.data.length} transfers recebidos do servidor`);
       
-      const convertedServices = result.data.map(function(serverItem) {
-        return {
-          id: serverItem.ID || Date.now() + Math.random(),
-          nomeCliente: serverItem.Cliente || 'Cliente não informado',
-          tipoServico: serverItem['Tipo Serviço'] || 'Transfer',
-          numeroPessoas: parseInt(serverItem.Pessoas) || 1,
-          numeroBagagens: parseInt(serverItem.Bagagens) || 0,
-          data: serverItem.Data || '',
-          contacto: serverItem.Contacto || 'Sem contacto',
-          numeroVoo: serverItem.Voo || '',
-          origem: serverItem.Origem || 'Origem não informada',
-          destino: serverItem.Destino || 'Destino não informado',
-          horaPickup: serverItem['Hora Pick-up'] || '00:00',
-          valorTotal: parseFloat(serverItem['Preço Cliente (€)']) || 0,
-          valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)']) || 0,
-          valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)']) || 0,
-          comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)']) || 0,
-          modoPagamento: serverItem['Forma Pagamento'] || 'Não informado',
-          pagoParaQuem: serverItem['Pago Para'] || 'Não informado',
-          status: serverItem.Status || 'Solicitado',
-          observacoes: serverItem.Observações || '',
-          created: serverItem['Data Criação'] || new Date().toISOString()
-        };
-      });
+      if (result.data.length === 0) {
+        showStatus('Nenhum transfer encontrado na planilha', 'warning');
+        renderTable(); // Renderizar tabela vazia
+        updateSummary();
+        return true;
+      }
       
-      console.log('Dados convertidos (amostra):', convertedServices[0]);
+      // Converter dados do servidor para formato local
+      const convertedServices = result.data.map((serverItem, index) => {
+        try {
+          return {
+            id: serverItem.ID || (Date.now() + index),
+            nomeCliente: serverItem.Cliente || 'Cliente não informado',
+            tipoServico: serverItem['Tipo Serviço'] || 'Transfer',
+            numeroPessoas: parseInt(serverItem.Pessoas) || 1,
+            numeroBagagens: parseInt(serverItem.Bagagens) || 0,
+            data: serverItem.Data || '',
+            contacto: serverItem.Contacto || 'Sem contacto',
+            numeroVoo: serverItem.Voo || '',
+            origem: serverItem.Origem || 'Origem não informada',
+            destino: serverItem.Destino || 'Destino não informado',
+            horaPickup: serverItem['Hora Pick-up'] || '00:00',
+            valorTotal: parseFloat(serverItem['Preço Cliente (€)']) || 0,
+            valorHotel: parseFloat(serverItem['Valor Impire Marques Hotel (€)']) || 0,
+            valorHUB: parseFloat(serverItem['Valor HUB Transfer (€)']) || 0,
+            comissaoRecepcao: parseFloat(serverItem['Comissão Recepção (€)']) || 0,
+            modoPagamento: serverItem['Forma Pagamento'] || 'Não informado',
+            pagoParaQuem: serverItem['Pago Para'] || 'Não informado',
+            status: serverItem.Status || 'Solicitado',
+            observacoes: serverItem.Observações || '',
+            created: serverItem['Data Criação'] || new Date().toISOString()
+          };
+        } catch (convError) {
+          console.error(`❌ Erro ao converter item ${index}:`, convError);
+          return null;
+        }
+      }).filter(item => item !== null);
       
+      console.log(`🔄 ${convertedServices.length} transfers convertidos com sucesso`);
+      
+      // Substituir dados locais pelos do servidor
       services = convertedServices;
-      console.log('Total: ' + services.length + ' transfers carregados');
       
+      // Salvar dados localmente e atualizar interface
       saveData();
       renderTable();
       updateSummary();
       
+      // Atualizar indicadores de sincronização
       lastSyncTime = new Date();
       localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
       updateLastSyncDisplay();
       
-      showStatus(services.length + ' transfers carregados com sucesso!', 'success');
+      showStatus(`${services.length} transfers carregados com sucesso!`, 'success');
       return true;
       
     } else {
-      throw new Error(result.error || 'Nenhum dado encontrado');
+      const errorMsg = result.error || result.message || 'Resposta inválida do servidor';
+      console.error('❌ Erro na resposta:', errorMsg);
+      showStatus(`Erro: ${errorMsg}`, 'error');
+      return false;
     }
     
   } catch (error) {
-    console.error('Erro ao carregar transfers:', error);
-    showStatus('Erro ao carregar: ' + error.message, 'error');
+    console.error('❌ Erro ao carregar transfers:', error);
+    showStatus(`Erro ao carregar: ${error.message}`, 'error');
     return false;
   }
 }
@@ -2403,6 +2418,26 @@ async function syncWithServer(showLoading = true) {
                 display.textContent = `Última sincronização: ${timeStr}`;
             }
         }
+
+/**
+ * Obtém a URL configurada do WebApp
+ */
+function getWebAppUrl() {
+  // Primeiro tentar o campo de input
+  const inputUrl = document.getElementById('webappUrl');
+  if (inputUrl && inputUrl.value && inputUrl.value.trim() !== '') {
+    return inputUrl.value.trim();
+  }
+  
+  // Depois tentar localStorage
+  const savedUrl = localStorage.getItem('webappUrl');
+  if (savedUrl && savedUrl.trim() !== '') {
+    return savedUrl.trim();
+  }
+  
+  // Por último usar a URL padrão
+  return 'https://script.google.com/macros/s/AKfycbyWPnoKtBue-9KD9m2xFnuj7BmQkvDYYuJy45PxL9Vh8vyIC9761siUqUT95v8CCfawhQ/exec';
+}
 
         // =====================================================
         // GERENCIAMENTO DE DADOS LOCAL
