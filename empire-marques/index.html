@@ -1630,15 +1630,44 @@
         }
 
         function showStatus(message, type = 'success') {
-            const statusDiv = document.getElementById('connectionStatus');
-            statusDiv.className = `status-message status-${type}`;
-            statusDiv.textContent = message;
-            statusDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+    const statusDiv = document.getElementById('connectionStatus');
+    if (!statusDiv) {
+        console.warn('Elemento connectionStatus não encontrado');
+        return;
+    }
+    
+    statusDiv.className = `status-message status-${type}`;
+    statusDiv.textContent = message;
+    statusDiv.style.display = 'block';
+    
+    console.log(`Status: ${type} - ${message}`);
+    
+    setTimeout(() => {
+        if (statusDiv) {
+            statusDiv.style.display = 'none';
         }
+    }, 5000);
+}
+
+/**
+ * Mostra/esconde a seção de configuração
+ */
+function toggleConfig() {
+    const configSection = document.getElementById('configSection');
+    if (configSection) {
+        configSection.classList.toggle('show');
+    }
+}
+
+/**
+ * Mostra/esconde a seção de limpeza de dados
+ */
+function toggleClearData() {
+    const clearSection = document.getElementById('clearDataSection');
+    if (clearSection) {
+        clearSection.classList.toggle('show');
+    }
+}
 
         function setButtonLoading(buttonId, loading = true) {
             const button = document.getElementById(buttonId);
@@ -3284,44 +3313,44 @@ function getWebAppUrl() {
         }
 
         function clearForm() {
-            try {
-                document.getElementById('transferForm').reset();
-                
-                document.getElementById('numeroPessoas').value = '';
-                document.getElementById('numeroBagagens').value = '0';
-                document.getElementById('modoPagamento').value = '';
-                document.getElementById('pagoParaQuem').value = '';
-                document.getElementById('observacoes').value = '';
-                document.getElementById('tourSelecionado').value = '';
-                
-                currentServiceType = 'transfer';
-                precoUnitarioAtual = 0;
-                
-                document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to, .btn-obs, .btn-service').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                document.getElementById('tourSelector').classList.remove('show');
-                document.getElementById('priceCalculationBox').classList.remove('show');
-                
-                document.querySelector('.btn-service').classList.add('active');
-                
-                editingId = null;
-                document.getElementById('submitBtn').textContent = 'Solicitar Transfer';
-                
-                if (phoneInput) {
-                    phoneInput.setNumber('');
-                }
-                
-                document.getElementById('data').valueAsDate = new Date();
-                
-                console.log('Formulário limpo com sucesso');
-                
-            } catch (error) {
-                console.error('Erro ao limpar formulário:', error);
-                showStatus('Erro ao limpar formulário', 'error');
-            }
+    try {
+        document.getElementById('transferForm').reset();
+        
+        document.getElementById('numeroPessoas').value = '';
+        document.getElementById('numeroBagagens').value = '0';
+        document.getElementById('modoPagamento').value = '';
+        document.getElementById('pagoParaQuem').value = '';
+        document.getElementById('observacoes').value = '';
+        document.getElementById('tourSelecionado').value = '';
+        
+        currentServiceType = 'transfer';
+        precoUnitarioAtual = 0;
+        
+        document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to, .btn-obs, .btn-service').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        document.getElementById('tourSelector').classList.remove('show');
+        document.getElementById('priceCalculationBox').classList.remove('show');
+        
+        document.querySelector('.btn-service').classList.add('active');
+        
+        editingId = null;
+        document.getElementById('submitBtn').textContent = 'Solicitar Transfer';
+        
+        if (phoneInput) {
+            phoneInput.setNumber('');
         }
+        
+        document.getElementById('data').valueAsDate = new Date();
+        
+        console.log('Formulário limpo com sucesso');
+        
+    } catch (error) {
+        console.error('Erro ao limpar formulário:', error);
+        showStatus('Erro ao limpar formulário', 'error');
+    }
+} // <- Esta chave estava faltando
 
         // =====================================================
         // EDIÇÃO E MANIPULAÇÃO DE SERVIÇOS
