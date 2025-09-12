@@ -2170,42 +2170,42 @@ function updateCalculation() {
     return false;
 }
         async function testBasicConnectivity() {
-            console.log('Testando conectividade básica...');
-            
-            const webappUrl = getWebAppUrl();
-            
-            try {
-                const pingResponse = await fetch(webappUrl + '?ping=true', {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                
-                console.log('Ping enviado');
-                showStatus('Teste de conectividade enviado', 'success');
-                
-                const testData = {
-                    action: 'test',
-                    message: 'Sistema Empire Marques funcionando',
-                    timestamp: new Date().toISOString()
-                };
-                
-                await fetch(webappUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(testData),
-                    mode: 'no-cors'
-                });
-                
-                console.log('Teste de conectividade completo');
-                showStatus('Conectividade OK - Sistema funcionando', 'success');
-                
-            } catch (error) {
-                console.error('Erro no teste de conectividade:', error);
-                showStatus('Erro de conectividade: ' + error.message, 'error');
-            }
-        }
+    console.log('Testando conectividade básica...');
+    
+    const webappUrl = getWebAppUrl();
+    
+    try {
+        const pingResponse = await fetch(webappUrl + '?ping=true', {
+            method: 'GET',
+            mode: 'no-cors'
+        });
+        
+        console.log('Ping enviado');
+        showStatus('Teste de conectividade enviado', 'success');
+        
+        const testData = {
+            action: 'test',
+            message: 'Sistema Empire Marques funcionando',
+            timestamp: new Date().toISOString()
+        };
+        
+        await fetch(webappUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(testData),
+            mode: 'no-cors'
+        });
+        
+        console.log('Teste de conectividade completo');
+        showStatus('Conectividade OK - Sistema funcionando', 'success');
+        
+    } catch (error) {
+        console.error('Erro no teste de conectividade:', error);
+        showStatus('Erro de conectividade: ' + error.message, 'error');
+    }
+}
 
         function convertServerDataToLocal(serverItem) {
             if (!serverItem || typeof serverItem !== 'object') {
