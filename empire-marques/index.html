@@ -2090,57 +2090,57 @@
         }
 
         async function attemptDataRetrieval(webappUrl) {
-    console.log('Tentando recuperar dados...');
-    
-    try {
-        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-        console.log('URL de busca:', dataUrl);
-        
-        const response = await fetch(dataUrl, {
-            method: 'GET',
-            cache: 'no-cache'
-        });
-        
-        if (response.ok) {
-            const text = await response.text();
-            console.log('Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
+            console.log('Tentando recuperar dados...');
             
             try {
-                const data = JSON.parse(text);
-                console.log('JSON parseado:', data);
+                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+                console.log('URL de busca:', dataUrl);
                 
-                if (data.success && data.data && Array.isArray(data.data)) {
-                    console.log(`${data.data.length} registros encontrados`);
+                const response = await fetch(dataUrl, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
                     
-                    const convertedServices = data.data.map(convertServerDataToLocal);
-                    services = mergeServicesData(services, convertedServices);
-                    
-                    saveData();
-                    renderTable();
-                    updateSummary();
-                    
-                    showStatus(`${services.length} transfers sincronizados com sucesso!`, 'success');
-                    
-                    lastSyncTime = new Date();
-                    localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                    updateLastSyncDisplay();
-                    
-                    return true;
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('JSON parseado:', data);
+                        
+                        if (data.success && data.data && Array.isArray(data.data)) {
+                            console.log(`${data.data.length} registros encontrados`);
+                            
+                            const convertedServices = data.data.map(convertServerDataToLocal);
+                            services = mergeServicesData(services, convertedServices);
+                            
+                            saveData();
+                            renderTable();
+                            updateSummary();
+                            
+                            showStatus(`${services.length} transfers sincronizados com sucesso!`, 'success');
+                            
+                            lastSyncTime = new Date();
+                            localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                            updateLastSyncDisplay();
+                            
+                            return true;
+                        }
+                    } catch (parseError) {
+                        console.log('Erro ao parsear JSON:', parseError);
+                    }
+                } else {
+                    console.log('Resposta não OK:', response.status);
                 }
-            } catch (parseError) {
-                console.log('Erro ao parsear JSON:', parseError);
+            } catch (error) {
+                console.log('Erro na requisição:', error.message);
             }
-        } else {
-            console.log('Resposta não OK:', response.status);
+            
+            console.log('Falha na recuperação de dados');
+            showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
+            return false;
         }
-    } catch (error) {
-        console.log('Erro na requisição:', error.message);
-    }
-    
-    console.log('Falha na recuperação de dados');
-    showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
-    return false;
-}
 
         async function testBasicConnectivity() {
             console.log('Testando conectividade básica...');
@@ -2181,40 +2181,41 @@
         }
 
         function convertServerDataToLocal(serverItem) {
-    if (!serverItem || typeof serverItem !== 'object') {
-        console.warn('Item inválido do servidor:', serverItem);
-        return null;
-    }
-    
-    try {
-        return {
-            id: parseInt(serverItem.ID) || parseInt(serverItem.id) || nextAvailableId++,
-            nomeCliente: serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado',
-            tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
-            tourSelecionado: serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
-            numeroPessoas: parseInt(serverItem.Pessoas) || parseInt(serverItem.numeroPessoas) || 1,
-            numeroBagagens: parseInt(serverItem.Bagagens) || parseInt(serverItem.numeroBagagens) || 0,
-            data: formatDateFromServer(serverItem.Data || serverItem.data),
-            contacto: serverItem.Contacto || serverItem.contacto || 'Sem contacto',
-            numeroVoo: serverItem.Voo || serverItem.numeroVoo || '',
-            origem: serverItem.Origem || serverItem.origem || 'Origem não informada',
-            destino: serverItem.Destino || serverItem.destino || 'Destino não informado',
-            horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00',
-            valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal) || 0,
-            valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel) || 0,
-            valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB) || 0,
-            comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao) || 0,
-            modoPagamento: serverItem.Pagamento || serverItem.modoPagamento || 'Não informado',
-            pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado',
-            status: serverItem.Status || serverItem.status || 'Solicitado',
-            observacoes: serverItem.Observações || serverItem.observacoes || '',
-            created: serverItem.created || new Date().toISOString()
-        };
-    } catch (error) {
-        console.error('Erro ao converter dados do servidor:', error, serverItem);
-        return null;
-    }
-}
+            if (!serverItem || typeof serverItem !== 'object') {
+                console.warn('Item inválido do servidor:', serverItem);
+                return null;
+            }
+            
+            try {
+                return {
+                    id: parseInt(serverItem.ID) || parseInt(serverItem.id) || nextAvailableId++,
+                    nomeCliente: serverItem.Cliente || serverItem.nomeCliente || 'Cliente não informado',
+                    tipoServico: serverItem['Tipo Serviço'] || serverItem.tipoServico || 'Transfer',
+                    tourSelecionado: serverItem['Tour Selecionado'] || serverItem.tourSelecionado || '',
+                    numeroPessoas: parseInt(serverItem.Pessoas) || parseInt(serverItem.numeroPessoas) || 1,
+                    numeroBagagens: parseInt(serverItem.Bagagens) || parseInt(serverItem.numeroBagagens) || 0,
+                    data: formatDateFromServer(serverItem.Data || serverItem.data),
+                    contacto: serverItem.Contacto || serverItem.contacto || 'Sem contacto',
+                    numeroVoo: serverItem.Voo || serverItem.numeroVoo || '',
+                    origem: serverItem.Origem || serverItem.origem || 'Origem não informada',
+                    destino: serverItem.Destino || serverItem.destino || 'Destino não informado',
+                    horaPickup: serverItem['Hora Pick-up'] || serverItem.horaPickup || '00:00',
+                    valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.valorTotal) || 0,
+                    valorHotel: parseFloat(serverItem['Valor Hotel'] || serverItem.valorHotel) || 0,
+                    valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.valorHUB) || 0,
+                    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.comissaoRecepcao) || 0,
+                    modoPagamento: serverItem.Pagamento || serverItem.modoPagamento || 'Não informado',
+                    pagoParaQuem: serverItem['Pago Para'] || serverItem.pagoParaQuem || 'Não informado',
+                    status: serverItem.Status || serverItem.status || 'Solicitado',
+                    observacoes: serverItem.Observações || serverItem.observacoes || '',
+                    created: serverItem.created || new Date().toISOString()
+                };
+            } catch (error) {
+                console.error('Erro ao converter dados do servidor:', error, serverItem);
+                return null;
+            }
+        }
+
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
             
