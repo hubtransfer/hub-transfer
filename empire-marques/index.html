@@ -2118,58 +2118,57 @@ function updateCalculation() {
         }
 
         async function attemptDataRetrieval(webappUrl) {
-            console.log('Tentando recuperar dados...');
+    console.log('Tentando recuperar dados...');
+    
+    try {
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('URL de busca:', dataUrl);
+        
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            cache: 'no-cache'
+        });
+        
+        if (response.ok) {
+            const text = await response.text();
+            console.log('Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
             
             try {
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('URL de busca:', dataUrl);
+                const data = JSON.parse(text);
+                console.log('JSON parseado:', data);
                 
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    cache: 'no-cache'
-                });
-                
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log('Resposta recebida (primeiros 200 chars):', text.substring(0, 200));
+                if (data.success && data.data && Array.isArray(data.data)) {
+                    console.log(`${data.data.length} registros encontrados`);
                     
-                    try {
-                        const data = JSON.parse(text);
-                        console.log('JSON parseado:', data);
-                        
-                        if (data.success && data.data && Array.isArray(data.data)) {
-                            console.log(`${data.data.length} registros encontrados`);
-                            
-                            const convertedServices = data.data.map(convertServerDataToLocal);
-                            services = mergeServicesData(services, convertedServices);
-                            
-                            saveData();
-                            renderTable();
-                            updateSummary();
-                            
-                            showStatus(`${services.length} transfers sincronizados com sucesso!`, 'success');
-                            
-                            lastSyncTime = new Date();
-                            localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                            updateLastSyncDisplay();
-                            
-                            return true;
-                        }
-                    } catch (parseError) {
-                        console.log('Erro ao parsear JSON:', parseError);
-                    }
-                } else {
-                    console.log('Resposta não OK:', response.status);
+                    const convertedServices = data.data.map(convertServerDataToLocal);
+                    services = mergeServicesData(services, convertedServices);
+                    
+                    saveData();
+                    renderTable();
+                    updateSummary();
+                    
+                    showStatus(`${services.length} transfers sincronizados com sucesso!`, 'success');
+                    
+                    lastSyncTime = new Date();
+                    localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                    updateLastSyncDisplay();
+                    
+                    return true;
                 }
-            } catch (error) {
-                console.log('Erro na requisição:', error.message);
+            } catch (parseError) {
+                console.log('Erro ao parsear JSON:', parseError);
             }
-            
-            console.log('Falha na recuperação de dados');
-            showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
-            return false;
+        } else {
+            console.log('Resposta não OK:', response.status);
         }
-
+    } catch (error) {
+        console.log('Erro na requisição:', error.message);
+    }
+    
+    console.log('Falha na recuperação de dados');
+    showStatus('Não foi possível carregar dados. Verifique a configuração.', 'warning');
+    return false;
+}
         async function testBasicConnectivity() {
             console.log('Testando conectividade básica...');
             
