@@ -1006,7 +1006,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbyXFSxmLe8wLBglf5PPRAeFRtebb0LI0_CdK3Lvb1xawN6m2WkwZvtx6yVZ1WqFcR-oDQ/exec" 
+                           value="https://script.google.com/macros/s/AKfycby4UE9kM_XMz4aPmbtHkwSEdsra2MYNKbpAat0p2Nyq8CsnbrEEN_U4iQKVd6-n6hK9dg/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1496,7 +1496,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXFSxmLe8wLBglf5PPRAeFRtebb0LI0_CdK3Lvb1xawN6m2WkwZvtx6yVZ1WqFcR-oDQ/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby4UE9kM_XMz4aPmbtHkwSEdsra2MYNKbpAat0p2Nyq8CsnbrEEN_U4iQKVd6-n6hK9dg/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2479,11 +2479,13 @@
                 }, 2000);
                 
             } catch (error) {
-            console.error('Erro ao limpar dados de teste:', error);
-            showStatus('Erro ao limpar dados de teste: ' + error.message, 'error');
-        } finally {
-            setButtonLoading('clearTestBtn', false);
+                console.error('Erro ao limpar dados de teste:', error);
+                showStatus('Erro ao limpar dados de teste: ' + error.message, 'error');
+            } finally {
+                setButtonLoading('clearTestBtn', false);
+            }
         }
+
         // =====================================================
         // RENDERIZAÇÃO DA TABELA
         // =====================================================
