@@ -1755,20 +1755,37 @@
         }
         
         // Se chegou até aqui, assumir sucesso
-        const dataArray = result.data || result || [];
-        console.log(`${dataArray.length} registros recebidos do servidor`);
-        
-        if (dataArray.length === 0) {
-            showStatus('Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-            services = [];
-            renderTable();
-            updateSummary();
-            return true;
+let dataArray = result.data || result || [];
+
+// Garantir que dataArray é um array
+if (!Array.isArray(dataArray)) {
+    console.warn('Dados recebidos não são um array:', typeof dataArray);
+    dataArray = [];
+}
+
+console.log(`${dataArray.length} registros recebidos do servidor`);
+
+if (dataArray.length === 0) {
+    showStatus('Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+    services = [];
+    renderTable();
+    updateSummary();
+    return true;
+}
+
+// Converter dados do servidor para formato local
+const convertedServices = [];
+for (let index = 0; index < dataArray.length; index++) {
+    const serverItem = dataArray[index];
+    try {
+        const converted = convertServerDataToLocal(serverItem, index);
+        if (converted) {
+            convertedServices.push(converted);
         }
-        
-        // Converter dados do servidor para formato local
-        const convertedServices = [];
-        dataArray.forEach((serverItem, index) => {
+    } catch (convError) {
+        console.error(`Erro ao converter item ${index}:`, convError, serverItem);
+    }
+}
             try {
                 const converted = convertServerDataToLocal(serverItem, index);
                 if (converted) {
