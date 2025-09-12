@@ -1006,7 +1006,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbx99UkF8keZfKskCo7F18YtYGbQyd3zG_LQbv8FCZT8CFeIIONunjMKkZRantlP4dhfWg/exec" 
+                           value="https://script.google.com/macros/s/AKfycbzwCbEjNqZ_0Bh4o4ztgUwSaHq8seYHPYzD1nroUqp7EEYgmci9ssbWi1omcEe4a3YyZQ/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1496,7 +1496,7 @@
         let isFiltering = false;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx99UkF8keZfKskCo7F18YtYGbQyd3zG_LQbv8FCZT8CFeIIONunjMKkZRantlP4dhfWg/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzwCbEjNqZ_0Bh4o4ztgUwSaHq8seYHPYzD1nroUqp7EEYgmci9ssbWi1omcEe4a3YyZQ/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2097,8 +2097,7 @@ async function syncWithServer(showLoading = true) {
   try {
     console.log('Buscando dados dos transfers...');
     
-    // Fazer requisição GET para buscar dados
-    const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+    const dataUrl = webappUrl + '?action=getAllData&_=' + Date.now();
     console.log('URL completa:', dataUrl);
     
     const response = await fetch(dataUrl, {
@@ -2113,7 +2112,7 @@ async function syncWithServer(showLoading = true) {
     console.log('Status da resposta:', response.status);
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error('HTTP ' + response.status + ': ' + response.statusText);
     }
     
     const textResponse = await response.text();
@@ -2130,10 +2129,9 @@ async function syncWithServer(showLoading = true) {
     console.log('Dados parseados:', result);
     
     if (result && result.success && result.data && Array.isArray(result.data)) {
-      console.log(`${result.data.length} transfers encontrados`);
+      console.log(result.data.length + ' transfers encontrados');
       
-      // Converter dados para formato local
-      const convertedServices = result.data.map(serverItem => {
+      const convertedServices = result.data.map(function(serverItem) {
         return {
           id: serverItem.ID || Date.now() + Math.random(),
           nomeCliente: serverItem.Cliente || 'Cliente não informado',
@@ -2160,25 +2158,22 @@ async function syncWithServer(showLoading = true) {
       
       console.log('Dados convertidos (amostra):', convertedServices[0]);
       
-      // Atualizar dados locais
       services = convertedServices;
-      console.log(`Total: ${services.length} transfers carregados`);
+      console.log('Total: ' + services.length + ' transfers carregados');
       
-      // Salvar e atualizar interface
       saveData();
       renderTable();
       updateSummary();
       
-      // Atualizar indicador de sincronização
       lastSyncTime = new Date();
       localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
       updateLastSyncDisplay();
       
-      showStatus(`${services.length} transfers carregados com sucesso!`, 'success');
+      showStatus(services.length + ' transfers carregados com sucesso!', 'success');
       return true;
       
     } else {
-      throw new Error(result?.error || 'Nenhum dado encontrado');
+      throw new Error(result.error || 'Nenhum dado encontrado');
     }
     
   } catch (error) {
