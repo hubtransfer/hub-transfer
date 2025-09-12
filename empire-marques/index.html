@@ -2069,19 +2069,18 @@ function updateCalculation() {
         }
 
         function getWebAppUrl() {
-            const inputUrl = document.getElementById('webappUrl').value.trim();
-            if (inputUrl) {
-                return inputUrl;
-            }
-            
-            const savedUrl = localStorage.getItem('webappUrl');
-            if (savedUrl) {
-                return savedUrl;
-            }
-            
-            return WEBAPP_URL;
-        }
-
+    const inputUrl = document.getElementById('webappUrl').value.trim();
+    if (inputUrl) {
+        return inputUrl;
+    }
+    
+    const savedUrl = localStorage.getItem('webappUrl');
+    if (savedUrl) {
+        return savedUrl;
+    }
+    
+    return 'https://script.google.com/macros/s/AKfycbzoCrSDD2c9xOX548Nw3qXCDASpzBXxJ8Jqre2U3UcVkV16tQ_RLgDep2b2Cr_EJDs36Q/exec';
+}
         async function testSimpleConnection() {
             console.log('Iniciando sincronização compatível com CORS...');
             
