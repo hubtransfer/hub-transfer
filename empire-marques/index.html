@@ -1418,8 +1418,8 @@
                         Limpar Filtros
                     </button>
                     <button type="button" class="btn btn-success" onclick="loadTransfersFromSheets()">
-                        Carregar Transfers
-                    </button>
+    Carregar Transfers
+</button>
                     <button type="button" class="btn btn-warning" onclick="testBasicConnectivity()">
                         Testar Conexão
                     </button>
@@ -1515,11 +1515,12 @@
         // FUNÇÕES DE CONFIGURAÇÃO E STATUS
         // =====================================================
         function toggleConfig() {
-            const configSection = document.getElementById('configSection');
-            if (configSection) {
-                configSection.classList.toggle('show');
-            }
-        }
+    const configSection = document.getElementById('configSection');
+    if (configSection) {
+        configSection.classList.toggle('show');
+    }
+    console.log('toggleConfig executada');
+}
 
         function toggleClearData() {
             const clearSection = document.getElementById('clearDataSection');
@@ -3565,6 +3566,14 @@ function getFieldLabel(fieldId) {
         console.log('   - syncWithServer() - Sincronização manual');
         console.log('   - testConnection() - Teste de conexão');
         console.log('   - loadTransfersFromSheets() - Carregar transfers do Google Sheets');
+                
+        // Garantir que as funções estão no escopo global
+        window.toggleConfig = toggleConfig;
+        window.loadTransfersFromSheets = loadTransfersFromSheets;
+        window.testBasicConnectivity = testBasicConnectivity;
+        window.clearAllData = clearAllData;
+        window.clearTestData = clearTestData;
+        window.toggleClearData = toggleClearData;
         
     </script>
 </body>
