@@ -1823,41 +1823,142 @@
     }
 }
 
-        function convertServerDataToLocal(serverItem, index) {
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn('Item inválido do servidor:', serverItem);
-                return null;
+// Função para validar resposta do servidor
+function isValidResponse(result) {
+    // Se tem status success explícito
+    if (result.status === 'success') return true;
+    
+    // Se tem mensagem de funcionamento
+    if (result.message && result.message.includes('funcionando')) return true;
+    
+    // Se tem array de dados
+    if (result.data && Array.isArray(result.data)) return true;
+    
+    // Se a resposta é diretamente um array
+    if (Array.isArray(result)) return true;
+    
+    // Se tem propriedade success como true
+    if (result.success === true) return true;
+    
+    return false;
+}
+
+// Função melhorada para converter dados do servidor
+function convertServerDataToLocal(serverItem, index) {
+    if (!serverItem || typeof serverItem !== 'object') {
+        console.warn('Item inválido do servidor:', serverItem);
+        return null;
+    }
+    
+    try {
+        // Log para debug quando necessário
+        if (index === 0) {
+            console.log('Exemplo de item do servidor:', Object.keys(serverItem));
+        }
+        
+        // Função auxiliar para obter valores com múltiplas tentativas
+        const getValue = (item, keys, defaultValue = '') => {
+            for (const key of keys) {
+                if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
+                    return item[key];
+                }
+            }
+            return defaultValue;
+        };
+        
+        // Função auxiliar para valores numéricos
+        const getNumericValue = (item, keys, defaultValue = 0) => {
+            const value = getValue(item, keys, defaultValue);
+            const parsed = parseFloat(value);
+            return isNaN(parsed) ? defaultValue : parsed;
+        };
+        
+        // Função auxiliar para valores inteiros
+        const getIntegerValue = (item, keys, defaultValue = 0) => {
+            const value = getValue(item, keys, defaultValue);
+            const parsed = parseInt(value);
+            return isNaN(parsed) ? defaultValue : parsed;
+        };
+        
+        // Mapear campos do Google Sheets para formato local com múltiplas variações
+        const convertedData = {
+            id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
+            nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
+            tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
+            tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
+            numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
+            numeroBagagens: getIntegerValue(serverItem, ['Bagagens', 'Num Bagagens', 'NumBagagens', 'bagagens'], 0),
+            data: formatDateFromServer(getValue(serverItem, ['Data', 'Data Transfer', 'DataTransfer', 'data'])),
+            contacto: getValue(serverItem, ['Contacto', 'Contato', 'Telefone', 'contacto'], 'Sem contacto'),
+            numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
+            origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
+            destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
+            horaPickup: getValue(serverItem, ['Hora Pick-up', 'Hora_Pickup', 'HoraPickup', 'Hora', 'hora'], '00:00'),
+            valorTotal: getNumericValue(serverItem, [
+                'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
+                'Preco Cliente', 'Total', 'valor_total'
+            ], 0),
+            valorHotel: getNumericValue(serverItem, [
+                'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Impire Marques Hotel (€)',
+                'Valor Empire', 'valor_hotel'
+            ], 0),
+            valorHUB: getNumericValue(serverItem, [
+                'Valor HUB', 'Valor_HUB', 'ValorHUB', 'Valor HUB Transfer (€)',
+                'HUB Transfer', 'valor_hub'
+            ], 0),
+            comissaoRecepcao: getNumericValue(serverItem, [
+                'Comissão Recepção', 'Comissao_Recepcao', 'ComissaoRecepcao', 'Comissão Recepção (€)',
+                'Comissao', 'comissao'
+            ], 0),
+            modoPagamento: getValue(serverItem, [
+                'Pagamento', 'Forma Pagamento', 'FormaPagamento', 'Modo Pagamento', 
+                'ModoPagamento', 'Payment'
+            ], 'Não informado'),
+            pagoParaQuem: getValue(serverItem, [
+                'Pago Para', 'Pago_Para', 'PagoPara', 'Paid To', 'pago_para'
+            ], 'Não informado'),
+            status: getValue(serverItem, ['Status', 'Estado', 'State', 'status'], 'Solicitado'),
+            observacoes: getValue(serverItem, [
+                'Observações', 'Observacoes', 'Obs', 'Notes', 'Comentarios', 'observacoes'
+            ], ''),
+            created: getValue(serverItem, [
+                'Data Criação', 'Data_Criacao', 'DataCriacao', 'Created', 'Timestamp'
+            ], new Date().toISOString())
+        };
+        
+        // Validação adicional dos dados convertidos
+        if (!convertedData.nomeCliente || convertedData.nomeCliente === 'Cliente não informado') {
+            console.warn(`Item ${index}: Cliente não informado ou vazio`);
+        }
+        
+        if (!convertedData.data) {
+            console.warn(`Item ${index}: Data inválida ou vazia`);
+        }
+        
+        // Calcular valores automáticos se não estiverem preenchidos
+        if (convertedData.valorTotal > 0) {
+            if (convertedData.valorHotel === 0) {
+                convertedData.valorHotel = convertedData.valorTotal * 0.30;
             }
             
-            try {
-                // Mapear campos do Google Sheets para formato local
-                return {
-                    id: parseInt(serverItem.ID) || (Date.now() + index),
-                    nomeCliente: serverItem.Cliente || 'Cliente não informado',
-                    tipoServico: serverItem['Tipo Serviço'] || serverItem['Tipo_Servico'] || 'Transfer',
-                    numeroPessoas: parseInt(serverItem.Pessoas) || 1,
-                    numeroBagagens: parseInt(serverItem.Bagagens) || 0,
-                    data: formatDateFromServer(serverItem.Data),
-                    contacto: serverItem.Contacto || 'Sem contacto',
-                    numeroVoo: serverItem.Voo || '',
-                    origem: serverItem.Origem || 'Origem não informada',
-                    destino: serverItem.Destino || 'Destino não informado',
-                    horaPickup: serverItem['Hora Pick-up'] || serverItem.Hora_Pickup || '00:00',
-                    valorTotal: parseFloat(serverItem['Valor Total'] || serverItem.Valor_Total || serverItem['Preço Cliente (€)']) || 0,
-                    valorHotel: parseFloat(serverItem['Valor Hotel (30%)'] || serverItem.Valor_Hotel || serverItem['Valor Impire Marques Hotel (€)']) || 0,
-                    valorHUB: parseFloat(serverItem['Valor HUB'] || serverItem.Valor_HUB || serverItem['Valor HUB Transfer (€)']) || 0,
-                    comissaoRecepcao: parseFloat(serverItem['Comissão Recepção'] || serverItem.Comissao_Recepcao || serverItem['Comissão Recepção (€)']) || 0,
-                    modoPagamento: serverItem.Pagamento || serverItem['Forma Pagamento'] || 'Não informado',
-                    pagoParaQuem: serverItem['Pago Para'] || serverItem.Pago_Para || 'Não informado',
-                    status: serverItem.Status || 'Solicitado',
-                    observacoes: serverItem.Observações || serverItem.Observacoes || '',
-                    created: serverItem['Data Criação'] || serverItem.Data_Criacao || new Date().toISOString()
-                };
-            } catch (error) {
-                console.error('Erro ao converter dados do servidor:', error, serverItem);
-                return null;
+            if (convertedData.comissaoRecepcao === 0) {
+                convertedData.comissaoRecepcao = convertedData.tipoServico.includes('Tour') ? 5.00 : 2.00;
+            }
+            
+            if (convertedData.valorHUB === 0) {
+                convertedData.valorHUB = convertedData.valorTotal - convertedData.valorHotel - convertedData.comissaoRecepcao;
             }
         }
+        
+        return convertedData;
+        
+    } catch (error) {
+        console.error('Erro ao converter dados do servidor:', error);
+        console.error('Item problemático:', serverItem);
+        console.error('Index:', index);
+        return null;
+    }
+}
 
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
