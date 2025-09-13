@@ -933,6 +933,58 @@
             padding-left: 60px;
         }
 
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-pagination {
+            padding: 8px 16px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            color: #3498db;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pagination:hover:not(:disabled) {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-pagination:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-size-selector {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -982,6 +1034,36 @@
         .btn-danger.pulse {
             animation: pulse 1s infinite;
         }
+
+    /* ADICIONE AQUI O NOVO CSS */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin: 20px 0;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .tour-row {
+        background-color: #fff8e1 !important;
+    }
+
+    .tour-row:hover {
+        background-color: #fff3c4 !important;
+    }
+
+    .airport-to-hotel-row {
+        background-color: #e3f2fd !important;
+    }
+
+    .airport-to-hotel-row:hover {
+        background-color: #bbdefb !important;
+    }
+
     </style>
 </head>
 
@@ -1495,6 +1577,73 @@
         let filteredData = [];
         let isFiltering = false;
 
+// Variáveis de paginação
+let currentPage = 1;
+let itemsPerPage = 10;
+let totalPages = 1;
+
+function updatePagination() {
+    const totalItems = services.length;
+    totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    // Criar controles de paginação se não existirem
+    let paginationContainer = document.getElementById('paginationContainer');
+    if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.id = 'paginationContainer';
+        paginationContainer.className = 'pagination-container';
+        
+        const servicesTable = document.querySelector('.services-table');
+        servicesTable.parentNode.insertBefore(paginationContainer, servicesTable.nextSibling);
+    }
+    
+    paginationContainer.innerHTML = `
+        <div class="pagination-info">
+            Mostrando ${Math.min(((currentPage - 1) * itemsPerPage) + 1, totalItems)} a ${Math.min(currentPage * itemsPerPage, totalItems)} de ${totalItems} transfers
+        </div>
+        <div class="pagination-controls">
+            <button class="btn-pagination" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>
+                ««
+            </button>
+            <button class="btn-pagination" onclick="changePage(currentPage - 1)" ${currentPage === 1 ? 'disabled' : ''}>
+                ‹ Anterior
+            </button>
+            <span style="margin: 0 15px; font-weight: 600;">
+                Página ${currentPage} de ${totalPages}
+            </span>
+            <button class="btn-pagination" onclick="changePage(currentPage + 1)" ${currentPage === totalPages ? 'disabled' : ''}>
+                Próxima ›
+            </button>
+            <button class="btn-pagination" onclick="changePage(totalPages)" ${currentPage === totalPages ? 'disabled' : ''}>
+                »»
+            </button>
+        </div>
+        <select class="page-size-selector" onchange="changePageSize(this.value)">
+            <option value="10" ${itemsPerPage === 10 ? 'selected' : ''}>10 por página</option>
+            <option value="25" ${itemsPerPage === 25 ? 'selected' : ''}>25 por página</option>
+            <option value="50" ${itemsPerPage === 50 ? 'selected' : ''}>50 por página</option>
+        </select>
+    `;
+}
+
+function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTable();
+}
+
+function changePageSize(size) {
+    itemsPerPage = parseInt(size);
+    currentPage = 1;
+    renderTable();
+}
+
+function getPaginatedServices() {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return services.slice(startIndex, endIndex);
+}
+
         // CONFIGURAÇÕES
         const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyWPnoKtBue-9KD9m2xFnuj7BmQkvDYYuJy45PxL9Vh8vyIC9761siUqUT95v8CCfawhQ/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
@@ -1947,6 +2096,29 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
+function formatPickupTime(timeValue) {
+    if (!timeValue) return '00:00';
+    
+    // Se é um objeto Date
+    if (timeValue instanceof Date || (typeof timeValue === 'object' && timeValue.getHours)) {
+        const hours = timeValue.getHours();
+        const minutes = timeValue.getMinutes();
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
+    
+    // Se é string no formato "HH:MM"
+    if (typeof timeValue === 'string' && timeValue.includes(':')) {
+        return timeValue;
+    }
+    
+    // Se é string com apenas hora
+    if (typeof timeValue === 'string' && !isNaN(timeValue)) {
+        return `${timeValue.padStart(2, '0')}:00`;
+    }
+    
+    return '00:00';
+}
+
         // Mapear campos do Google Sheets para formato local com múltiplas variações
         const convertedData = {
             id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
@@ -1960,7 +2132,7 @@ function convertServerDataToLocal(serverItem, index) {
             numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
             origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
             destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-            horaPickup: getValue(serverItem, ['Hora Pick-up', 'Hora_Pickup', 'HoraPickup', 'Hora', 'hora'], '00:00'),
+            horaPickup: formatPickupTime(serverItem['Hora Pick-up'] || serverItem.Hora_Pickup || serverItem.HoraPickup || '00:00'),
             valorTotal: getNumericValue(serverItem, [
                 'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
                 'Preco Cliente', 'Total', 'valor_total'
@@ -2638,94 +2810,110 @@ phoneInputElement.addEventListener('input', function() {
         // RENDERIZAÇÃO DA TABELA
         // =====================================================
         function renderTable() {
-            const tbody = document.getElementById('servicesTableBody');
-            tbody.innerHTML = '';
+    const tbody = document.getElementById('servicesTableBody');
+    tbody.innerHTML = '';
 
-            if (services.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="18" class="empty-state">
-                            <h3>Nenhum serviço cadastrado</h3>
-                            <p>Use o botão "Carregar Transfers" para sincronizar com o Google Sheets</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    if (services.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="18" class="empty-state">
+                    <h3>Nenhum serviço cadastrado</h3>
+                    <p>Use o botão "Carregar Transfers" para sincronizar com o Google Sheets</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-            const sortedServices = services.sort((a, b) => b.id - a.id);
+    // Usar dados paginados em vez de todos os serviços
+    const paginatedServices = getPaginatedServices();
 
-            sortedServices.forEach(service => {
-                const row = document.createElement('tr');
-                
-                const modoPagamento = service.modoPagamento || 'Não informado';
-                const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
-                                    modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
-                
-                const tipoServico = service.tipoServico || 'Transfer';
-                const tipoLabel = tipoServico === 'Tour Regular' || tipoServico === 'tour' ? 'Tour' : 
-                                 tipoServico === 'Private Tour' || tipoServico === 'private' ? 'Private' : 
-                                 'Transfer';
-                
-                row.innerHTML = `
-                    <td><strong>#${service.id}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
-                    </td>
-                    <td>${tipoLabel}</td>
-                    <td>
-                        <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            ${service.numeroPessoas}
-                        </span>
-                    </td>
-                    <td>
-                        <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
-                            ${service.numeroBagagens}
-                        </span>
-                    </td>
-                    <td><strong>${formatDate(service.data)}</strong></td>
-                    <td>
-                        <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
-                            ${service.horaPickup}
-                        </div>
-                    </td>
-                    <td>${service.contacto}</td>
-                    <td>${service.numeroVoo || '-'}</td>
-                    <td>
-                        <div style="font-size: 0.9rem;">
-                            <div><strong>De:</strong> ${service.origem}</div>
-                            <div><strong>Para:</strong> ${service.destino}</div>
-                        </div>
-                    </td>
-                    <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHotel || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.valorHUB || 0).toFixed(2)}
-                    </td>
-                    <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
-                        €${(service.comissaoRecepcao || 0).toFixed(2)}
-                    </td>
-                    <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
-                    <td>
-                        <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
-                            ${service.pagoParaQuem}
-                        </span>
-                    </td>
-                    <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
-                            <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
-                            <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+    paginatedServices.forEach(service => {
+        const row = document.createElement('tr');
+        
+        // Determinar cor de fundo baseada no tipo e rota
+        let rowBackgroundClass = '';
+        if (service.tipoServico && (service.tipoServico.includes('Tour') || service.tipoServico === 'tour')) {
+            rowBackgroundClass = 'tour-row';
+        } else if (service.origem && service.origem.toLowerCase().includes('aeroporto') && 
+                   service.destino && service.destino.toLowerCase().includes('empire')) {
+            rowBackgroundClass = 'airport-to-hotel-row';
         }
+        
+        if (rowBackgroundClass) {
+            row.classList.add(rowBackgroundClass);
+        }
+        
+        const modoPagamento = service.modoPagamento || 'Não informado';
+        const paymentClass = modoPagamento.toLowerCase().includes('dinheiro') ? 'payment-cash' :
+                            modoPagamento.toLowerCase().includes('cartão') ? 'payment-card' : 'payment-transfer';
+        
+        const tipoServico = service.tipoServico || 'Transfer';
+        const tipoLabel = tipoServico === 'Tour Regular' || tipoServico === 'tour' ? 'Tour' : 
+                         tipoServico === 'Private Tour' || tipoServico === 'private' ? 'Private' : 
+                         'Transfer';
+        
+        row.innerHTML = `
+            <td><strong>#${service.id}</strong></td>
+            <td>
+                <div class="client-info">${service.nomeCliente}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d;">${service.contacto}</div>
+            </td>
+            <td>${tipoLabel}</td>
+            <td>
+                <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    ${service.numeroPessoas}
+                </span>
+            </td>
+            <td>
+                <span style="background: #e67e22; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600;">
+                    ${service.numeroBagagens}
+                </span>
+            </td>
+            <td><strong>${formatDate(service.data)}</strong></td>
+            <td>
+                <div style="font-weight: 600; color: #2c3e50; font-size: 1.1rem;">
+                    ${service.horaPickup}
+                </div>
+            </td>
+            <td>${service.contacto}</td>
+            <td>${service.numeroVoo || '-'}</td>
+            <td>
+                <div style="font-size: 0.9rem;">
+                    <div><strong>De:</strong> ${service.origem}</div>
+                    <div><strong>Para:</strong> ${service.destino}</div>
+                </div>
+            </td>
+            <td><span class="value-highlight">€${service.valorTotal.toFixed(2)}</span></td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHotel || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.valorHUB || 0).toFixed(2)}
+            </td>
+            <td class="admin-column" style="display: ${isAdminMode ? 'table-cell' : 'none'};">
+                €${(service.comissaoRecepcao || 0).toFixed(2)}
+            </td>
+            <td><span class="payment-method ${paymentClass}">${service.modoPagamento}</span></td>
+            <td>
+                <span class="pago-para ${service.pagoParaQuem === 'Recepção' ? 'pago-recepcao' : 'pago-motorista'}">
+                    ${service.pagoParaQuem}
+                </span>
+            </td>
+            <td><span class="status status-${service.status.toLowerCase()}">${service.status}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-small btn-primary" onclick="editService(${service.id})" title="Editar">✏️</button>
+                    <button class="btn btn-small btn-success" onclick="changeStatus(${service.id})" title="Alterar Status">🔄</button>
+                    <button class="btn btn-small btn-export" onclick="deleteService(${service.id})" title="Excluir">🗑️</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    updatePagination();
+}
 
         function updateSummary() {
             const total = services.length;
