@@ -2096,68 +2096,25 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
-        // Função específica para formatar horário do Google Sheets - VERSÃO CORRIGIDA
         const formatPickupTime = (timeValue) => {
             if (!timeValue) return '00:00';
             
-            console.log('Processando horário:', timeValue, typeof timeValue);
-            
-            // Se já é string formatada corretamente
+            // Se já é string HH:MM correta
             if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
                 return timeValue;
             }
             
-            // CORREÇÃO PRINCIPAL: Se é string com timestamp do Google Sheets
-            if (typeof timeValue === 'string' && timeValue.includes('1899-12-30')) {
-                try {
-                    // Extrair apenas a parte da hora do timestamp
-                    const timeMatch = timeValue.match(/T(\d{2}):(\d{2}):(\d{2})/);
-                    if (timeMatch) {
-                        const hours = timeMatch[1];
-                        const minutes = timeMatch[2];
-                        console.log(`Corrigindo horário de "${timeValue}" para "${hours}:${minutes}"`);
-                        return `${hours}:${minutes}`;
-                    }
-                } catch (e) {
-                    console.error('Erro ao processar timestamp:', e);
-                }
+            // Converter qualquer formato para string e extrair apenas HH:MM
+            let timeString = timeValue.toString();
+            const horaMatch = timeString.match(/(\d{2}):(\d{2})/);
+            
+            if (horaMatch) {
+                return `${horaMatch[1]}:${horaMatch[2]}`;
             }
             
-            // Se é string com formato ISO completo
-            if (typeof timeValue === 'string' && timeValue.includes('T')) {
-                const timeMatch = timeValue.match(/T(\d{2}):(\d{2}):(\d{2})/);
-                if (timeMatch) {
-                    return `${timeMatch[1]}:${timeMatch[2]}`;
-                }
-            }
-            
-            // Se é objeto Date
-            if (timeValue && typeof timeValue === 'object') {
-                try {
-                    const dateObj = new Date(timeValue);
-                    if (!isNaN(dateObj.getTime())) {
-                        const hours = dateObj.getHours().toString().padStart(2, '0');
-                        const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-                        console.log(`Convertendo objeto Date para "${hours}:${minutes}"`);
-                        return `${hours}:${minutes}`;
-                    }
-                } catch (e) {
-                    console.error('Erro ao processar objeto Date:', e);
-                }
-            }
-            
-            // Fallback: tentar extrair HH:MM de qualquer string
-            if (typeof timeValue === 'string') {
-                const timeMatch = timeValue.match(/(\d{2}):(\d{2})/);
-                if (timeMatch) {
-                    return `${timeMatch[1]}:${timeMatch[2]}`;
-                }
-            }
-            
-            console.warn('Não foi possível formatar horário:', timeValue);
             return '00:00';
         };
-
+        
         // Mapear campos do Google Sheets para formato local com múltiplas variações
         const convertedData = {
             id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
@@ -2171,14 +2128,10 @@ function convertServerDataToLocal(serverItem, index) {
             numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
             origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
             destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-            horaPickup: formatPickupTime(
-                serverItem['Hora Pick-up'] || 
-                serverItem['Hora_Pick-up'] || 
-                serverItem.Hora_Pickup || 
-                serverItem.HoraPickup || 
-                serverItem.hora_pickup ||
-                '00:00'
-            ),
+            horaPickup: getValue(serverItem, [
+                'Hora Pick-up', 'Hora_Pick-up', 'Hora_Pickup', 'HoraPickup', 
+                'hora_pickup', 'Hora', 'Time'
+            ], '00:00'),
             valorTotal: getNumericValue(serverItem, [
                 'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
                 'Preco Cliente', 'Total', 'valor_total'
@@ -2244,6 +2197,7 @@ function convertServerDataToLocal(serverItem, index) {
         return null;
     }
 }
+
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
             
