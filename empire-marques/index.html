@@ -1773,27 +1773,86 @@ if (dataArray.length === 0) {
     return true;
 }
 
-// Converter dados usando map com tratamento de erro
+// Converter dados do servidor com tratamento robusto de erros
 const convertedServices = [];
+let successCount = 0;
+let errorCount = 0;
 
-for (let index = 0; index < dataArray.length; index++) {
-    try {
-        const serverItem = dataArray[index];
-        const converted = convertServerDataToLocal(serverItem, index);
-        if (converted) {
-            convertedServices.push(converted);
-        }
-    } catch (convError) {
-        console.error(`Erro ao converter item ${index}:`, convError, serverItem);
+try {
+    // Validar se dataArray é realmente um array
+    if (!Array.isArray(dataArray)) {
+        throw new Error('Dados recebidos não são um array válido');
     }
-}        
-        console.log(`${convertedServices.length} transfers convertidos com sucesso`);
+    
+    // Processar cada item com controle detalhado
+    for (let index = 0; index < dataArray.length; index++) {
+        const serverItem = dataArray[index];
         
-        if (convertedServices.length === 0) {
-            showStatus('Nenhum transfer válido encontrado nos dados recebidos', 'warning');
-            return false;
+        // Validar item antes do processamento
+        if (!serverItem || typeof serverItem !== 'object') {
+            console.warn(`Item ${index} inválido:`, serverItem);
+            errorCount++;
+            continue;
         }
         
+        try {
+            const converted = convertServerDataToLocal(serverItem, index);
+            
+            if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
+                convertedServices.push(converted);
+                successCount++;
+            } else {
+                console.warn(`Item ${index} convertido mas sem dados válidos:`, converted);
+                errorCount++;
+            }
+            
+        } catch (conversionError) {
+            console.error(`Erro ao converter item ${index}:`, conversionError);
+            console.error('Item problemático:', serverItem);
+            errorCount++;
+        }
+    }
+    
+    // Log detalhado do resultado
+    console.log(`Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
+    console.log(`${convertedServices.length} transfers válidos convertidos`);
+    
+    // Verificar se obtivemos dados utilizáveis
+    if (convertedServices.length === 0) {
+        if (dataArray.length > 0) {
+            showStatus(`${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
+            console.error('Dados originais do servidor:', dataArray.slice(0, 2)); // Log dos primeiros 2 para debug
+        } else {
+            showStatus('Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+        }
+        return false;
+    }
+    
+    // Validação adicional dos dados convertidos
+    const validTransfers = convertedServices.filter(service => 
+        service.id && 
+        service.nomeCliente && 
+        service.nomeCliente !== 'Cliente não informado' &&
+        service.data
+    );
+    
+    if (validTransfers.length < convertedServices.length) {
+        console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
+    }
+    
+    if (validTransfers.length === 0) {
+        showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
+        return false;
+    }
+    
+    // Usar apenas os transfers válidos
+    const finalServices = validTransfers;
+    
+} catch (processingError) {
+    console.error('Erro durante o processamento dos dados:', processingError);
+    showStatus(`Erro no processamento: ${processingError.message}`, 'error');
+    return false;
+}        
         // Substituir dados locais pelos do servidor
         services = convertedServices;
         
