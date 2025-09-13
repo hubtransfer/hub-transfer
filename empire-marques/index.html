@@ -1088,7 +1088,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbzjd22qYTCkk1QoBDCdDisBqLRt7b4J5qZPY1mztHwe3x84NNy6sr-hx2dKtVqbXiYajQ/exec" 
+                           value="https://script.google.com/macros/s/AKfycbwvVXu8PctPTCWIWWNWkXHJqN-qQp5BrUX9WInbRYZeD5tjToJIrdvSENRPKc6-Ikq2yQ/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1645,7 +1645,7 @@ function getPaginatedServices() {
 }
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzjd22qYTCkk1QoBDCdDisBqLRt7b4J5qZPY1mztHwe3x84NNy6sr-hx2dKtVqbXiYajQ/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwvVXu8PctPTCWIWWNWkXHJqN-qQp5BrUX9WInbRYZeD5tjToJIrdvSENRPKc6-Ikq2yQ/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2096,57 +2096,65 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
-        // Função específica para formatar horário do Google Sheets
+        // Função específica para formatar horário do Google Sheets - VERSÃO CORRIGIDA
         const formatPickupTime = (timeValue) => {
             if (!timeValue) return '00:00';
             
-            // Log para debug do valor recebido
-            console.log('Valor da hora recebido:', timeValue, typeof timeValue);
+            console.log('Processando horário:', timeValue, typeof timeValue);
             
-            // Se é string já formatada corretamente
+            // Se já é string formatada corretamente
             if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
                 return timeValue;
             }
             
-            // Se é string com formato de data completa do Google Sheets
-            if (typeof timeValue === 'string') {
-                // Procurar padrão HH:MM:SS na string
-                const timeMatch = timeValue.match(/(\d{2}):(\d{2}):(\d{2})/);
-                if (timeMatch) {
-                    return `${timeMatch[1]}:${timeMatch[2]}`;
-                }
-                
-                // Procurar padrão HH:MM na string
-                const shortTimeMatch = timeValue.match(/(\d{2}):(\d{2})/);
-                if (shortTimeMatch) {
-                    return `${shortTimeMatch[1]}:${shortTimeMatch[2]}`;
-                }
-            }
-            
-            // Se é objeto Date do Google Sheets
-            if (timeValue && typeof timeValue === 'object') {
+            // CORREÇÃO PRINCIPAL: Se é string com timestamp do Google Sheets
+            if (typeof timeValue === 'string' && timeValue.includes('1899-12-30')) {
                 try {
-                    // Converter para string e extrair hora
-                    const timeStr = timeValue.toString();
-                    console.log('String da hora:', timeStr);
-                    
-                    const timeMatch = timeStr.match(/(\d{2}):(\d{2}):(\d{2})/);
+                    // Extrair apenas a parte da hora do timestamp
+                    const timeMatch = timeValue.match(/T(\d{2}):(\d{2}):(\d{2})/);
                     if (timeMatch) {
-                        return `${timeMatch[1]}:${timeMatch[2]}`;
-                    }
-                    
-                    // Tentar usar métodos de Date se disponíveis
-                    if (timeValue.getHours && timeValue.getMinutes) {
-                        const hours = timeValue.getHours().toString().padStart(2, '0');
-                        const minutes = timeValue.getMinutes().toString().padStart(2, '0');
+                        const hours = timeMatch[1];
+                        const minutes = timeMatch[2];
+                        console.log(`Corrigindo horário de "${timeValue}" para "${hours}:${minutes}"`);
                         return `${hours}:${minutes}`;
                     }
                 } catch (e) {
-                    console.error('Erro ao processar objeto de hora:', e);
+                    console.error('Erro ao processar timestamp:', e);
                 }
             }
             
-            console.warn('Não foi possível formatar a hora:', timeValue);
+            // Se é string com formato ISO completo
+            if (typeof timeValue === 'string' && timeValue.includes('T')) {
+                const timeMatch = timeValue.match(/T(\d{2}):(\d{2}):(\d{2})/);
+                if (timeMatch) {
+                    return `${timeMatch[1]}:${timeMatch[2]}`;
+                }
+            }
+            
+            // Se é objeto Date
+            if (timeValue && typeof timeValue === 'object') {
+                try {
+                    const dateObj = new Date(timeValue);
+                    if (!isNaN(dateObj.getTime())) {
+                        const hours = dateObj.getHours().toString().padStart(2, '0');
+                        const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+                        console.log(`Convertendo objeto Date para "${hours}:${minutes}"`);
+                        return `${hours}:${minutes}`;
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar objeto Date:', e);
+                }
+            }
+            
+            // Fallback: tentar extrair HH:MM de qualquer string
+            if (typeof timeValue === 'string') {
+                const timeMatch = timeValue.match(/(\d{2}):(\d{2})/);
+                if (timeMatch) {
+                    return `${timeMatch[1]}:${timeMatch[2]}`;
+                }
+            }
+            
+            console.warn('Não foi possível formatar horário:', timeValue);
             return '00:00';
         };
 
@@ -2163,7 +2171,14 @@ function convertServerDataToLocal(serverItem, index) {
             numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
             origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
             destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-            horaPickup: formatPickupTime(serverItem['Hora Pick-up'] || serverItem.Hora_Pickup || serverItem.HoraPickup),
+            horaPickup: formatPickupTime(
+                serverItem['Hora Pick-up'] || 
+                serverItem['Hora_Pick-up'] || 
+                serverItem.Hora_Pickup || 
+                serverItem.HoraPickup || 
+                serverItem.hora_pickup ||
+                '00:00'
+            ),
             valorTotal: getNumericValue(serverItem, [
                 'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
                 'Preco Cliente', 'Total', 'valor_total'
@@ -4110,6 +4125,18 @@ function getFieldLabel(fieldId) {
         window.clearAllData = clearAllData;
         window.clearTestData = clearTestData;
         window.toggleClearData = toggleClearData;
+
+// Função para debug dos horários - TEMPORÁRIA
+function debugHorarios() {
+    console.log('=== DEBUG HORÁRIOS ===');
+    services.forEach((service, index) => {
+        console.log(`#${service.id} - ${service.nomeCliente}: "${service.horaPickup}"`);
+    });
+    console.log('====================');
+}
+
+// Expor função para teste
+window.debugHorarios = debugHorarios;
         
     </script>
 </body>
