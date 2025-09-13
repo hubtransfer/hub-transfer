@@ -2059,7 +2059,6 @@ function isValidResponse(result) {
     return false;
 }
 
-// Função melhorada para converter dados do servidor
 function convertServerDataToLocal(serverItem, index) {
     if (!serverItem || typeof serverItem !== 'object') {
         console.warn('Item inválido do servidor:', serverItem);
@@ -2067,23 +2066,11 @@ function convertServerDataToLocal(serverItem, index) {
     }
     
     try {
-        // Log para debug quando necessário
-        if (index === 0) {
-            console.log('Exemplo de item do servidor:', Object.keys(serverItem));
-        }
-        
-        // Função auxiliar para obter valores com múltiplas tentativas - VERSÃO ATUALIZADA
+        // Função auxiliar para obter valores - VERSÃO CORRIGIDA
         const getValue = (item, keys, defaultValue = '') => {
             for (const key of keys) {
                 if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-                    let value = item[key];
-                    
-                    // Tratamento especial para horários
-                    if (keys.includes('Hora Pick-up') || keys.includes('Hora_Pickup')) {
-                        return formatPickupTime(value);
-                    }
-                    
-                    return value;
+                    return item[key];
                 }
             }
             return defaultValue;
@@ -2103,108 +2090,64 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
-        const formatPickupTime = (timeValue) => {
-            if (!timeValue) return '00:00';
+        // FUNÇÃO ESPECÍFICA PARA HORÁRIO - PEGA VALOR DIRETO DO SHEETS
+        const getHorarioValue = (item) => {
+            const horarioRaw = getValue(item, [
+                'Hora Pick-up', 'Hora_Pick-up', 'Hora_Pickup', 'HoraPickup'
+            ], '00:00');
             
-            // Se já é string HH:MM correta
-            if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-                return timeValue;
+            console.log('Horário raw do sheets:', horarioRaw);
+            
+            // Se já é string HH:MM, retorna direto
+            if (typeof horarioRaw === 'string' && /^\d{2}:\d{2}$/.test(horarioRaw)) {
+                return horarioRaw;
             }
             
-            // Converter qualquer formato para string e extrair apenas HH:MM
-            let timeString = timeValue.toString();
-            const horaMatch = timeString.match(/(\d{2}):(\d{2})/);
-            
-            if (horaMatch) {
-                return `${horaMatch[1]}:${horaMatch[2]}`;
+            // Se é string de hora simples, formatar
+            if (typeof horarioRaw === 'string') {
+                const match = horarioRaw.match(/(\d{1,2}):(\d{2})/);
+                if (match) {
+                    return `${match[1].padStart(2, '0')}:${match[2]}`;
+                }
             }
             
             return '00:00';
         };
         
-        // Mapear campos do Google Sheets para formato local com múltiplas variações
+        // Mapear campos do Google Sheets
         const convertedData = {
             id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
-            nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
-            tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
-            tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
-            numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
-            numeroBagagens: getIntegerValue(serverItem, ['Bagagens', 'Num Bagagens', 'NumBagagens', 'bagagens'], 0),
-            data: formatDateFromServer(getValue(serverItem, ['Data', 'Data Transfer', 'DataTransfer', 'data'])),
-            contacto: getValue(serverItem, ['Contacto', 'Contato', 'Telefone', 'contacto'], 'Sem contacto'),
-            numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
-            origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
-            destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-            horaPickup: getValue(serverItem, [
-                'Hora Pick-up', 'Hora_Pick-up', 'Hora_Pickup', 'HoraPickup', 
-                'hora_pickup', 'Hora', 'Time'
-            ], '00:00'),
-            valorTotal: getNumericValue(serverItem, [
-                'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
-                'Preco Cliente', 'Total', 'valor_total'
-            ], 0),
-            valorHotel: getNumericValue(serverItem, [
-                'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Impire Marques Hotel (€)',
-                'Valor Empire', 'valor_hotel'
-            ], 0),
-            valorHUB: getNumericValue(serverItem, [
-                'Valor HUB', 'Valor_HUB', 'ValorHUB', 'Valor HUB Transfer (€)',
-                'HUB Transfer', 'valor_hub'
-            ], 0),
-            comissaoRecepcao: getNumericValue(serverItem, [
-                'Comissão Recepção', 'Comissao_Recepcao', 'ComissaoRecepcao', 'Comissão Recepção (€)',
-                'Comissao', 'comissao'
-            ], 0),
-            modoPagamento: getValue(serverItem, [
-                'Pagamento', 'Forma Pagamento', 'FormaPagamento', 'Modo Pagamento', 
-                'ModoPagamento', 'Payment'
-            ], 'Não informado'),
-            pagoParaQuem: getValue(serverItem, [
-                'Pago Para', 'Pago_Para', 'PagoPara', 'Paid To', 'pago_para'
-            ], 'Não informado'),
-            status: getValue(serverItem, ['Status', 'Estado', 'State', 'status'], 'Solicitado'),
-            observacoes: getValue(serverItem, [
-                'Observações', 'Observacoes', 'Obs', 'Notes', 'Comentarios', 'observacoes'
-            ], ''),
-            created: getValue(serverItem, [
-                'Data Criação', 'Data_Criacao', 'DataCriacao', 'Created', 'Timestamp'
-            ], new Date().toISOString())
+            nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente'], 'Cliente não informado'),
+            tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico'], 'Transfer'),
+            tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado'], ''),
+            numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas'], 1),
+            numeroBagagens: getIntegerValue(serverItem, ['Bagagens', 'Num Bagagens'], 0),
+            data: formatDateFromServer(getValue(serverItem, ['Data', 'Data Transfer'])),
+            contacto: getValue(serverItem, ['Contacto', 'Contato', 'Telefone'], 'Sem contacto'),
+            numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo'], ''),
+            origem: getValue(serverItem, ['Origem', 'Local Origem'], 'Origem não informada'),
+            destino: getValue(serverItem, ['Destino', 'Local Destino'], 'Destino não informado'),
+            horaPickup: getHorarioValue(serverItem), // USAR FUNÇÃO ESPECÍFICA
+            valorTotal: getNumericValue(serverItem, ['Valor Total', 'Preço Cliente (€)'], 0),
+            valorHotel: getNumericValue(serverItem, ['Valor Hotel (30%)', 'Valor Empire Marques Hotel (€)'], 0),
+            valorHUB: getNumericValue(serverItem, ['Valor HUB', 'Valor HUB Transfer (€)'], 0),
+            comissaoRecepcao: getNumericValue(serverItem, ['Comissão Recepção', 'Comissão Recepção (€)'], 0),
+            modoPagamento: getValue(serverItem, ['Pagamento', 'Forma Pagamento'], 'Não informado'),
+            pagoParaQuem: getValue(serverItem, ['Pago Para', 'Paid To'], 'Não informado'),
+            status: getValue(serverItem, ['Status', 'Estado'], 'Solicitado'),
+            observacoes: getValue(serverItem, ['Observações', 'Obs'], ''),
+            created: getValue(serverItem, ['Data Criação', 'Created'], new Date().toISOString())
         };
         
-        // Validação adicional dos dados convertidos
-        if (!convertedData.nomeCliente || convertedData.nomeCliente === 'Cliente não informado') {
-            console.warn(`Item ${index}: Cliente não informado ou vazio`);
-        }
-        
-        if (!convertedData.data) {
-            console.warn(`Item ${index}: Data inválida ou vazia`);
-        }
-        
-        // Calcular valores automáticos se não estiverem preenchidos
-        if (convertedData.valorTotal > 0) {
-            if (convertedData.valorHotel === 0) {
-                convertedData.valorHotel = convertedData.valorTotal * 0.30;
-            }
-            
-            if (convertedData.comissaoRecepcao === 0) {
-                convertedData.comissaoRecepcao = convertedData.tipoServico.includes('Tour') ? 5.00 : 2.00;
-            }
-            
-            if (convertedData.valorHUB === 0) {
-                convertedData.valorHUB = convertedData.valorTotal - convertedData.valorHotel - convertedData.comissaoRecepcao;
-            }
-        }
+        console.log(`ID ${convertedData.id}: Horário convertido = "${convertedData.horaPickup}"`);
         
         return convertedData;
         
     } catch (error) {
         console.error('Erro ao converter dados do servidor:', error);
-        console.error('Item problemático:', serverItem);
-        console.error('Index:', index);
         return null;
     }
 }
-
         function formatDateFromServer(dateStr) {
             if (!dateStr) return '';
             
