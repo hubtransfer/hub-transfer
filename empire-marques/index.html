@@ -1088,7 +1088,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbwvVXu8PctPTCWIWWNWkXHJqN-qQp5BrUX9WInbRYZeD5tjToJIrdvSENRPKc6-Ikq2yQ/exec" 
+                           value="https://script.google.com/macros/s/AKfycbyvVqmrPAfLik0EkUXkKWMtV60T_uCg3hZsfGvIJNGzIsRtl73AqmhlQ3hmc_btdQwyvA/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1645,7 +1645,7 @@ function getPaginatedServices() {
 }
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwvVXu8PctPTCWIWWNWkXHJqN-qQp5BrUX9WInbRYZeD5tjToJIrdvSENRPKc6-Ikq2yQ/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvVqmrPAfLik0EkUXkKWMtV60T_uCg3hZsfGvIJNGzIsRtl73AqmhlQ3hmc_btdQwyvA/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2090,25 +2090,30 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
-        // FUNÇÃO ESPECÍFICA PARA HORÁRIO - PEGA VALOR DIRETO DO SHEETS
+        // FUNÇÃO DINÂMICA PARA HORÁRIO - dentro de convertServerDataToLocal
         const getHorarioValue = (item) => {
             const horarioRaw = getValue(item, [
                 'Hora Pick-up', 'Hora_Pick-up', 'Hora_Pickup', 'HoraPickup'
             ], '00:00');
-            
-            console.log('Horário raw do sheets:', horarioRaw);
             
             // Se já é string HH:MM, retorna direto
             if (typeof horarioRaw === 'string' && /^\d{2}:\d{2}$/.test(horarioRaw)) {
                 return horarioRaw;
             }
             
-            // Se é string de hora simples, formatar
-            if (typeof horarioRaw === 'string') {
-                const match = horarioRaw.match(/(\d{1,2}):(\d{2})/);
+            // Se é timestamp do Google Sheets, extrair apenas hora
+            if (typeof horarioRaw === 'string' && horarioRaw.includes('1899-12-30T')) {
+                const match = horarioRaw.match(/T(\d{2}):(\d{2}):/);
                 if (match) {
-                    return `${match[1].padStart(2, '0')}:${match[2]}`;
+                    return `${match[1]}:${match[2]}`;
                 }
+            }
+            
+            // Para qualquer outro formato, tentar extrair HH:MM
+            const timeString = horarioRaw.toString();
+            const match = timeString.match(/(\d{2}):(\d{2})/);
+            if (match) {
+                return `${match[1]}:${match[2]}`;
             }
             
             return '00:00';
@@ -2148,38 +2153,38 @@ function convertServerDataToLocal(serverItem, index) {
         return null;
     }
 }
-        function formatDateFromServer(dateStr) {
-            if (!dateStr) return '';
-            
-            try {
-                // Se já está no formato YYYY-MM-DD
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                    return dateStr;
-                }
-                
-                // Se está no formato DD/MM/YYYY
-                if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                    const [day, month, year] = dateStr.split('/');
-                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                }
-                
-                // Tentar converter como data
-                const date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                
-                return dateStr;
-                
-            } catch (error) {
-                console.error('Erro ao formatar data do servidor:', dateStr, error);
-                return dateStr;
-            }
-        }
 
+function formatDateFromServer(dateStr) {
+    if (!dateStr) return '';
+    
+    try {
+        // Se já está no formato YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            return dateStr;
+        }
+        
+        // Se está no formato DD/MM/YYYY
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+            const [day, month, year] = dateStr.split('/');
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        
+        // Tentar converter como data
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        return dateStr;
+        
+    } catch (error) {
+        console.error('Erro ao formatar data do servidor:', dateStr, error);
+        return dateStr;
+    }
+}
         // =====================================================
         // SINCRONIZAÇÃO COM SERVIDOR
         // =====================================================
