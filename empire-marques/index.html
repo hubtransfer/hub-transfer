@@ -2341,40 +2341,46 @@ function convertServerDataToLocal(serverItem, index) {
         // ENVIO PARA GOOGLE SHEETS
         // =====================================================
         async function sendToSheets(serviceData) {
-            const url = getWebAppUrl();
+    const url = getWebAppUrl();
+    
+    if (!url) {
+        console.log('URL não configurada');
+        return false;
+    }
+    
+    if (isConnected) {
+        console.log('Tentando enviar para Google Sheets:', serviceData);
+        try {
+            const dataWithEmail = {
+                ...serviceData,
+                emailDestino: TEST_EMAIL,
+                action: 'addTransfer'
+            };
             
-            if (!url) {
-                console.log('URL não configurada');
-                return false;
-            }
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: JSON.stringify(dataWithEmail),
+                mode: 'no-cors'
+            });
             
-            try {
-                console.log('Enviando dados para Sheets:', serviceData);
-                
-                const dataWithEmail = {
-                    ...serviceData,
-                    emailDestino: TEST_EMAIL,
-                    action: 'addTransfer'
-                };
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(dataWithEmail),
-                    mode: 'no-cors'
-                });
-                
-                console.log('Requisição enviada para:', TEST_EMAIL);
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao enviar para Google Sheets:', error);
-                showStatus('Erro de conexão com Google Sheets', 'error');
-                return false;
-            }
+            console.log('Transfer enviado para Google Sheets com sucesso!');
+            showStatus('Transfer enviado para Google Sheets e email enviado!', 'success');
+            console.log('Requisição enviada para:', TEST_EMAIL);
+            return true;
+            
+        } catch (error) {
+            console.error('Erro ao enviar para Sheets:', error);
+            showStatus('Erro no envio: ' + error.message, 'error');
+            return false;
         }
+    } else {
+        showStatus('Não conectado ao Google Sheets. Transfer salvo apenas localmente.', 'warning');
+        return false;
+    }
+}
 
         // =====================================================
         // GERENCIAMENTO DE DADOS LOCAL
@@ -3474,36 +3480,38 @@ phoneInputElement.addEventListener('input', function() {
         });
 
         function validateForm() {
-            const requiredFields = [
-                'nomeCliente', 'numeroPessoas', 'data', 'contacto', 
-                'origem', 'destino', 'horaPickup', 'valorTotal', 
-                'modoPagamento', 'pagoParaQuem'
-            ];
+    const requiredFields = [
+        'nomeCliente', 'numeroPessoas', 'data', 'contacto', 
+        'origem', 'destino', 'horaPickup', 'valorTotal', 
+        'modoPagamento', 'pagoParaQuem'
+    ];
 
-            for (let field of requiredFields) {
-                const element = document.getElementById(field);
-                if (!element.value || element.value.trim() === '') {
-                    element.focus();
-                    showStatus(`Campo obrigatório não preenchido: ${getFieldLabel(field)}`, 'error');
-                    return false;
-                }
-            }
-
-            const valor = parseFloat(document.getElementById('valorTotal').value);
-            if (isNaN(valor) || valor <= 0) {
-                document.getElementById('valorTotal').focus();
-                showStatus('Valor deve ser um número positivo', 'error');
-                return false;
-            }
-
-            const pessoas = parseInt(document.getElementById('numeroPessoas').value);
-            if (isNaN(pessoas) || pessoas < 1) {
-                showStatus('Número de pessoas deve ser pelo menos 1', 'error');
-                return false;
-            }
-
-            return true;
+    for (let field of requiredFields) {
+        const element = document.getElementById(field);
+        console.log(`Campo ${field}:`, element.value, 'Visível:', element.style.display !== 'none');
+        
+        if (!element.value || element.value.trim() === '') {
+            element.focus();
+            showStatus(`Campo obrigatório não preenchido: ${getFieldLabel(field)}`, 'error');
+            return false;
         }
+    }
+
+    const valor = parseFloat(document.getElementById('valorTotal').value);
+    if (isNaN(valor) || valor <= 0) {
+        document.getElementById('valorTotal').focus();
+        showStatus('Valor deve ser um número positivo', 'error');
+        return false;
+    }
+
+    const pessoas = parseInt(document.getElementById('numeroPessoas').value);
+    if (isNaN(pessoas) || pessoas < 1) {
+        showStatus('Número de pessoas deve ser pelo menos 1', 'error');
+        return false;
+    }
+
+    return true;
+}
 
 function getFieldLabel(fieldId) {
             const labels = {
