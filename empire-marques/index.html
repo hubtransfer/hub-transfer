@@ -1088,7 +1088,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbyvVqmrPAfLik0EkUXkKWMtV60T_uCg3hZsfGvIJNGzIsRtl73AqmhlQ3hmc_btdQwyvA/exec" 
+                           value="https://script.google.com/macros/s/AKfycbzv-02u9UuWaSP7yhgPgNMETSJ1kjyzEPRivmhXen_LzX6efxPEyQXRMo2bNSZ7ndQJwA/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1645,7 +1645,7 @@ function getPaginatedServices() {
 }
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvVqmrPAfLik0EkUXkKWMtV60T_uCg3hZsfGvIJNGzIsRtl73AqmhlQ3hmc_btdQwyvA/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzv-02u9UuWaSP7yhgPgNMETSJ1kjyzEPRivmhXen_LzX6efxPEyQXRMo2bNSZ7ndQJwA/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2090,30 +2090,21 @@ function convertServerDataToLocal(serverItem, index) {
             return isNaN(parsed) ? defaultValue : parsed;
         };
         
-        // FUNÇÃO DINÂMICA PARA HORÁRIO - dentro de convertServerDataToLocal
+        // FUNÇÃO SIMPLIFICADA PARA HORÁRIO - VERSÃO FINAL
         const getHorarioValue = (item) => {
-            const horarioRaw = getValue(item, [
+            const horario = getValue(item, [
                 'Hora Pick-up', 'Hora_Pick-up', 'Hora_Pickup', 'HoraPickup'
             ], '00:00');
             
-            // Se já é string HH:MM, retorna direto
-            if (typeof horarioRaw === 'string' && /^\d{2}:\d{2}$/.test(horarioRaw)) {
-                return horarioRaw;
+            // Se já é string simples HH:MM, retorna direto
+            if (typeof horario === 'string' && /^\d{2}:\d{2}$/.test(horario)) {
+                return horario;
             }
             
-            // Se é timestamp do Google Sheets, extrair apenas hora
-            if (typeof horarioRaw === 'string' && horarioRaw.includes('1899-12-30T')) {
-                const match = horarioRaw.match(/T(\d{2}):(\d{2}):/);
-                if (match) {
-                    return `${match[1]}:${match[2]}`;
-                }
-            }
-            
-            // Para qualquer outro formato, tentar extrair HH:MM
-            const timeString = horarioRaw.toString();
-            const match = timeString.match(/(\d{2}):(\d{2})/);
-            if (match) {
-                return `${match[1]}:${match[2]}`;
+            // Para qualquer outro formato, extrair HH:MM
+            const timeMatch = horario.toString().match(/(\d{1,2}):(\d{2})/);
+            if (timeMatch) {
+                return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
             }
             
             return '00:00';
