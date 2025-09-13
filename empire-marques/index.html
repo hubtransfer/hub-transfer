@@ -1088,7 +1088,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycby0YQ7sj486IcRcB1wjAc12QmQ1FcOYsz8BIKHqV_rCxFkTUd5AqPCdVeyIO4s_moBtyA/exec" 
+                           value="https://script.google.com/macros/s/AKfycbzCDp1Sv7Bj-8wRvnSP0V4IuqFs5bTyo2Q5U8Q-ogw6T1YeM5aNCx7fk-Dmm4K4kjGi8g/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1645,7 +1645,7 @@ function getPaginatedServices() {
 }
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby0YQ7sj486IcRcB1wjAc12QmQ1FcOYsz8BIKHqV_rCxFkTUd5AqPCdVeyIO4s_moBtyA/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzCDp1Sv7Bj-8wRvnSP0V4IuqFs5bTyo2Q5U8Q-ogw6T1YeM5aNCx7fk-Dmm4K4kjGi8g/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2842,6 +2842,112 @@ phoneInputElement.addEventListener('input', function() {
             return document.getElementById('contacto').value;
         }
 
+function formatPhoneDisplay(phone) {
+  if (!phone) return 'Sem contacto';
+  
+  let cleanPhone = phone.toString().trim();
+  
+  // Remover espaços, parênteses, hífens mas manter o +
+  cleanPhone = cleanPhone.replace(/[\s\-\(\)\.]/g, '');
+  
+  // Se já tem + no início, manter como está
+  if (cleanPhone.startsWith('+')) {
+    return cleanPhone;
+  }
+  
+  // Se não tem +, adicionar baseado no comprimento e padrão
+  if (/^\d+$/.test(cleanPhone)) {
+    // Códigos de país mais comuns por comprimento
+    if (cleanPhone.length >= 10) {
+      // Números com 10+ dígitos provavelmente já incluem código do país
+      
+      // Brasil: 55 + 11 dígitos = 13 total
+      if (cleanPhone.length === 13 && cleanPhone.startsWith('55')) {
+        return '+' + cleanPhone;
+      }
+      
+      // EUA/Canadá: 1 + 10 dígitos = 11 total
+      if (cleanPhone.length === 11 && cleanPhone.startsWith('1')) {
+        return '+' + cleanPhone;
+      }
+      
+      // Portugal: 351 + 9 dígitos = 12 total
+      if (cleanPhone.length === 12 && cleanPhone.startsWith('351')) {
+        return '+' + cleanPhone;
+      }
+      
+      // Espanha: 34 + 9 dígitos = 11 total
+      if (cleanPhone.length === 11 && cleanPhone.startsWith('34')) {
+        return '+' + cleanPhone;
+      }
+      
+      // França: 33 + 10 dígitos = 12 total
+      if (cleanPhone.length === 12 && cleanPhone.startsWith('33')) {
+        return '+' + cleanPhone;
+      }
+      
+      // Reino Unido: 44 + 10 dígitos = 12 total
+      if (cleanPhone.length === 12 && cleanPhone.startsWith('44')) {
+        return '+' + cleanPhone;
+      }
+      
+      // Alemanha: 49 + 10/11 dígitos = 12/13 total
+      if ((cleanPhone.length === 12 || cleanPhone.length === 13) && cleanPhone.startsWith('49')) {
+        return '+' + cleanPhone;
+      }
+      
+      // Para outros números longos, assumir que já tem código de país
+      if (cleanPhone.length >= 10) {
+        return '+' + cleanPhone;
+      }
+    }
+    
+    // Números nacionais sem código de país - assumir Portugal por padrão
+    if (cleanPhone.length === 9 && /^[923]/.test(cleanPhone)) {
+      return '+351' + cleanPhone;
+    }
+    
+    // Para números de 7-8 dígitos, assumir Portugal
+    if (cleanPhone.length >= 7 && cleanPhone.length <= 9) {
+      return '+351' + cleanPhone;
+    }
+  }
+  
+  // Se chegou até aqui e não tem +, adicionar
+  return cleanPhone.startsWith('+') ? cleanPhone : '+' + cleanPhone;
+}
+
+function formatPhoneForWhatsApp(phone) {
+  const formatted = formatPhoneDisplay(phone);
+  // Remove apenas o primeiro + para o WhatsApp
+  return formatted.replace(/^\+/, '');
+}
+
+// Função auxiliar para detectar país pelo código
+function detectCountryFromPhone(phone) {
+  const clean = phone.replace(/[^\d]/g, '');
+  
+  const countryCodes = {
+    '1': 'US/CA',
+    '33': 'FR',
+    '34': 'ES', 
+    '44': 'UK',
+    '49': 'DE',
+    '55': 'BR',
+    '351': 'PT',
+    '352': 'LU',
+    '353': 'IE'
+  };
+  
+  for (const [code, country] of Object.entries(countryCodes)) {
+    if (clean.startsWith(code)) {
+      return { code: '+' + code, country: country };
+    }
+  }
+  
+  return { code: '+351', country: 'PT' }; // Padrão Portugal
+}
+
         // =====================================================
         // RENDERIZAÇÃO DA TABELA
         // =====================================================
@@ -2912,7 +3018,13 @@ phoneInputElement.addEventListener('input', function() {
                     ${service.horaPickup}
                 </div>
             </td>
-            <td>${service.contacto}</td>
+            <td>
+  <a href="https://wa.me/${formatPhoneForWhatsApp(service.contacto)}" 
+     target="_blank" 
+     style="color: #25d366; text-decoration: none; font-weight: 600;">
+    ${formatPhoneDisplay(service.contacto)}
+  </a>
+</td>
             <td>${service.numeroVoo || '-'}</td>
             <td>
                 <div style="font-size: 0.9rem;">
