@@ -1773,11 +1773,12 @@ if (dataArray.length === 0) {
     return true;
 }
 
-// Converter dados do servidor para formato local
+// Converter dados usando map com tratamento de erro
 const convertedServices = [];
+
 for (let index = 0; index < dataArray.length; index++) {
-    const serverItem = dataArray[index];
     try {
+        const serverItem = dataArray[index];
         const converted = convertServerDataToLocal(serverItem, index);
         if (converted) {
             convertedServices.push(converted);
@@ -1785,17 +1786,7 @@ for (let index = 0; index < dataArray.length; index++) {
     } catch (convError) {
         console.error(`Erro ao converter item ${index}:`, convError, serverItem);
     }
-}
-            try {
-                const converted = convertServerDataToLocal(serverItem, index);
-                if (converted) {
-                    convertedServices.push(converted);
-                }
-            } catch (convError) {
-                console.error(`Erro ao converter item ${index}:`, convError, serverItem);
-            }
-        });
-        
+}        
         console.log(`${convertedServices.length} transfers convertidos com sucesso`);
         
         if (convertedServices.length === 0) {
