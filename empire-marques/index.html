@@ -2072,11 +2072,18 @@ function convertServerDataToLocal(serverItem, index) {
             console.log('Exemplo de item do servidor:', Object.keys(serverItem));
         }
         
-        // Função auxiliar para obter valores com múltiplas tentativas
+        // Função auxiliar para obter valores com múltiplas tentativas - VERSÃO ATUALIZADA
         const getValue = (item, keys, defaultValue = '') => {
             for (const key of keys) {
                 if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-                    return item[key];
+                    let value = item[key];
+                    
+                    // Tratamento especial para horários
+                    if (keys.includes('Hora Pick-up') || keys.includes('Hora_Pickup')) {
+                        return formatPickupTime(value);
+                    }
+                    
+                    return value;
                 }
             }
             return defaultValue;
