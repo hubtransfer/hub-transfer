@@ -1717,249 +1717,302 @@ tr:last-child td {
         </div>
 
         <div class="quick-add">
-            <h2>Solicitar Novo Transfer</h2>
-            
-           <!-- Grupo: Informações básicas -->
-<div class="form-row">
-    <div class="form-group">
-        <label for="nomeCliente">Nome do Cliente *</label>
-        <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
-    </div>
-                    
-                    <div class="service-buttons">
-    <button type="button" class="btn-service active" onclick="setServiceType('transfer')">
-        🚗 Transfer
-    </button>
-    <button type="button" class="btn-service" onclick="setServiceType('tour')">
-        🎯 Tour Regular
-    </button>
-    <button type="button" class="btn-service" onclick="setServiceType('private')">
-        👑 Private Tour
-    </button>
-</div>
-                    </div>
-                    
-                    <div class="form-group tour-selector" id="tourSelector">
-                        <label for="tourSelecionado">Selecione o Tour</label>
-                        <select id="tourSelecionado" onchange="updateTourPrice()">
-                            <option value="">Escolha o tour...</option>
-                            <optgroup label="Tours Regulares (Por Pessoa)">
-                                <option value="tour-sintra-cascais" data-price="67" data-type="regular">
-                                    Sintra e Cascais (8h) - €67/pessoa
-                                </option>
-                                <option value="tour-fatima-obidos" data-price="83" data-type="regular">
-                                    Fátima e Óbidos (8h) - €83/pessoa
-                                </option>
-                                <option value="tour-combo-2dias" data-price="138" data-type="regular">
-                                    Combo 2 Dias (16h) - €138/pessoa
-                                </option>
-                            </optgroup>
-                            <optgroup label="Private Tours (Por Grupo)">
-                                <option value="private-sintra-palaces" data-price-small="347" data-price-large="492" data-type="private">
-                                    Palaces of Sintra - €347 (1-3) / €492 (4-8)
-                                </option>
-                                <option value="private-evora" data-price-small="347" data-price-large="492" data-type="private">
-                                    Évora City - €347 (1-3) / €492 (4-8)
-                                </option>
-                                <option value="private-templars" data-price-small="347" data-price-large="492" data-type="private">
-                                    Templars - €347 (1-3) / €492 (4-8)
-                                </option>
-                                <option value="private-arrabida" data-price-small="347" data-price-large="492" data-type="private">
-                                    Arrábida - €347 (1-3) / €492 (4-8)
-                                </option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="numeroPessoas">Número de Pessoas *</label>
-                        <div class="people-buttons">
-                            <button type="button" class="btn-people" onclick="setPeople(1)">1</button>
-                            <button type="button" class="btn-people" onclick="setPeople(2)">2</button>
-                            <button type="button" class="btn-people" onclick="setPeople(3)">3</button>
-                            <button type="button" class="btn-people" onclick="setPeople(4)">4</button>
-                            <button type="button" class="btn-people" onclick="setPeople(5)">5</button>
-                            <button type="button" class="btn-people" onclick="setPeople(6)">6</button>
-                            <button type="button" class="btn-people" onclick="setPeople(7)">7</button>
-                            <button type="button" class="btn-people" onclick="setPeople(8)">8+</button>
-                        </div>
-                        <input type="number" id="numeroPessoas" min="1" max="20" required style="display: none;" onchange="updateCalculation()">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="numeroBagagens">Número de Bagagens</label>
-                        <div class="baggage-buttons">
-                            <button type="button" class="btn-baggage" onclick="setBaggage(0)">0</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(1)">1</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(2)">2</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(3)">3</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(4)">4</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(5)">5</button>
-                            <button type="button" class="btn-baggage" onclick="setBaggage(6)">6+</button>
-                        </div>
-                        <input type="number" id="numeroBagagens" min="0" max="20" value="0" style="display: none;">
-                    </div>
-                    
-                    <!-- Grupo: Data e horário -->
-<div class="form-group">
-    <label for="data">📅 Data do Transfer *</label>
-    <div class="date-buttons">
-        <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
-        <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
-    </div>
-    <input type="date" id="data" required>
-</div>
-
-<div class="form-group">
-    <label for="horaPickup">🕐 Hora de Pick-up *</label>
-                    
-                    <div class="form-group">
-        <label for="contacto">Contacto *</label>
-        <div class="phone-container">
-            <input type="tel" id="contacto" required placeholder="Digite o número...">
-        </div>
-    </div>
-                    
-                    <div class="form-group">
-        <label for="numeroVoo">Número do Voo</label>
-        <input type="text" id="numeroVoo" placeholder="Ex: TP1234">
-    </div>
-</div>
-                    
-                    <div class="form-group">
-    <label for="origem">📍 Local de Origem *</label>
-    <div class="location-buttons">
-        <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
-            ✈️ Aeroporto de Lisboa
-        </button>
-        <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
-            🏨 Empire Marques Hotel
-        </button>
-    </div>
-    <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
-</div>
-
-<div class="form-group">
-    <label for="destino">🎯 Local de Destino *</label>
-    <div class="location-buttons">
-        <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
-            🏨 Empire Marques Hotel
-        </button>
-        <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
-            ✈️ Aeroporto de Lisboa
-        </button>
-    </div>
-    <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
-</div>
-                    
-                    <div class="form-group">
-                        <label for="valorTotal">Valor do Serviço (€) *</label>
-                        <div class="price-buttons">
-                            <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
-                            <button type="button" class="btn-price" onclick="setPrice(35)">€35</button>
-                            <button type="button" class="btn-price" onclick="setPrice(45)">€45</button>
-                            <button type="button" class="btn-price" onclick="setPrice(60)">€60</button>
-                            <button type="button" class="btn-price" onclick="setPrice(75)">€75</button>
-                            <button type="button" class="btn-price" onclick="setPrice(100)">€100</button>
-                        </div>
-                        <input type="number" id="valorTotal" step="0.01" required placeholder="Ou digite valor...">
-                    </div>
-                    
-                    <div class="payment-buttons">
-    <button type="button" class="btn-payment" onclick="setPayment('Dinheiro')">
-        💵 Dinheiro
-    </button>
-    <button type="button" class="btn-payment" onclick="setPayment('Cartão')">
-        💳 Cartão
-    </button>
-    <button type="button" class="btn-payment" onclick="setPayment('Transferência')">
-        🏦 Transferência
-    </button>
-</div>
-                        <select id="modoPagamento" required style="display: none;">
-                            <option value="">Selecionar...</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão">Cartão</option>
-                            <option value="Transferência">Transferência Bancária</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Pago Para - Centralizado -->
-<div class="centered-section">
-    <label for="pagoParaQuem">Pago Para *</label>
-    <div class="payment-to-buttons">
-        <button type="button" class="btn-payment-to" onclick="setPaymentTo('Recepção')">
-            🏨 Recepção
-        </button>
-        <button type="button" class="btn-payment-to" onclick="setPaymentTo('Motorista')">
-            👨‍✈️ Motorista
-        </button>
-    </div>
-    <select id="pagoParaQuem" required style="display: none;">
-        <option value="">Selecionar...</option>
-        <option value="Recepção">Recepção</option>
-        <option value="Motorista">Motorista</option>
-    </select>
-</div>
-
-<!-- Observações - Centralizado -->
-<div class="centered-section">
-    <label for="observacoes">Observações</label>
-    <div class="obs-buttons">
-        <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">Bagagem Extra</button>
-        <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">Urgente</button>
-        <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
-        <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
-    </div>
-    <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
-</div>
-</div>
-
-<!-- Box de Cálculo de Preço -->
-<div class="price-calculation-box" id="priceCalculationBox">
-    <div class="calculation-header">Cálculo do Valor Total</div>
-    <div class="calculation-details">
-        <div class="calculation-row">
-            <span class="calculation-label">Tipo de Serviço:</span>
-            <span class="calculation-value" id="calcTipoServico">-</span>
-        </div>
-        <div class="calculation-row">
-            <span class="calculation-label">Preço Unitário:</span>
-            <span class="calculation-value" id="calcPrecoUnitario">€0</span>
-        </div>
-        <div class="calculation-row">
-            <span class="calculation-label">Quantidade de Pessoas:</span>
-            <span class="calculation-value" id="calcPessoas">0</span>
-        </div>
-    </div>
-    <div class="calculation-total">
-        VALOR TOTAL: €<span id="calcTotal">0</span>
-    </div>
+    <h2>Solicitar Novo Transfer</h2>
     
-    <!-- Campos Admin -->
-    <div class="admin-fields" id="adminFields">
-        <div class="calculation-row">
-            <span class="calculation-label">Valor Empire Marques Hotel (30%):</span>
-            <span class="calculation-value" id="calcHotel">€0</span>
+    <form id="transferForm">
+        <!-- Linha 1: Nome do Cliente -->
+        <div class="form-row-compact single">
+            <div class="form-group full-width">
+                <label for="nomeCliente">👤 Nome do Cliente *</label>
+                <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+            </div>
         </div>
-        <div class="calculation-row">
-            <span class="calculation-label">Valor HUB Transfer:</span>
-            <span class="calculation-value" id="calcHUB">€0</span>
-        </div>
-        <div class="calculation-row">
-            <span class="calculation-label">Comissão Recepção:</span>
-            <span class="calculation-value" id="calcRecepcao">€0</span>
-        </div>
-    </div>
-</div>
 
-<div class="form-actions">
-    <button type="submit" class="btn btn-primary" id="submitBtn">Solicitar Transfer</button>
-    <button type="button" class="btn btn-clear" onclick="clearForm()">Limpar</button>
-    <button type="button" class="btn btn-export" onclick="exportToCSV()">Exportar CSV</button>
-    <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">Atualizar Dados</button>
-    <button type="button" class="btn btn-config" onclick="toggleConfig()">Configurar</button>
-    <button type="button" class="btn btn-danger" onclick="toggleClearData()">Limpar Dados</button>
+        <!-- Linha 2: Tipo de Serviço e Seletor de Tour -->
+        <div class="form-row-compact">
+            <div class="form-group">
+                <label>🚗 Tipo de Serviço</label>
+                <div class="service-buttons">
+                    <button type="button" class="btn-service active" onclick="setServiceType('transfer')">
+                        🚗 Transfer
+                    </button>
+                    <button type="button" class="btn-service" onclick="setServiceType('tour')">
+                        🎯 Tour Regular
+                    </button>
+                    <button type="button" class="btn-service" onclick="setServiceType('private')">
+                        👑 Private Tour
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group tour-selector" id="tourSelector">
+                <label for="tourSelecionado">🎪 Selecione o Tour</label>
+                <select id="tourSelecionado" onchange="updateTourPrice()">
+                    <option value="">Escolha o tour...</option>
+                    <optgroup label="Tours Regulares (Por Pessoa)">
+                        <option value="tour-sintra-cascais" data-price="67" data-type="regular">
+                            Sintra e Cascais (8h) - €67/pessoa
+                        </option>
+                        <option value="tour-fatima-obidos" data-price="83" data-type="regular">
+                            Fátima e Óbidos (8h) - €83/pessoa
+                        </option>
+                        <option value="tour-combo-2dias" data-price="138" data-type="regular">
+                            Combo 2 Dias (16h) - €138/pessoa
+                        </option>
+                    </optgroup>
+                    <optgroup label="Private Tours (Por Grupo)">
+                        <option value="private-sintra-palaces" data-price-small="347" data-price-large="492" data-type="private">
+                            Palaces of Sintra - €347 (1-3) / €492 (4-8)
+                        </option>
+                        <option value="private-evora" data-price-small="347" data-price-large="492" data-type="private">
+                            Évora City - €347 (1-3) / €492 (4-8)
+                        </option>
+                        <option value="private-templars" data-price-small="347" data-price-large="492" data-type="private">
+                            Templars - €347 (1-3) / €492 (4-8)
+                        </option>
+                        <option value="private-arrabida" data-price-small="347" data-price-large="492" data-type="private">
+                            Arrábida - €347 (1-3) / €492 (4-8)
+                        </option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <!-- Linha 3: Pessoas e Bagagens -->
+        <div class="form-row-compact">
+            <div class="form-group">
+                <label for="numeroPessoas">👥 Número de Pessoas *</label>
+                <div class="people-buttons">
+                    <button type="button" class="btn-people" onclick="setPeople(1)">1</button>
+                    <button type="button" class="btn-people" onclick="setPeople(2)">2</button>
+                    <button type="button" class="btn-people" onclick="setPeople(3)">3</button>
+                    <button type="button" class="btn-people" onclick="setPeople(4)">4</button>
+                    <button type="button" class="btn-people" onclick="setPeople(5)">5</button>
+                    <button type="button" class="btn-people" onclick="setPeople(6)">6</button>
+                    <button type="button" class="btn-people" onclick="setPeople(7)">7</button>
+                    <button type="button" class="btn-people" onclick="setPeople(8)">8+</button>
+                </div>
+                <input type="number" id="numeroPessoas" min="1" max="20" required style="display: none;" onchange="updateCalculation()">
+            </div>
+            
+            <div class="form-group">
+                <label for="numeroBagagens">🧳 Número de Bagagens</label>
+                <div class="baggage-buttons">
+                    <button type="button" class="btn-baggage" onclick="setBaggage(0)">0</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(1)">1</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(2)">2</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(3)">3</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(4)">4</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(5)">5</button>
+                    <button type="button" class="btn-baggage" onclick="setBaggage(6)">6+</button>
+                </div>
+                <input type="number" id="numeroBagagens" min="0" max="20" value="0" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Linha 4: Data e Hora -->
+        <div class="form-row-compact">
+            <div class="form-group date-field">
+                <label for="data">📅 Data do Transfer *</label>
+                <div class="date-buttons">
+                    <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
+                    <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
+                </div>
+                <input type="date" id="data" required>
+            </div>
+            
+            <div class="form-group time-field">
+                <label for="horaPickup">🕐 Hora de Pick-up *</label>
+                <div class="time-picker-container">
+                    <input type="time" id="horaPickup" required class="time-picker-input">
+                    <div class="time-buttons">
+                        <button type="button" class="btn-time" onclick="setTime('06:00')">06:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('07:00')">07:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('08:00')">08:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('09:00')">09:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('10:00')">10:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('11:00')">11:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('12:00')">12:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('13:00')">13:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('14:00')">14:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('15:00')">15:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('16:00')">16:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('17:00')">17:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('18:00')">18:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('19:00')">19:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('20:00')">20:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('21:00')">21:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('22:00')">22:00</button>
+                        <button type="button" class="btn-time" onclick="setTime('23:00')">23:00</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linha 5: Contacto e Número do Voo -->
+        <div class="form-row-compact">
+            <div class="form-group">
+                <label for="contacto">📞 Contacto do Cliente *</label>
+                <div class="phone-container">
+                    <input type="tel" id="contacto" required placeholder="Digite o número...">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="numeroVoo">✈️ Número do Voo</label>
+                <input type="text" id="numeroVoo" placeholder="Ex: TP1234" onblur="createFlightLink()">
+                <div id="flightLink" class="flight-link-container"></div>
+            </div>
+        </div>
+
+        <!-- Linha 6: Origem e Destino -->
+        <div class="form-row-compact">
+            <div class="form-group">
+                <label for="origem">📍 Local de Origem *</label>
+                <div class="location-buttons">
+                    <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
+                        ✈️ Aeroporto de Lisboa
+                    </button>
+                    <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
+                        🏨 Empire Marques Hotel
+                    </button>
+                </div>
+                <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
+            </div>
+            
+            <div class="form-group">
+                <label for="destino">🎯 Local de Destino *</label>
+                <div class="location-buttons">
+                    <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
+                        🏨 Empire Marques Hotel
+                    </button>
+                    <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
+                        ✈️ Aeroporto de Lisboa
+                    </button>
+                </div>
+                <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
+            </div>
+        </div>
+
+        <!-- Linha 7: Valor do Serviço -->
+        <div class="form-row-compact single">
+            <div class="form-group">
+                <label for="valorTotal">💰 Valor do Serviço (€) *</label>
+                <div class="price-buttons">
+                    <button type="button" class="btn-price" onclick="setPrice(25)">€25</button>
+                    <button type="button" class="btn-price" onclick="setPrice(35)">€35</button>
+                    <button type="button" class="btn-price" onclick="setPrice(45)">€45</button>
+                    <button type="button" class="btn-price" onclick="setPrice(60)">€60</button>
+                    <button type="button" class="btn-price" onclick="setPrice(75)">€75</button>
+                    <button type="button" class="btn-price" onclick="setPrice(100)">€100</button>
+                </div>
+                <input type="number" id="valorTotal" step="0.01" required placeholder="Ou digite valor...">
+            </div>
+        </div>
+
+        <!-- Linha 8: Forma de Pagamento e Pago Para -->
+        <div class="form-row-compact">
+            <div class="form-group">
+                <label for="modoPagamento">💳 Forma de Pagamento *</label>
+                <div class="payment-buttons">
+                    <button type="button" class="btn-payment" onclick="setPayment('Dinheiro')">
+                        💵 Dinheiro
+                    </button>
+                    <button type="button" class="btn-payment" onclick="setPayment('Cartão')">
+                        💳 Cartão
+                    </button>
+                    <button type="button" class="btn-payment" onclick="setPayment('Transferência')">
+                        🏦 Transferência
+                    </button>
+                </div>
+                <select id="modoPagamento" required style="display: none;">
+                    <option value="">Selecionar...</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Cartão">Cartão</option>
+                    <option value="Transferência">Transferência Bancária</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="pagoParaQuem">👤 Pago Para *</label>
+                <div class="payment-to-buttons">
+                    <button type="button" class="btn-payment-to" onclick="setPaymentTo('Recepção')">
+                        🏨 Recepção
+                    </button>
+                    <button type="button" class="btn-payment-to" onclick="setPaymentTo('Motorista')">
+                        👨‍✈️ Motorista
+                    </button>
+                </div>
+                <select id="pagoParaQuem" required style="display: none;">
+                    <option value="">Selecionar...</option>
+                    <option value="Recepção">Recepção</option>
+                    <option value="Motorista">Motorista</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Linha 9: Observações -->
+        <div class="form-row-compact single">
+            <div class="form-group full-width">
+                <label for="observacoes">📝 Observações</label>
+                <div class="obs-buttons">
+                    <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">Bagagem Extra</button>
+                    <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">Urgente</button>
+                    <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">VIP</button>
+                    <button type="button" class="btn-obs" onclick="addObservation('Com criança')">Com Criança</button>
+                </div>
+                <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+            </div>
+        </div>
+
+        <!-- Box de Cálculo de Preço -->
+        <div class="price-calculation-box" id="priceCalculationBox">
+            <div class="calculation-header">Cálculo do Valor Total</div>
+            <div class="calculation-details">
+                <div class="calculation-row">
+                    <span class="calculation-label">Tipo de Serviço:</span>
+                    <span class="calculation-value" id="calcTipoServico">-</span>
+                </div>
+                <div class="calculation-row">
+                    <span class="calculation-label">Preço Unitário:</span>
+                    <span class="calculation-value" id="calcPrecoUnitario">€0</span>
+                </div>
+                <div class="calculation-row">
+                    <span class="calculation-label">Quantidade de Pessoas:</span>
+                    <span class="calculation-value" id="calcPessoas">0</span>
+                </div>
+            </div>
+            <div class="calculation-total">
+                VALOR TOTAL: €<span id="calcTotal">0</span>
+            </div>
+            
+            <!-- Campos Admin -->
+            <div class="admin-fields" id="adminFields">
+                <div class="calculation-row">
+                    <span class="calculation-label">Valor Empire Marques Hotel (30%):</span>
+                    <span class="calculation-value" id="calcHotel">€0</span>
+                </div>
+                <div class="calculation-row">
+                    <span class="calculation-label">Valor HUB Transfer:</span>
+                    <span class="calculation-value" id="calcHUB">€0</span>
+                </div>
+                <div class="calculation-row">
+                    <span class="calculation-label">Comissão Recepção:</span>
+                    <span class="calculation-value" id="calcRecepcao">€0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">Solicitar Transfer</button>
+            <button type="button" class="btn btn-clear" onclick="clearForm()">Limpar</button>
+            <button type="button" class="btn btn-export" onclick="exportToCSV()">Exportar CSV</button>
+            <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">Atualizar Dados</button>
+            <button type="button" class="btn btn-config" onclick="toggleConfig()">Configurar</button>
+            <button type="button" class="btn btn-danger" onclick="toggleClearData()">Limpar Dados</button>
+        </div>
+    </form>
 </div>
 
         <div class="summary-section">
