@@ -288,11 +288,28 @@ body {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: start;
 }
 
+/* Melhorar alinhamento dos grupos de formulário */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    min-height: fit-content;
+}
+
+.form-group label {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 .form-group {
     display: flex;
     flex-direction: column;
@@ -602,6 +619,48 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 10px;
     flex-wrap: wrap;
     justify-content: flex-start;
+}
+
+/* Melhor organização dos botões de seleção */
+.people-buttons, .baggage-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+    max-width: 300px;
+}
+
+.btn-people, .btn-baggage {
+    aspect-ratio: 1;
+    min-width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid;
+}
+
+/* Melhor organização dos botões de preço */
+.price-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+    max-width: 400px;
+}
+
+/* Melhor organização dos botões de pagamento */
+.payment-buttons, .payment-to-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+    max-width: 500px;
 }
 
 .btn-people, .btn-baggage {
@@ -1371,26 +1430,17 @@ tr:hover {
                     </div>
                     
                     <!-- Grupo: Data e horário -->
-<div class="form-row">
-    <div class="form-group">
-        <label for="data">📅 Data do Transfer *</label>
-        <div class="date-buttons">
-            <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
-            <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
-        </div>
-        <input type="date" id="data" required>
+<div class="form-group">
+    <label for="data">📅 Data do Transfer *</label>
+    <div class="date-buttons">
+        <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
+        <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
     </div>
-                    
-                    <!-- Grupo: Data e horário -->
-<div class="form-row">
-    <div class="form-group">
-        <label for="data">📅 Data do Transfer *</label>
-        <div class="date-buttons">
-            <button type="button" class="btn-date" onclick="setDate('today')">Hoje</button>
-            <button type="button" class="btn-date" onclick="setDate('tomorrow')">Amanhã</button>
-        </div>
-        <input type="date" id="data" required>
-    </div>
+    <input type="date" id="data" required>
+</div>
+
+<div class="form-group">
+    <label for="horaPickup">🕐 Hora de Pick-up *</label>
                     
                     <div class="form-group">
         <label for="contacto">Contacto *</label>
@@ -1406,30 +1456,30 @@ tr:hover {
 </div>
                     
                     <div class="form-group">
-                        <label for="origem">Local de Origem *</label>
-                        <div class="location-buttons">
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
-                                Aeroporto de Lisboa
-                            </button>
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
-                                Empire Marques Hotel
-                            </button>
-                        </div>
-                        <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="destino">Local de Destino *</label>
-                        <div class="location-buttons">
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
-                                Empire Marques Hotel
-                            </button>
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
-                                Aeroporto de Lisboa
-                            </button>
-                        </div>
-                        <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
-                    </div>
+    <label for="origem">📍 Local de Origem *</label>
+    <div class="location-buttons">
+        <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
+            ✈️ Aeroporto de Lisboa
+        </button>
+        <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
+            🏨 Empire Marques Hotel
+        </button>
+    </div>
+    <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
+</div>
+
+<div class="form-group">
+    <label for="destino">🎯 Local de Destino *</label>
+    <div class="location-buttons">
+        <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
+            🏨 Empire Marques Hotel
+        </button>
+        <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
+            ✈️ Aeroporto de Lisboa
+        </button>
+    </div>
+    <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
+</div>
                     
                     <div class="form-group">
                         <label for="valorTotal">Valor do Serviço (€) *</label>
