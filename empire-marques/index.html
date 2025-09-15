@@ -1647,6 +1647,603 @@ body {
         --text-primary: var(--secondary-100);
     }
 }
+
+/* ===== SEÇÃO DE RESUMO MELHORADA ===== */
+.summary-section {
+    padding: var(--space-12);
+    background: linear-gradient(135deg, var(--secondary-50) 0%, #f8fafc 100%);
+    position: relative;
+}
+
+.summary-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-300), transparent);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+}
+
+.summary-card {
+    background: white;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    box-shadow: var(--shadow-base);
+    border: 2px solid var(--secondary-100);
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-500), var(--success-500));
+}
+
+.summary-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-200);
+}
+
+.summary-number {
+    font-size: var(--text-5xl);
+    font-weight: 800;
+    color: var(--secondary-800);
+    margin-bottom: var(--space-3);
+    line-height: 1;
+}
+
+.summary-label {
+    color: var(--secondary-600);
+    font-size: var(--text-base);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+}
+
+.financial-summary {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    color: white;
+    padding: var(--space-12);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--space-10);
+    box-shadow: var(--shadow-2xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.financial-summary::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    transform: rotate(45deg);
+}
+
+.financial-summary h3 {
+    text-align: center;
+    margin-bottom: var(--space-10);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-8);
+    position: relative;
+    z-index: 1;
+}
+
+.financial-item {
+    text-align: center;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: var(--transition-base);
+}
+
+.financial-item:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.financial-value {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    margin-bottom: var(--space-3);
+    line-height: 1;
+}
+
+.financial-label {
+    font-size: var(--text-lg);
+    opacity: 0.95;
+    font-weight: 600;
+}
+
+/* ===== SEÇÃO DE SERVIÇOS E FILTROS MELHORADA ===== */
+.services-section {
+    padding: var(--space-12);
+    background: white;
+}
+
+.services-header {
+    margin-bottom: var(--space-10);
+}
+
+.services-title {
+    color: var(--secondary-800);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-8);
+    text-align: center;
+    position: relative;
+    padding-bottom: var(--space-4);
+}
+
+.services-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
+    border-radius: var(--radius-full);
+}
+
+.filters-container {
+    background: white;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--secondary-100);
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    color: var(--secondary-700);
+}
+
+.filter-group input,
+.filter-group select {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    border: 2px solid var(--secondary-200);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-base);
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.filter-indicator {
+    background: var(--primary-500);
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin: var(--space-4) 0;
+    text-align: center;
+    display: none;
+    box-shadow: var(--shadow-base);
+}
+
+.filter-actions {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: var(--space-6);
+    border-top: 2px solid var(--secondary-100);
+}
+
+.sync-info {
+    font-size: var(--text-xs);
+    color: var(--secondary-500);
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* ===== TABELA RESPONSIVA MELHORADA ===== */
+.services-table-container {
+    background: white;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-2xl);
+    border: 2px solid var(--secondary-100);
+    margin-top: var(--space-8);
+    position: relative;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-500) var(--secondary-100);
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--secondary-100);
+    border-radius: var(--radius-full);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--primary-500);
+    border-radius: var(--radius-full);
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-600);
+}
+
+.services-table {
+    width: 100%;
+    min-width: 1400px;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.services-table th {
+    background: linear-gradient(135deg, var(--secondary-800) 0%, var(--secondary-900) 100%);
+    color: white;
+    padding: var(--space-6) var(--space-4);
+    text-align: left;
+    font-weight: 700;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.services-table td {
+    padding: var(--space-5) var(--space-4);
+    border-bottom: 1px solid var(--secondary-100);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.services-table tr:hover {
+    background: var(--secondary-50);
+}
+
+.services-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Larguras específicas das colunas */
+.th-id { min-width: 80px; }
+.th-cliente { min-width: 200px; }
+.th-tipo { min-width: 100px; }
+.th-pessoas { min-width: 90px; }
+.th-bagagens { min-width: 100px; }
+.th-data { min-width: 120px; }
+.th-hora { min-width: 100px; }
+.th-contacto { min-width: 150px; }
+.th-voo { min-width: 100px; }
+.th-rota { min-width: 250px; }
+.th-valor { min-width: 120px; }
+.th-hotel { min-width: 120px; }
+.th-hub { min-width: 120px; }
+.th-comissao { min-width: 140px; }
+.th-pagamento { min-width: 130px; }
+.th-pago-para { min-width: 120px; }
+.th-status { min-width: 120px; }
+.th-acoes { min-width: 150px; }
+
+/* ===== ESTADOS E BADGES MELHORADOS ===== */
+.status {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    border: 2px solid;
+}
+
+.status-solicitado {
+    background: var(--warning-50);
+    color: var(--warning-700);
+    border-color: var(--warning-500);
+}
+
+.status-confirmado {
+    background: var(--success-50);
+    color: var(--success-700);
+    border-color: var(--success-500);
+}
+
+.status-finalizado {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border-color: var(--primary-500);
+}
+
+.status-cancelado {
+    background: var(--danger-50);
+    color: var(--danger-700);
+    border-color: var(--danger-500);
+}
+
+.payment-method {
+    font-weight: 700;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    display: inline-block;
+    border: 2px solid;
+}
+
+.payment-cash {
+    background: var(--success-50);
+    color: var(--success-700);
+    border-color: var(--success-500);
+}
+
+.payment-card {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border-color: var(--primary-500);
+}
+
+.payment-transfer {
+    background: var(--warning-50);
+    color: var(--warning-700);
+    border-color: var(--warning-500);
+}
+
+.pago-para {
+    font-weight: 700;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    display: inline-block;
+    border: 2px solid;
+}
+
+.pago-recepcao {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border-color: var(--primary-500);
+}
+
+.pago-motorista {
+    background: var(--success-50);
+    color: var(--success-700);
+    border-color: var(--success-500);
+}
+
+/* ===== BOTÕES DE AÇÃO NA TABELA ===== */
+.action-buttons {
+    display: flex;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-small {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-base);
+    min-width: 40px;
+    height: 40px;
+    text-align: center;
+    transition: var(--transition-base);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    font-weight: 700;
+}
+
+.btn-small:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.client-info {
+    font-weight: 700;
+    color: var(--secondary-800);
+    line-height: 1.4;
+}
+
+.value-highlight {
+    font-weight: 800;
+    color: var(--success-600);
+    font-size: var(--text-lg);
+}
+
+/* ===== ESTADO VAZIO MELHORADO ===== */
+.empty-state {
+    text-align: center;
+    padding: var(--space-20) var(--space-6);
+    color: var(--secondary-500);
+}
+
+.empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.empty-icon {
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-4);
+}
+
+.empty-state h3 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-3);
+    color: var(--secondary-700);
+    font-weight: 700;
+}
+
+.empty-state p {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-6);
+    max-width: 400px;
+}
+
+/* ===== INDICADOR DE SCROLL PARA MOBILE ===== */
+.table-scroll-hint {
+    display: none;
+    background: var(--primary-50);
+    padding: var(--space-3);
+    text-align: center;
+    border-top: 2px solid var(--primary-200);
+}
+
+.scroll-indicator {
+    font-size: var(--text-sm);
+    color: var(--primary-700);
+    font-weight: 600;
+    animation: scrollHint 2s ease-in-out infinite;
+}
+
+@keyframes scrollHint {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* ===== LINHAS ESPECIAIS DA TABELA ===== */
+.tour-row {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%) !important;
+    border-left: 6px solid var(--warning-500);
+}
+
+.tour-row:hover {
+    background: linear-gradient(135deg, #fff3c4 0%, #ffecb3 100%) !important;
+}
+
+.airport-to-hotel-row {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+    border-left: 6px solid var(--primary-500);
+}
+
+.airport-to-hotel-row:hover {
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%) !important;
+}
+
+/* ===== RESPONSIVIDADE ESPECÍFICA ===== */
+@media (max-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .sync-info {
+        margin-left: 0;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+    }
+    
+    .financial-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .services-table {
+        min-width: 1200px;
+    }
+    
+    .table-scroll-hint {
+        display: block;
+    }
+    
+    .services-section {
+        padding: var(--space-6);
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .services-table {
+        min-width: 1000px;
+    }
+    
+    .btn-small {
+        padding: var(--space-1) var(--space-2);
+        min-width: 36px;
+        height: 36px;
+        font-size: var(--text-xs);
+    }
+}
     </style>
 </head>
 
@@ -2051,6 +2648,179 @@ body {
                 </div>
             </form>
         </div>
+
+<!-- Seção de Resumo -->
+        <div class="summary-section">
+            <!-- Indicador de Filtros -->
+            <div class="filter-indicator" id="filterIndicator"></div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-number" id="totalServices">0</div>
+                    <div class="summary-label">Total de Serviços</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="pendingServices">0</div>
+                    <div class="summary-label">Solicitados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="confirmedServices">0</div>
+                    <div class="summary-label">Confirmados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="completedServices">0</div>
+                    <div class="summary-label">Finalizados</div>
+                </div>
+            </div>
+
+            <div class="financial-summary">
+                <h3>Resumo Financeiro</h3>
+                <div class="financial-grid">
+                    <div class="financial-item">
+                        <div class="financial-value" id="totalRevenue">€0.00</div>
+                        <div class="financial-label">Receita Total</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="pendingRevenue">€0.00</div>
+                        <div class="financial-label">Valor Pendente</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="confirmedRevenue">€0.00</div>
+                        <div class="financial-label">Valor Confirmado</div>
+                    </div>
+                    <div class="financial-item">
+                        <div class="financial-value" id="completedRevenue">€0.00</div>
+                        <div class="financial-label">Valor Finalizado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Serviços e Filtros -->
+        <div class="services-section">
+            <div class="services-header">
+                <h2 class="services-title">Serviços de Transfer</h2>
+                
+                <!-- Sistema de Filtros Melhorado -->
+                <div class="filters-container">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="filterDateStart">Data Início:</label>
+                            <input type="date" id="filterDateStart" onchange="updateDateFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterDateEnd">Data Fim:</label>
+                            <input type="date" id="filterDateEnd" onchange="updateDateFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="quickPeriodSelect">Períodos Rápidos:</label>
+                            <select id="quickPeriodSelect" onchange="applyQuickPeriod()">
+                                <option value="">Personalizado</option>
+                                <option value="today">Hoje</option>
+                                <option value="yesterday">Ontem</option>
+                                <option value="thisWeek">Esta Semana</option>
+                                <option value="lastWeek">Semana Passada</option>
+                                <option value="thisMonth">Este Mês</option>
+                                <option value="lastMonth">Mês Passado</option>
+                                <option value="last7days">Últimos 7 Dias</option>
+                                <option value="last30days">Últimos 30 Dias</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterStatus">Status:</label>
+                            <select id="filterStatus" onchange="updateStatusFilter()">
+                                <option value="">Todos</option>
+                                <option value="Solicitado">Solicitado</option>
+                                <option value="Confirmado">Confirmado</option>
+                                <option value="Finalizado">Finalizado</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="searchClient">Cliente:</label>
+                            <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="updateClientFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterTipoServico">Tipo Serviço:</label>
+                            <select id="filterTipoServico" onchange="updateServiceTypeFilter()">
+                                <option value="">Todos</option>
+                                <option value="Transfer">Transfer</option>
+                                <option value="Tour Regular">Tour Regular</option>
+                                <option value="Private Tour">Private Tour</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button type="button" class="btn btn-primary" onclick="applyAllFilters()">
+                            Aplicar Filtros
+                        </button>
+                        <button type="button" class="btn btn-clear" onclick="clearAllFilters()">
+                            Limpar Filtros
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="loadTransfersFromSheets()">
+                            Carregar Transfers
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="testBasicConnectivity()">
+                            Testar Conexão
+                        </button>
+                        <div class="sync-info">
+                            <span id="lastSyncDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabela Responsiva Melhorada -->
+            <div class="services-table-container">
+                <div class="table-responsive">
+                    <table id="servicesTable" class="services-table">
+                        <thead>
+                            <tr>
+                                <th class="th-id">ID</th>
+                                <th class="th-cliente">Cliente</th>
+                                <th class="th-tipo">Tipo</th>
+                                <th class="th-pessoas">Pessoas</th>
+                                <th class="th-bagagens">Bagagens</th>
+                                <th class="th-data">Data</th>
+                                <th class="th-hora">Hora Pick-up</th>
+                                <th class="th-contacto">Contacto</th>
+                                <th class="th-voo">Voo</th>
+                                <th class="th-rota">Rota</th>
+                                <th class="th-valor">Valor Total</th>
+                                <th class="th-hotel admin-column" style="display: none;">Valor Hotel</th>
+                                <th class="th-hub admin-column" style="display: none;">Valor HUB</th>
+                                <th class="th-comissao admin-column" style="display: none;">Comissão Recepção</th>
+                                <th class="th-pagamento">Pagamento</th>
+                                <th class="th-pago-para">Pago Para</th>
+                                <th class="th-status">Status</th>
+                                <th class="th-acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesTableBody">
+                            <tr>
+                                <td colspan="18" class="empty-state">
+                                    <div class="empty-content">
+                                        <div class="empty-icon">📋</div>
+                                        <h3>Nenhum serviço cadastrado</h3>
+                                        <p>Use o botão "Carregar Transfers" para sincronizar com o Google Sheets</p>
+                                        <button class="btn btn-success" onclick="loadTransfersFromSheets()">
+                                            Carregar Transfers
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Controles de Scroll Horizontal para Mobile -->
+                <div class="table-scroll-hint">
+                    <span class="scroll-indicator">← Deslize para ver mais colunas →</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Botão Admin -->
     <div class="admin-toggle" onclick="toggleAdminMode()">
