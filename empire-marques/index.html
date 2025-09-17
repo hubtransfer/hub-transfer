@@ -2691,10 +2691,11 @@
                 console.log('Tentando enviar para Google Sheets:', serviceData);
                 try {
                     const dataWithEmail = {
-                        ...serviceData,
-                        emailDestino: TEST_EMAIL,
-                        action: 'addTransfer'
-                    };
+    ...serviceData,
+    referencia: serviceData.referencia || '',
+    emailDestino: TEST_EMAIL,
+    action: 'addTransfer'
+};
                     
                     const response = await fetch(url, {
                         method: 'POST',
