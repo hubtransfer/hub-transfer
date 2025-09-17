@@ -2495,8 +2495,8 @@
 
                 const convertedData = {
                     id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
-                    referencia: getValue(serverItem, ['Referencia', 'Referência', 'Reference', 'referencia'], ''),
-                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
+                    referencia: getValue(serverItem, ['Referencia', 'Referência', 'Reference', 'referencia', 'B'], ''),
+                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente', 'C'], 'Cliente não informado'),
                     tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
                     tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
                     numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
