@@ -319,11 +319,9 @@
         }
 
         .tour-selector {
-    display: none;
-    margin-bottom: 15px;
-    grid-column: 1 / -1;
-    width: 100%;
-}
+            display: none;
+            margin-bottom: 15px;
+        }
 
         .tour-selector.show {
             display: block;
@@ -1392,7 +1390,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbzKYTAi5v-UY6yBefEdoXLJnZeYzaal9f3AKTn6OhIat038maK9QYm1SlYROsS5cd6IbA/exec" 
+                           value="https://script.google.com/macros/s/AKfycbyfmnqCrFaJsNewsxBI_1Zph5omrV1hETNgmyWmtmK248iQD2Ouho0bcFgUEAdZcJ5dAA/exec" 
                            placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1431,14 +1429,10 @@
             <form id="transferForm">
                 <div class="form-grid">
                     <div class="form-group">
-    <label for="referencia">📋 Referência (opcional)</label>
-    <input type="text" id="referencia" maxlength="50" placeholder="Ex: REF-2025-001, BKG123456">
-</div>
-
-<div class="form-group">
-    <label for="nomeCliente">👤 Nome do Cliente *</label>
-    <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
-</div>                    
+                        <label for="nomeCliente">👤 Nome do Cliente *</label>
+                        <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+                    </div>
+                    
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
                         <div class="service-buttons">
@@ -1454,9 +1448,9 @@
                         </div>
                     </div>
                     
-                    <div class="form-group tour-selector" id="tourSelector" style="grid-column: 1 / -1;">
-    <label for="tourSelecionado">🎯 Selecione o Tour</label>
-    <select id="tourSelecionado" onchange="updateTourPrice()">
+                    <div class="form-group tour-selector" id="tourSelector">
+                        <label for="tourSelecionado">🎯 Selecione o Tour</label>
+                        <select id="tourSelecionado" onchange="updateTourPrice()">
                             <option value="">Escolha o tour...</option>
                             <optgroup label="🌟 Tours Regulares (Por Pessoa)">
                                 <option value="tour-sintra-cascais" data-price="67" data-type="regular">
@@ -1785,9 +1779,9 @@
                         </select>
                     </div>
                     <div class="filter-group">
-    <label for="searchReference">📋 Referência:</label>
-    <input type="text" id="searchReference" placeholder="Buscar..." onkeyup="updateReferenceFilter()">
-</div>
+                        <label for="searchClient">🔍 Cliente:</label>
+                        <input type="text" id="searchClient" placeholder="Buscar..." onkeyup="updateClientFilter()">
+                    </div>
                     <div class="filter-group">
                         <label for="filterTipoServico">🚗 Tipo Serviço:</label>
                         <select id="filterTipoServico" onchange="updateServiceTypeFilter()">
@@ -1822,7 +1816,6 @@
                         <thead>
                             <tr>
                                 <th>🆔 ID</th>
-                                <th>📋 Referência</th>
                                 <th>👤 Cliente</th>
                                 <th>🚗 Tipo</th>
                                 <th>👥 Pessoas</th>
@@ -1875,17 +1868,15 @@
         let lastSyncTime = null;
         let serverData = [];
         let nextAvailableId = 1;
-        let referenciaAtual = '';
-
+        
         let activeFilters = {
-    dateStart: null,
-    dateEnd: null,
-    status: '',
-    cliente: '',
-    referencia: '',
-    quickPeriod: '',
-    tipoServico: ''
-};
+            dateStart: null,
+            dateEnd: null,
+            status: '',
+            cliente: '',
+            quickPeriod: '',
+            tipoServico: ''
+        };
         
         let filteredData = [];
         let isFiltering = false;
@@ -1896,7 +1887,7 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzKYTAi5v-UY6yBefEdoXLJnZeYzaal9f3AKTn6OhIat038maK9QYm1SlYROsS5cd6IbA/exec';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyfmnqCrFaJsNewsxBI_1Zph5omrV1hETNgmyWmtmK248iQD2Ouho0bcFgUEAdZcJ5dAA/exec';
         const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
         const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
         
@@ -2495,8 +2486,7 @@
 
                 const convertedData = {
                     id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
-                    referencia: getValue(serverItem, ['Referencia', 'Referência', 'Reference', 'referencia', 'B'], ''),
-                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente', 'C'], 'Cliente não informado'),
+                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
                     tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
                     tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
                     numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
@@ -2691,11 +2681,10 @@
                 console.log('Tentando enviar para Google Sheets:', serviceData);
                 try {
                     const dataWithEmail = {
-    ...serviceData,
-    referencia: serviceData.referencia || '',
-    emailDestino: TEST_EMAIL,
-    action: 'addTransfer'
-};
+                        ...serviceData,
+                        emailDestino: TEST_EMAIL,
+                        action: 'addTransfer'
+                    };
                     
                     const response = await fetch(url, {
                         method: 'POST',
@@ -3245,14 +3234,9 @@
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
                 row.innerHTML = `
-    <td><strong>#${service.id}</strong></td>
-    <td>
-        <div style="font-weight: 600; color: #6c757d; font-size: 0.9rem;">
-            ${service.referencia || '-'}
-        </div>
-    </td>
-    <td>
-        <div class="client-info">${service.nomeCliente}</div>
+                    <td><strong>#${service.id}</strong></td>
+                    <td>
+                        <div class="client-info">${service.nomeCliente}</div>
                         <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
                     </td>
                     <td>${tipoLabel}</td>
@@ -3509,14 +3493,6 @@
             applyCurrentFilters();
         }
 
-function updateReferenceFilter() {
-    const referenceFilter = document.getElementById('searchReference');
-    activeFilters.referencia = referenceFilter ? referenceFilter.value : '';
-    
-    saveFilters();
-    applyCurrentFilters();
-}
-
         function applyAllFilters() {
             console.log('Aplicando todos os filtros:', activeFilters);
             applyCurrentFilters();
@@ -3565,13 +3541,6 @@ function updateReferenceFilter() {
                     );
                 }
                 
-                if (activeFilters.referencia) {
-    const searchTerm = activeFilters.referencia.toLowerCase();
-    filtered = filtered.filter(service =>
-        (service.referencia || '').toLowerCase().includes(searchTerm)
-    );
-}
-
                 if (activeFilters.tipoServico) {
                     filtered = filtered.filter(service =>
                         service.tipoServico === activeFilters.tipoServico
@@ -3641,14 +3610,9 @@ function updateReferenceFilter() {
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
                 row.innerHTML = `
-    <td><strong>#${service.id || 'N/A'}</strong></td>
-    <td>
-        <div style="font-weight: 600; color: #6c757d; font-size: 0.9rem;">
-            ${service.referencia || '-'}
-        </div>
-    </td>
-    <td>
-        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
+                    <td><strong>#${service.id || 'N/A'}</strong></td>
+                    <td>
+                        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
                         <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
                     </td>
                     <td>${tipoLabel}</td>
@@ -3876,7 +3840,6 @@ function parseServiceDate(dateStr) {
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
 
             const formData = {
-                referencia: document.getElementById('referencia').value.trim(),
                 nomeCliente: document.getElementById('nomeCliente').value.trim(),
                 tipoServico: currentServiceType,
                 tourSelecionado: document.getElementById('tourSelecionado').value,
@@ -3897,13 +3860,6 @@ function parseServiceDate(dateStr) {
                 observacoes: document.getElementById('observacoes').value.trim(),
                 status: 'Solicitado'
             };
-
-
- // DEBUG: Log dos dados antes do envio
-            console.log('🔍 DEBUG FRONTEND - Dados do formulário:');
-            console.log('Referência digitada:', document.getElementById('referencia').value);
-            console.log('Referência após trim:', document.getElementById('referencia').value.trim());
-            console.log('FormData completo:', formData);
 
             try {
                 if (editingId) {
@@ -4009,45 +3965,44 @@ function parseServiceDate(dateStr) {
         }
 
         function clearForm() {
-    try {
-        document.getElementById('transferForm').reset();
-        
-        document.getElementById('referencia').value = '';
-        document.getElementById('numeroPessoas').value = '';
-        document.getElementById('numeroBagagens').value = '0';
-        document.getElementById('modoPagamento').value = '';
-        document.getElementById('pagoParaQuem').value = '';
-        document.getElementById('observacoes').value = '';
-        document.getElementById('tourSelecionado').value = '';
-        
-        currentServiceType = 'transfer';
-        precoUnitarioAtual = 0;
-        
-        document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to, .btn-obs, .btn-service').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        document.getElementById('tourSelector').classList.remove('show');
-        document.getElementById('priceCalculationBox').classList.remove('show');
-        
-        document.querySelector('.btn-service').classList.add('active');
-        
-        editingId = null;
-        document.getElementById('submitBtn').textContent = 'Solicitar Transfer';
-        
-        if (phoneInput) {
-            phoneInput.setNumber('');
+            try {
+                document.getElementById('transferForm').reset();
+                
+                document.getElementById('numeroPessoas').value = '';
+                document.getElementById('numeroBagagens').value = '0';
+                document.getElementById('modoPagamento').value = '';
+                document.getElementById('pagoParaQuem').value = '';
+                document.getElementById('observacoes').value = '';
+                document.getElementById('tourSelecionado').value = '';
+                
+                currentServiceType = 'transfer';
+                precoUnitarioAtual = 0;
+                
+                document.querySelectorAll('.btn-people, .btn-baggage, .btn-date, .btn-time, .origem-btn, .destino-btn, .btn-price, .btn-payment, .btn-payment-to, .btn-obs, .btn-service').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                document.getElementById('tourSelector').classList.remove('show');
+                document.getElementById('priceCalculationBox').classList.remove('show');
+                
+                document.querySelector('.btn-service').classList.add('active');
+                
+                editingId = null;
+                document.getElementById('submitBtn').textContent = 'Solicitar Transfer';
+                
+                if (phoneInput) {
+                    phoneInput.setNumber('');
+                }
+                
+                document.getElementById('data').valueAsDate = new Date();
+                
+                console.log('Formulário limpo com sucesso');
+                
+            } catch (error) {
+                console.error('Erro ao limpar formulário:', error);
+                showStatus('Erro ao limpar formulário', 'error');
+            }
         }
-        
-        document.getElementById('data').valueAsDate = new Date();
-        
-        console.log('Formulário limpo com sucesso');
-        
-    } catch (error) {
-        console.error('Erro ao limpar formulário:', error);
-        showStatus('Erro ao limpar formulário', 'error');
-    }
-}
 
         function getNextSyncedId() {
             const localIds = services.map(s => parseInt(s.id)).filter(id => !isNaN(id));
@@ -4070,7 +4025,7 @@ function parseServiceDate(dateStr) {
             }
 
             try {
-                document.getElementById('referencia').value = service.referencia || '';
+                document.getElementById('nomeCliente').value = service.nomeCliente;
                 document.getElementById('numeroPessoas').value = service.numeroPessoas;
                 document.getElementById('numeroBagagens').value = service.numeroBagagens;
                 document.getElementById('data').value = service.data;
@@ -4221,7 +4176,7 @@ function parseServiceDate(dateStr) {
 
             try {
                 const headers = [
-                    'ID', 'Referencia', 'Cliente', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens',
+                    'ID', 'Cliente', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
                     'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor Total', 
                     'Valor Hotel', 'Valor HUB', 'Comissão Recepção', 'Pagamento', 'Pago Para', 
                     'Status', 'Observações', 'Data Criação'
@@ -4232,7 +4187,6 @@ function parseServiceDate(dateStr) {
                 services.forEach(service => {
                     const row = [
                         service.id,
-                        `"${service.referencia || ''}"`,
                         `"${service.nomeCliente}"`,
                         `"${service.tipoServico || 'Transfer'}"`,
                         `"${service.tourSelecionado || ''}"`,
