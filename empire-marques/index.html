@@ -3898,6 +3898,13 @@ function parseServiceDate(dateStr) {
                 status: 'Solicitado'
             };
 
+
+ // DEBUG: Log dos dados antes do envio
+            console.log('🔍 DEBUG FRONTEND - Dados do formulário:');
+            console.log('Referência digitada:', document.getElementById('referencia').value);
+            console.log('Referência após trim:', document.getElementById('referencia').value.trim());
+            console.log('FormData completo:', formData);
+
             try {
                 if (editingId) {
                     const index = services.findIndex(s => s.id === editingId);
