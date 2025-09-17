@@ -319,9 +319,11 @@
         }
 
         .tour-selector {
-            display: none;
-            margin-bottom: 15px;
-        }
+    display: none;
+    margin-bottom: 15px;
+    grid-column: 1 / -1;
+    width: 100%;
+}
 
         .tour-selector.show {
             display: block;
@@ -1452,9 +1454,9 @@
                         </div>
                     </div>
                     
-                    <div class="form-group tour-selector" id="tourSelector">
-                        <label for="tourSelecionado">🎯 Selecione o Tour</label>
-                        <select id="tourSelecionado" onchange="updateTourPrice()">
+                    <div class="form-group tour-selector" id="tourSelector" style="grid-column: 1 / -1;">
+    <label for="tourSelecionado">🎯 Selecione o Tour</label>
+    <select id="tourSelecionado" onchange="updateTourPrice()">
                             <option value="">Escolha o tour...</option>
                             <optgroup label="🌟 Tours Regulares (Por Pessoa)">
                                 <option value="tour-sintra-cascais" data-price="67" data-type="regular">
