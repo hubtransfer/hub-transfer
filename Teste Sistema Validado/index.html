@@ -1671,7 +1671,7 @@
                     <!-- Campos Admin -->
                     <div class="admin-fields" id="adminFields">
                         <div class="calculation-row">
-                            <span class="calculation-label">🏨 Valor Empire Marques Hotel (30%):</span>
+                            <span class="calculation-label">🏨 Valor Hotel (30%):</span>
                             <span class="calculation-value" id="calcHotel">€0</span>
                         </div>
                         <div class="calculation-row">
@@ -2123,7 +2123,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 
                 const testData = {
                     action: 'test',
-                    message: 'Sistema Empire Marques funcionando',
+                    message: 'TESTE Sistema funcionando',
                     timestamp: new Date().toISOString()
                 };
                 
@@ -2170,7 +2170,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             
             if (locationLower.includes('aeroporto') || locationLower.includes('airport')) {
                 return '✈️';
-            } else if (locationLower.includes('hotel') || locationLower.includes('empire')) {
+            } else if (locationLower.includes('hotel')) {
                 return '🏨';
             } else if (locationLower.includes('estação') || locationLower.includes('train')) {
                 return '🚂';
@@ -2502,8 +2502,8 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                         'Preco Cliente', 'Total', 'valor_total'
                     ], 0),
                     valorHotel: getNumericValue(serverItem, [
-                        'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Impire Marques Hotel (€)',
-                        'Valor Empire', 'valor_hotel'
+                        'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Hotel (€)',
+                        'Valor Hotel', 'valor_hotel'
                     ], 0),
                     valorHUB: getNumericValue(serverItem, [
                         'Valor HUB', 'Valor_HUB', 'ValorHUB', 'Valor HUB Transfer (€)',
@@ -3199,7 +3199,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 if (service.tipoServico && (service.tipoServico.includes('Tour') || service.tipoServico === 'tour')) {
                     rowBackgroundClass = 'tour-row';
                 } else if (service.origem && service.origem.toLowerCase().includes('aeroporto') && 
-                           service.destino && service.destino.toLowerCase().includes('empire')) {
+           service.destino && service.destino.toLowerCase().includes('hotel')) {
                     rowBackgroundClass = 'airport-to-hotel-row';
                 }
                 
