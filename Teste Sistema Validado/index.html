@@ -3240,10 +3240,9 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                                    service.status === 'Confirmado' ? '✅' :
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
-                const referenciaDisplay = service.referencia && service.referencia.trim() !== '' ? 
-    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia}</span>` : 
+                const referenciaDisplay = service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '' ? 
+    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
     '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
-
 row.innerHTML = `
     <td><strong>#${service.id}</strong></td>
     <td>
