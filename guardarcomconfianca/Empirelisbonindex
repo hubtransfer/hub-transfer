@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Parceria - Empire Marques Hotel & HUB Transfer</title>
+    <title>Sistema de Parceria - Empire Lisbon Hotel & HUB Transfer</title>
     
     <!-- Google Maps API -->
     <script>
@@ -1372,14 +1372,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Sistema de Parceria</h1>
-            <p>Gestão de Transfers - Colaboração Empresarial</p>
-            <div class="company-logos">
-                <div class="company-logo">🏨 Empire Marques Hotel</div>
-                <div class="company-logo">🚗 HUB Transfer</div>
-            </div>
-        </div>
-
+    <h1>Sistema de Parceria</h1>
+    <p>Gestão de Transfers - Colaboração Empresarial</p>
+    <div class="company-logos">
+        <div class="company-logo">🏨 Empire Lisbon Hotel</div>
+        <div class="company-logo">🚗 HUB Transfer</div>
+    </div>
+</div>
         <!-- Indicador de Sincronização -->
         <div class="sync-indicator" id="syncIndicator">🔄 Sincronizando...</div>
 
@@ -1390,8 +1389,8 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-                           value="https://script.google.com/macros/s/AKfycbwOO1hyPdmyMMH1qp6DK_gRl7qdnGFfx2TfJ6DEuMpBa178GxYYqzwAwBwHLbkVqFeXqg/exec" 
-                           placeholder="https://script.google.com/macros/s/...">
+       value="https://script.google.com/macros/s/AKfycbymUO8Bn25fIQb9TmDbB0qEJHt52qLPGdze6Y7Bvn36kwGkle7qvFsKRMXFgEF37urcow/exec" 
+       placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     ✅ Testar Conexão
@@ -1565,9 +1564,9 @@
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Marques Hotel')">
-                                🏨 Empire Marques Hotel
-                            </button>
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Lisbon Hotel')">
+    🏨 Empire Lisbon Hotel
+</button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
                     </div>
@@ -1575,9 +1574,9 @@
                     <div class="form-group">
                         <label for="destino">🎯 Local de Destino *</label>
                         <div class="location-buttons">
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Marques Hotel')">
-                                🏨 Empire Marques Hotel
-                            </button>
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Lisbon Hotel')">
+    🏨 Empire Lisbon Hotel
+</button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
@@ -1887,9 +1886,9 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwOO1hyPdmyMMH1qp6DK_gRl7qdnGFfx2TfJ6DEuMpBa178GxYYqzwAwBwHLbkVqFeXqg/exec';
-        const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
-        const SPREADSHEET_ID = '1ZfG_IXBWMbGQzCmn7nWNzFqUBbGkXCXWSnY7JYziHxI';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbymUO8Bn25fIQb9TmDbB0qEJHt52qLPGdze6Y7Bvn36kwGkle7qvFsKRMXFgEF37urcow/exec';
+const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
+const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
         
         // TOURS E PREÇOS
         const TOURS_DATA = {
@@ -4215,7 +4214,7 @@ function parseServiceDate(dateStr) {
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', `transfers_Empire_marques_hub_${new Date().toISOString().split('T')[0]}.csv`);
+                link.setAttribute('download', `transfers_Empire_lisbon_hub_${new Date().toISOString().split('T')[0]}.csv`);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
