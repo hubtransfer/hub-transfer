@@ -539,13 +539,13 @@ const STYLES = {
   
   // Formatações de Células
   FORMATS: {
-    MOEDA: '€#,##0.00',
-    DATA: 'dd/mm/yyyy',
-    HORA: 'hh:mm',
-    TIMESTAMP: 'dd/mm/yyyy hh:mm',
-    NUMERO: '0',
-    PERCENTUAL: '0.00%'
-  }
+  MOEDA: '€#,##0.00',
+  DATA: 'dd/mm/yyyy',
+  HORA: '@',
+  TIMESTAMP: 'dd/mm/yyyy hh:mm',
+  NUMERO: '@',
+  PERCENTUAL: '0.00%'
+}
 };
 
 // ===================================================
@@ -1467,6 +1467,119 @@ function processarHorariosDinamicamente() {
 }
 
 /**
+ * Força colunas D, E e K como texto simples em todas as abas
+ */
+function forcarColunasComoTexto() {
+  logger.info('Forçando colunas D, E e K como texto em todas as abas');
+  
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheets = ss.getSheets();
+    let abasProcessadas = 0;
+    let registrosConvertidos = 0;
+    
+    sheets.forEach(sheet => {
+      const nome = sheet.getName();
+      
+      // Processar abas de transfers
+      if (nome === CONFIG.SHEET_NAME || 
+          nome === CONFIG.PRICING_SHEET_NAME ||
+          nome.startsWith(CONFIG.SISTEMA.PREFIXO_MES)) {
+        
+        const lastRow = sheet.getLastRow();
+        
+        // Formatar colunas INTEIRAS como texto
+        sheet.getRange('D:D').setNumberFormat('@'); // Pessoas
+        sheet.getRange('E:E').setNumberFormat('@'); // Bagagens  
+        sheet.getRange('K:K').setNumberFormat('@'); // Hora
+        
+        if (lastRow > 1) {
+          // Converter dados existentes para texto
+          const rangePessoas = sheet.getRange(2, 4, lastRow - 1, 1);
+          const rangeBagagens = sheet.getRange(2, 5, lastRow - 1, 1);
+          const rangeHorarios = sheet.getRange(2, 11, lastRow - 1, 1);
+          
+          // Processar pessoas (coluna D)
+          const valoresPessoas = rangePessoas.getValues();
+          valoresPessoas.forEach((linha, index) => {
+            const valor = linha[0];
+            if (valor !== null && valor !== undefined && valor !== '') {
+              const textoValor = valor.toString();
+              if (textoValor !== valor) {
+                sheet.getRange(index + 2, 4).setValue(textoValor);
+                registrosConvertidos++;
+              }
+            }
+          });
+          
+          // Processar bagagens (coluna E)
+          const valoresBagagens = rangeBagagens.getValues();
+          valoresBagagens.forEach((linha, index) => {
+            const valor = linha[0];
+            if (valor !== null && valor !== undefined && valor !== '') {
+              const textoValor = valor.toString();
+              if (textoValor !== valor) {
+                sheet.getRange(index + 2, 5).setValue(textoValor);
+                registrosConvertidos++;
+              }
+            }
+          });
+          
+          // Processar horários (coluna K)
+          const valoresHorarios = rangeHorarios.getValues();
+          valoresHorarios.forEach((linha, index) => {
+            const valor = linha[0];
+            if (valor) {
+              let textoHorario = '';
+              
+              if (valor instanceof Date) {
+                const h = valor.getHours().toString().padStart(2, '0');
+                const m = valor.getMinutes().toString().padStart(2, '0');
+                textoHorario = `${h}:${m}`;
+              } else {
+                textoHorario = valor.toString();
+                // Garantir formato HH:MM
+                const match = textoHorario.match(/(\d{1,2}):(\d{2})/);
+                if (match) {
+                  textoHorario = `${match[1].padStart(2, '0')}:${match[2]}`;
+                }
+              }
+              
+              if (textoHorario !== valor.toString()) {
+                sheet.getRange(index + 2, 11).setValue(textoHorario);
+                registrosConvertidos++;
+              }
+            }
+          });
+        }
+        
+        abasProcessadas++;
+        logger.debug('Aba processada', { nome, abasProcessadas });
+      }
+    });
+    
+    logger.success('Colunas D, E e K formatadas como texto', { 
+      abasProcessadas, 
+      registrosConvertidos 
+    });
+    
+    return {
+      sucesso: true,
+      abasProcessadas: abasProcessadas,
+      registrosConvertidos: registrosConvertidos,
+      mensagem: `Colunas D, E e K formatadas como texto em ${abasProcessadas} abas`
+    };
+    
+  } catch (error) {
+    logger.error('Erro ao formatar colunas como texto', error);
+    return {
+      sucesso: false,
+      erro: error.message
+    };
+  }
+}
+
+/**
  * Função auxiliar para validar formato de horário
  */
 function validarFormatoHorario(horario) {
@@ -1803,15 +1916,16 @@ function aplicarFormatacaoMensal(sheet) {
       // Formatação de data (coluna F) - ATUALIZADO
       sheet.getRange(2, 6, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.DATA);
       
-      // Formatação de hora (coluna K) - ATUALIZADO
-      sheet.getRange(2, 11, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.HORA);
+      // Formatação de hora (coluna K) - FORÇAR COMO TEXTO
+      sheet.getRange(2, 11, maxRows - 1, 1).setNumberFormat('@');
       
       // Formatação de timestamp (coluna T) - ATUALIZADO
       sheet.getRange(2, 20, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.TIMESTAMP);
       
-      // Formatação de números (colunas A, D, E) - ATUALIZADO
-      sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.NUMERO);
-      sheet.getRange(2, 4, maxRows - 1, 2).setNumberFormat(STYLES.FORMATS.NUMERO);
+      // Formatação de números como TEXTO (colunas A, D, E) - FRONTEND COMPATÍVEL
+      sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat('@'); // ID como texto
+      sheet.getRange(2, 4, maxRows - 1, 1).setNumberFormat('@'); // Pessoas como texto
+      sheet.getRange(2, 5, maxRows - 1, 1).setNumberFormat('@'); // Bagagens como texto
     }
     
     // Aplicar cores alternadas
@@ -5124,12 +5238,12 @@ function processarNovoTransfer(dadosRecebidos) {
       dados.tipoServico || 'Transfer',     // C - Tipo Serviço
       dados.numeroPessoas,                 // D - Pessoas
       dados.numeroBagagens,                // E - Bagagens
-      new Date(dados.data),                // F - Data ← CORREÇÃO APLICADA
+      new Date(dados.data),                // F - Data
       formatPhoneNumber(dados.contacto),   // G - Contacto
       dados.numeroVoo || '',               // H - Voo
       dados.origem,                        // I - Origem
       dados.destino,                       // J - Destino
-      dados.horaPickup,                    // K - Hora Pick-up
+      validarEFormatarHora(dados.horaPickup), // K - Hora Pick-up ← CORREÇÃO APLICADA
       valores.precoCliente,                // L - Preço Cliente
       valores.valorHotel,                  // M - Valor Hotel
       valores.valorHUB,                    // N - Valor HUB
@@ -6384,85 +6498,87 @@ function aplicarFormatacao(sheet) {
       // Data (coluna F)
       sheet.getRange(2, 6, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.DATA);
       
-      // Hora (coluna K)
-      sheet.getRange(2, 11, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.HORA);
+      // Hora (coluna K) - FORÇAR COMO TEXTO
+      sheet.getRange(2, 11, maxRows - 1, 1).setNumberFormat('@');
       
       // Timestamp (coluna T)
       sheet.getRange(2, 20, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.TIMESTAMP);
       
-// Números (colunas A, D, E)
-     sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.NUMERO);
-     sheet.getRange(2, 4, maxRows - 1, 2).setNumberFormat(STYLES.FORMATS.NUMERO);
-   }
-   
-   // Aplicar validações
-   aplicarValidacoesPlanilha(sheet);
-   
-   logger.debug('Formatação aplicada com sucesso');
-   
- } catch (error) {
-   logger.error('Erro ao aplicar formatação', error);
- }
+      // Números como TEXTO (colunas A, D, E) - FRONTEND COMPATÍVEL
+      sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat('@'); // ID como texto
+      sheet.getRange(2, 4, maxRows - 1, 1).setNumberFormat('@'); // Pessoas como texto
+      sheet.getRange(2, 5, maxRows - 1, 1).setNumberFormat('@'); // Bagagens como texto
+    }
+    
+    // Aplicar validações
+    aplicarValidacoesPlanilha(sheet);
+    
+    logger.debug('Formatação aplicada com sucesso');
+    
+  } catch (error) {
+    logger.error('Erro ao aplicar formatação', error);
+  }
 }
 
 /**
-* Aplica formatação na tabela de preços (ATUALIZADO PARA CÓDIGO NOVO)
-* @param {Sheet} sheet - Planilha de preços
-*/
+ * Aplica formatação na tabela de preços (ATUALIZADO PARA CÓDIGO NOVO)
+ * @param {Sheet} sheet - Planilha de preços
+ */
 function aplicarFormatacaoPrecos(sheet) {
- logger.debug('Aplicando formatação na tabela de preços');
- 
- try {
-   // Larguras das colunas
-   STYLES.COLUMN_WIDTHS.PRECOS.forEach((width, index) => {
-     sheet.setColumnWidth(index + 1, width);
-   });
-   
-   // Headers
-   const headerRange = sheet.getRange(1, 1, 1, PRICING_HEADERS.length);
-   headerRange
-     .setBackground(STYLES.HEADER_COLORS.PRECOS)
-     .setFontColor('#ffffff')
-     .setFontWeight('bold')
-     .setFontSize(11)
-     .setHorizontalAlignment('center')
-     .setVerticalAlignment('middle');
-   
-   sheet.setFrozenRows(1);
-   
-   const maxRows = Math.max(sheet.getMaxRows(), 500);
-   
-   if (maxRows > 1) {
-     // Formatação monetária (colunas H, I, J, K, L, M)
-     sheet.getRange(2, 8, maxRows - 1, 6).setNumberFormat(STYLES.FORMATS.MOEDA);
-     
-     // Timestamp (coluna O)
-     sheet.getRange(2, 15, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.TIMESTAMP);
-     
-     // Números (colunas A, F, G)
-     sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.NUMERO);
-     sheet.getRange(2, 6, maxRows - 1, 2).setNumberFormat(STYLES.FORMATS.NUMERO);
-     
-     // Validação Tipo de Serviço (coluna B)
-     const tipoValidation = SpreadsheetApp.newDataValidation()
-       .requireValueInList(VALIDACOES.VALORES_PERMITIDOS.TIPO_SERVICO)
-       .setAllowInvalid(false)
-       .build();
-     sheet.getRange(2, 2, maxRows - 1, 1).setDataValidation(tipoValidation);
-     
-     // Validação Ativo/Inativo (coluna N)
-     const ativoValidation = SpreadsheetApp.newDataValidation()
-       .requireValueInList(['Sim', 'Não'])
-       .setAllowInvalid(false)
-       .build();
-     sheet.getRange(2, 14, maxRows - 1, 1).setDataValidation(ativoValidation);
-   }
-   
-   logger.debug('Formatação de preços aplicada');
-   
- } catch (error) {
-   logger.error('Erro ao aplicar formatação de preços', error);
- }
+  logger.debug('Aplicando formatação na tabela de preços');
+  
+  try {
+    // Larguras das colunas
+    STYLES.COLUMN_WIDTHS.PRECOS.forEach((width, index) => {
+      sheet.setColumnWidth(index + 1, width);
+    });
+    
+    // Headers
+    const headerRange = sheet.getRange(1, 1, 1, PRICING_HEADERS.length);
+    headerRange
+      .setBackground(STYLES.HEADER_COLORS.PRECOS)
+      .setFontColor('#ffffff')
+      .setFontWeight('bold')
+      .setFontSize(11)
+      .setHorizontalAlignment('center')
+      .setVerticalAlignment('middle');
+    
+    sheet.setFrozenRows(1);
+    
+    const maxRows = Math.max(sheet.getMaxRows(), 500);
+    
+    if (maxRows > 1) {
+      // Formatação monetária (colunas H, I, J, K, L, M)
+      sheet.getRange(2, 8, maxRows - 1, 6).setNumberFormat(STYLES.FORMATS.MOEDA);
+      
+      // Timestamp (coluna O)
+      sheet.getRange(2, 15, maxRows - 1, 1).setNumberFormat(STYLES.FORMATS.TIMESTAMP);
+      
+      // Números como TEXTO (colunas A, F, G) - FRONTEND COMPATÍVEL
+      sheet.getRange(2, 1, maxRows - 1, 1).setNumberFormat('@'); // ID como texto
+      sheet.getRange(2, 6, maxRows - 1, 1).setNumberFormat('@'); // Pessoas como texto
+      sheet.getRange(2, 7, maxRows - 1, 1).setNumberFormat('@'); // Bagagens como texto
+      
+      // Validação Tipo de Serviço (coluna B)
+      const tipoValidation = SpreadsheetApp.newDataValidation()
+        .requireValueInList(VALIDACOES.VALORES_PERMITIDOS.TIPO_SERVICO)
+        .setAllowInvalid(false)
+        .build();
+      sheet.getRange(2, 2, maxRows - 1, 1).setDataValidation(tipoValidation);
+      
+      // Validação Ativo/Inativo (coluna N)
+      const ativoValidation = SpreadsheetApp.newDataValidation()
+        .requireValueInList(['Sim', 'Não'])
+        .setAllowInvalid(false)
+        .build();
+      sheet.getRange(2, 14, maxRows - 1, 1).setDataValidation(ativoValidation);
+    }
+    
+    logger.debug('Formatação de preços aplicada');
+    
+  } catch (error) {
+    logger.error('Erro ao aplicar formatação de preços', error);
+  }
 }
 
 /**
