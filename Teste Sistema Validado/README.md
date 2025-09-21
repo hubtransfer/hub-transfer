@@ -12,7 +12,7 @@ Sistema desenvolvido para testes de gestão de transfers da **HUB Transfer**.
 - **Integração** com Google Sheets
 
 ### 🔗 Links de Acesso
-- **Sistema Online**: [Acessar TESTE Sistema](https://hubtransfer.github.io/hub-transfer/teste-sistema/)
+- **Sistema Online**: [Acessar TESTE Sistema](https://hubtransfer.github.io/hub-transfer/Teste%20Sistema%20Validado/)
 - **Planilha Google Sheets**: [Abrir Planilha TESTE](https://docs.google.com/spreadsheets/d/15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI/)
 
 ### 👥 Contatos
