@@ -1429,9 +1429,14 @@
             <form id="transferForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="nomeCliente">👤 Nome do Cliente *</label>
-                        <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
-                    </div>
+    <label for="nomeCliente">👤 Nome do Cliente *</label>
+    <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+</div>
+
+<div class="form-group">
+    <label for="referencia">📋 Referência da Reserva</label>
+    <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
+</div>
                     
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
@@ -1816,6 +1821,7 @@
                         <thead>
                             <tr>
                                 <th>🆔 ID</th>
+                                <th>📋 Ref</th>
                                 <th>👤 Cliente</th>
                                 <th>🚗 Tipo</th>
                                 <th>👥 Pessoas</th>
@@ -1837,7 +1843,7 @@
                         </thead>
                         <tbody id="servicesTableBody">
                             <tr>
-                                <td colspan="18" class="empty-state">
+                                <td colspan="19" class="empty-state">
                                     <h3>📭 Nenhum serviço cadastrado</h3>
                                     <p>Use o botão "📥 Carregar Transfers" para sincronizar com o Google Sheets</p>
                                 </td>
@@ -2487,6 +2493,7 @@
                 const convertedData = {
                     id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
                     nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
+                    referencia: getValue(serverItem, ['Referência', 'Referencia', 'Ref', 'referencia', 'Coluna U'], ''),
                     tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
                     tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
                     numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
@@ -3180,7 +3187,7 @@
             if (services.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="18" class="empty-state">
+                        <td colspan="19" class="empty-state">
                             <h3>📭 Nenhum serviço cadastrado</h3>
                             <p>Use o botão "📥 Carregar Transfers" para sincronizar com o Google Sheets</p>
                         </td>
@@ -3233,12 +3240,19 @@
                                    service.status === 'Confirmado' ? '✅' :
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
-                row.innerHTML = `
-                    <td><strong>#${service.id}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
-                    </td>
+                const referenciaDisplay = (service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '') ? 
+    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
+    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
+
+row.innerHTML = `
+    <td><strong>#${service.id}</strong></td>
+    <td>
+        <div style="text-align: center;">${referenciaDisplay}</div>
+    </td>
+    <td>
+        <div class="client-info">${service.nomeCliente}</div>
+        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
+    </td>
                     <td>${tipoLabel}</td>
                     <td>
                         <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
@@ -3567,7 +3581,7 @@
             if (sortedServices.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="18" class="empty-state">
+                        <td colspan="19" class="empty-state">
                             <h3>🔍 Nenhum transfer encontrado</h3>
                             <p>Tente ajustar os filtros ou carregar dados do Google Sheets</p>
                             <button class="btn btn-primary" onclick="clearAllFilters()">🗑️ Limpar Filtros</button>
@@ -3609,12 +3623,19 @@
                                    service.status === 'Confirmado' ? '✅' :
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
-                row.innerHTML = `
-                    <td><strong>#${service.id || 'N/A'}</strong></td>
-                    <td>
-                        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
-                    </td>
+                const referenciaDisplay = (service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '') ? 
+    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
+    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
+
+row.innerHTML = `
+    <td><strong>#${service.id || 'N/A'}</strong></td>
+    <td>
+        <div style="text-align: center;">${referenciaDisplay}</div>
+    </td>
+    <td>
+        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
+        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
+    </td>
                     <td>${tipoLabel}</td>
                     <td>
                         <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
@@ -3840,8 +3861,9 @@ function parseServiceDate(dateStr) {
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
 
             const formData = {
-                nomeCliente: document.getElementById('nomeCliente').value.trim(),
-                tipoServico: currentServiceType,
+            nomeCliente: document.getElementById('nomeCliente').value.trim(),
+            referencia: document.getElementById('referencia').value.trim(),
+            tipoServico: currentServiceType,
                 tourSelecionado: document.getElementById('tourSelecionado').value,
                 numeroPessoas: pessoas,
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
@@ -3967,7 +3989,8 @@ function parseServiceDate(dateStr) {
         function clearForm() {
             try {
                 document.getElementById('transferForm').reset();
-                
+
+                document.getElementById('referencia').value = '';
                 document.getElementById('numeroPessoas').value = '';
                 document.getElementById('numeroBagagens').value = '0';
                 document.getElementById('modoPagamento').value = '';
@@ -4026,6 +4049,7 @@ function parseServiceDate(dateStr) {
 
             try {
                 document.getElementById('nomeCliente').value = service.nomeCliente;
+                document.getElementById('referencia').value = service.referencia || '';
                 document.getElementById('numeroPessoas').value = service.numeroPessoas;
                 document.getElementById('numeroBagagens').value = service.numeroBagagens;
                 document.getElementById('data').value = service.data;
@@ -4176,7 +4200,7 @@ function parseServiceDate(dateStr) {
 
             try {
                 const headers = [
-                    'ID', 'Cliente', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
+                    'ID', 'Cliente', 'Referência', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
                     'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor Total', 
                     'Valor Hotel', 'Valor HUB', 'Comissão Recepção', 'Pagamento', 'Pago Para', 
                     'Status', 'Observações', 'Data Criação'
@@ -4186,8 +4210,9 @@ function parseServiceDate(dateStr) {
                 
                 services.forEach(service => {
                     const row = [
-                        service.id,
+                    service.id,
                         `"${service.nomeCliente}"`,
+                        `"${service.referencia || ''}"`,
                         `"${service.tipoServico || 'Transfer'}"`,
                         `"${service.tourSelecionado || ''}"`,
                         service.numeroPessoas,
