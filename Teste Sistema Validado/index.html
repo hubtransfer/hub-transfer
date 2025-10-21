@@ -2601,40 +2601,77 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         // SINCRONIZAÇÃO COM SERVIDOR
         // =====================================================
         async function syncWithServer(showLoading = true) {
-            if (syncInProgress) {
-                console.log('Sincronização já em andamento...');
-                return false;
+    if (syncInProgress) {
+        console.log('⏳ Sincronização já em andamento...');
+        return false;
+    }
+    
+    syncInProgress = true;
+    
+    if (showLoading) {
+        showSyncLoading(true);
+    }
+    
+    try {
+        // PASSO 1: Buscar mudanças pendentes do backend
+        console.log('🔄 PASSO 1: Verificando mudanças no backend...');
+        const mudancas = await buscarMudancasPendentes();
+        
+        let updatesCount = 0;
+        if (mudancas.success && mudancas.changes && mudancas.changes.length > 0) {
+            console.log(`🔄 ${mudancas.changes.length} mudanças detectadas no backend`);
+            
+            // Aplicar mudanças aos transfers existentes
+            mudancas.changes.forEach(change => {
+                const updated = atualizarTransferNoFrontend(
+                    change.transferId, 
+                    change.campo, 
+                    change.novoValor
+                );
+                if (updated) updatesCount++;
+            });
+            
+            if (updatesCount > 0) {
+                console.log(`✅ ${updatesCount} transfers atualizados com mudanças do backend`);
             }
             
-            syncInProgress = true;
-            
-            if (showLoading) {
-                showSyncLoading(true);
-            }
-            
-            try {
-                const result = await loadTransfersFromSheets();
-                
-                if (result) {
-                    showSyncSuccess(services.length);
-                    return true;
-                } else {
-                    showSyncError('Falha na sincronização com Google Sheets');
-                    return false;
-                }
-                
-            } catch (error) {
-                console.error('Erro na sincronização:', error);
-                showSyncError(error.message);
-                return false;
-                
-            } finally {
-                syncInProgress = false;
-                if (showLoading) {
-                    showSyncLoading(false);
-                }
-            }
+            // Marcar mudanças como sincronizadas
+            await marcarMudancasComoSincronizadas(mudancas.changes.map(c => c.rowIndex));
         }
+        
+        // PASSO 2: Carregar todos os dados do Google Sheets
+        console.log('🔄 PASSO 2: Carregando dados completos do Google Sheets...');
+        const result = await loadTransfersFromSheets();
+        
+        if (result) {
+            // Salvar e renderizar
+            saveData();
+            renderTable();
+            updateSummary();
+            
+            const mensagem = updatesCount > 0 
+                ? `${services.length} transfers carregados + ${updatesCount} atualizações do backend sincronizadas!`
+                : `${services.length} transfers sincronizados com sucesso!`;
+            
+            showSyncSuccess(mensagem);
+            return true;
+        } else {
+            showSyncError('Falha na sincronização com Google Sheets');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização:', error);
+        showSyncError(error.message);
+        return false;
+        
+    } finally {
+        syncInProgress = false;
+        if (showLoading) {
+            showSyncLoading(false);
+        }
+    }
+}
 
         function showSyncLoading(show) {
             const button = document.getElementById('syncBtn');
@@ -2656,11 +2693,14 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             }
         }
 
-        function showSyncSuccess(count) {
-            showStatus(`${count} transfers sincronizados com sucesso!`, 'success');
-            updateLastSyncDisplay();
-        }
-
+        function showSyncSuccess(message) {
+    if (typeof message === 'string') {
+        showStatus(message, 'success');
+    } else {
+        showStatus(`${message} transfers sincronizados com sucesso!`, 'success');
+    }
+    updateLastSyncDisplay();
+}
         function showSyncError(message) {
             showStatus(`Erro na sincronização: ${message}`, 'error');
         }
@@ -2673,6 +2713,145 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             }
         }
 
+        // =====================================================
+// ATUALIZAÇÃO DE TRANSFER NO FRONTEND
+// =====================================================
+function atualizarTransferNoFrontend(transferId, campo, novoValor) {
+    try {
+        const index = services.findIndex(s => s.id === transferId);
+        
+        if (index === -1) {
+            console.warn(`⚠️ Transfer ${transferId} não encontrado localmente`);
+            return false;
+        }
+        
+        // Mapear nomes de campos do backend para frontend
+        const campoMap = {
+            'Status': 'status',
+            'Hora Pick-up': 'horaPickup',
+            'Voo': 'numeroVoo',
+            'Observações': 'observacoes',
+            'Pagamento': 'modoPagamento',
+            'Pago Para': 'pagoParaQuem',
+            'Cliente': 'nomeCliente',
+            'Contacto': 'contacto',
+            'Origem': 'origem',
+            'Destino': 'destino',
+            'Data': 'data',
+            'Pessoas': 'numeroPessoas',
+            'Bagagens': 'numeroBagagens',
+            'Valor Total': 'valorTotal',
+            'Referência': 'referencia',
+            'Tipo Serviço': 'tipoServico',
+            'Tour': 'tourSelecionado',
+            'Valor Hotel (30%)': 'valorHotel',
+            'Valor HUB Transfer': 'valorHUB',
+            'Comissão Recepção': 'comissaoRecepcao'
+        };
+        
+        const campoFrontend = campoMap[campo] || campo.toLowerCase().replace(/ /g, '').replace(/[()%]/g, '');
+        
+        // Converter valores numéricos se necessário
+        let valorConvertido = novoValor;
+        if (['numeroPessoas', 'numeroBagagens'].includes(campoFrontend)) {
+            valorConvertido = parseInt(novoValor) || 0;
+        } else if (['valorTotal', 'valorHotel', 'valorHUB', 'comissaoRecepcao'].includes(campoFrontend)) {
+            valorConvertido = parseFloat(novoValor) || 0;
+        }
+        
+        // Atualizar o valor
+        const valorAnterior = services[index][campoFrontend];
+        services[index][campoFrontend] = valorConvertido;
+        
+        console.log(`✏️ Transfer #${transferId}: ${campo} alterado de "${valorAnterior}" para "${valorConvertido}"`);
+        
+        return true;
+        
+    } catch (error) {
+        console.error(`❌ Erro ao atualizar transfer ${transferId}:`, error);
+        return false;
+    }
+}
+
+async function buscarMudancasPendentes() {
+    try {
+        const webappUrl = getWebAppUrl();
+        
+        if (!webappUrl) {
+            console.warn('⚠️ URL não configurada');
+            return { success: false, changes: [] };
+        }
+        
+        console.log('🔍 Buscando mudanças pendentes no backend...');
+        
+        const response = await fetch(`${webappUrl}?action=getPendingChanges&_=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn('⚠️ Erro na resposta:', response.status);
+            return { success: false, changes: [] };
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.changes && data.changes.length > 0) {
+            console.log(`📊 ${data.changes.length} mudanças encontradas:`, data.changes);
+            return data;
+        } else {
+            console.log('✅ Nenhuma mudança pendente no backend');
+            return { success: true, changes: [] };
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao buscar mudanças pendentes:', error);
+        return { success: false, changes: [] };
+    }
+}
+
+async function marcarMudancasComoSincronizadas(rowIndices) {
+    try {
+        const webappUrl = getWebAppUrl();
+        
+        if (!webappUrl || !rowIndices || rowIndices.length === 0) {
+            return false;
+        }
+        
+        console.log(`✅ Marcando ${rowIndices.length} mudanças como sincronizadas...`);
+        
+        const response = await fetch(webappUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'markChangesSynced',
+                rowIndices: rowIndices
+            }),
+            mode: 'cors'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Mudanças marcadas como sincronizadas no backend');
+            return true;
+        } else {
+            console.warn('⚠️ Erro ao marcar mudanças:', result.message);
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao marcar mudanças como sincronizadas:', error);
+        return false;
+    }
+}
+        
         // =====================================================
         // ENVIO PARA GOOGLE SHEETS
         // =====================================================
@@ -4431,6 +4610,11 @@ function parseServiceDate(dateStr) {
         window.loadTransfersFromSheets = loadTransfersFromSheets;
         window.testBasicConnectivity = testBasicConnectivity;
 
+        // ✅ ADICIONE ESTAS LINHAS:
+        window.buscarMudancasPendentes = buscarMudancasPendentes;
+        window.atualizarTransferNoFrontend = atualizarTransferNoFrontend;
+        window.marcarMudancasComoSincronizadas = marcarMudancasComoSincronizadas;
+
         // Garantir que as funções estão no escopo global
         window.toggleConfig = toggleConfig;
         window.loadTransfersFromSheets = loadTransfersFromSheets;
@@ -4450,6 +4634,11 @@ function parseServiceDate(dateStr) {
         console.log('   - syncWithServer() - Sincronização manual');
         console.log('   - testConnection() - Teste de conexão');
         console.log('   - loadTransfersFromSheets() - Carregar transfers do Google Sheets');
+
+        // ✅ ADICIONE ESTAS LINHAS:
+        console.log('   - buscarMudancasPendentes() - Verificar mudanças no backend');
+        console.log('   - atualizarTransferNoFrontend(id, campo, valor) - Atualizar transfer específico');
+        console.log('🔄 Sincronização: Manual (clique em "Atualizar Dados")');
                 
     </script>
 </body>
