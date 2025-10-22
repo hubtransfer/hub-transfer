@@ -2221,188 +2221,485 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         }
 
         // =====================================================
-        // FUNÇÃO PRINCIPAL PARA CARREGAR TRANSFERS
-        // =====================================================
-        async function loadTransfersFromSheets() {
-            console.log('📥 Iniciando carregamento de transfers do Google Sheets...');
+// CARREGAR TRANSFERS DO GOOGLE SHEETS (VERSÃO HÍBRIDA COM MERGE)
+// =====================================================
+/**
+ * Carrega transfers do Google Sheets e faz merge inteligente com dados locais
+ * VERSÃO HÍBRIDA: Une robustez do código original + sistema de merge
+ * 
+ * Funcionalidades:
+ * - Carrega dados do servidor com tratamento robusto de erros
+ * - Converte dados do formato do servidor para formato local
+ * - Faz merge inteligente: atualiza/adiciona/remove registros
+ * - Mantém compatibilidade CORS total
+ * - Log detalhado de todas as operações
+ */
+async function loadTransfersFromSheets() {
+    console.log('🔄 Iniciando carregamento de transfers do Google Sheets...');
+    
+    // Previne sincronizações simultâneas
+    if (typeof syncInProgress !== 'undefined' && syncInProgress) {
+        console.warn('⚠️ Sincronização já em andamento, aguarde...');
+        showStatus('Sincronização em andamento, aguarde...', 'warning');
+        return false;
+    }
+    
+    // Obtém URL configurada (mantém função original do sistema)
+    const webappUrl = getWebAppUrl();
+    console.log('🔗 URL configurada:', webappUrl);
+    
+    if (!webappUrl) {
+        showStatus('❌ URL do Google Apps Script não configurada', 'error');
+        return false;
+    }
+    
+    try {
+        // Marca sincronização em progresso
+        if (typeof syncInProgress !== 'undefined') {
+            syncInProgress = true;
+        }
+        
+        // Exibe indicadores de carregamento
+        showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
+        if (typeof showSyncIndicator === 'function') {
+            showSyncIndicator('Sincronizando...');
+        }
+        
+        // === FASE 1: BUSCAR DADOS DO SERVIDOR ===
+        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('📡 Fazendo requisição para:', dataUrl);
+        
+        const response = await fetch(dataUrl, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('📊 Status da resposta:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // === FASE 2: PROCESSAR RESPOSTA ===
+        const textResponse = await response.text();
+        console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
+        
+        if (!textResponse || textResponse.trim() === '') {
+            throw new Error('Resposta vazia do servidor');
+        }
+        
+        let result;
+        try {
+            result = JSON.parse(textResponse);
+        } catch (parseError) {
+            console.error('❌ Erro ao fazer parse do JSON:', parseError);
+            console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
+            throw new Error('Resposta do servidor não é um JSON válido');
+        }
+        
+        console.log('📊 Dados parseados:', result);
+        
+        if (!result) {
+            throw new Error('Resposta nula do servidor');
+        }
+        
+        if (result.success === false) {
+            const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
+            throw new Error(errorMsg);
+        }
+        
+        let dataArray = result.data || result || [];
+        
+        if (!Array.isArray(dataArray)) {
+            console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
+            dataArray = [];
+        }
+        
+        console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
+        
+        if (dataArray.length === 0) {
+            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+            services = [];
+            renderTable();
+            updateSummary();
+            return true;
+        }
+        
+        // === FASE 3: CONVERTER DADOS DO SERVIDOR ===
+        const convertedServices = [];
+        let successCount = 0;
+        let errorCount = 0;
+        
+        try {
+            for (let index = 0; index < dataArray.length; index++) {
+                const serverItem = dataArray[index];
+                
+                if (!serverItem || typeof serverItem !== 'object') {
+                    console.warn(`⚠️ Item ${index} inválido:`, serverItem);
+                    errorCount++;
+                    continue;
+                }
+                
+                try {
+                    const converted = convertServerDataToLocal(serverItem, index);
+                    
+                    if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
+                        convertedServices.push(converted);
+                        successCount++;
+                    } else {
+                        console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
+                        errorCount++;
+                    }
+                    
+                } catch (conversionError) {
+                    console.error(`❌ Erro ao converter item ${index}:`, conversionError);
+                    console.error('📄 Item problemático:', serverItem);
+                    errorCount++;
+                }
+            }
             
-            const webappUrl = getWebAppUrl();
-            console.log('🔗 URL configurada:', webappUrl);
+            console.log(`✅ Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
+            console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
             
-            if (!webappUrl) {
-                showStatus('❌ URL do Google Apps Script não configurada', 'error');
+            if (convertedServices.length === 0) {
+                if (dataArray.length > 0) {
+                    showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
+                    console.error('📄 Dados originais do servidor:', dataArray.slice(0, 2));
+                } else {
+                    showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+                }
                 return false;
             }
             
-            try {
-                showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
-                
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('📡 Fazendo requisição para:', dataUrl);
-                
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                console.log('📊 Status da resposta:', response.status, response.statusText);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const textResponse = await response.text();
-                console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
-                
-                if (!textResponse || textResponse.trim() === '') {
-                    throw new Error('Resposta vazia do servidor');
-                }
-                
-                let result;
-                try {
-                    result = JSON.parse(textResponse);
-                } catch (parseError) {
-                    console.error('❌ Erro ao fazer parse do JSON:', parseError);
-                    console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
-                    throw new Error('Resposta do servidor não é um JSON válido');
-                }
-                
-                console.log('📊 Dados parseados:', result);
-                
-                if (!result) {
-                    throw new Error('Resposta nula do servidor');
-                }
-                
-                if (result.success === false) {
-                    const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
-                    throw new Error(errorMsg);
-                }
-                
-                let dataArray = result.data || result || [];
-
-                if (!Array.isArray(dataArray)) {
-                    console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
-                    dataArray = [];
-                }
-
-                console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
-
-                if (dataArray.length === 0) {
-                    showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-                    services = [];
-                    renderTable();
-                    updateSummary();
-                    return true;
-                }
-
-                const convertedServices = [];
-                let successCount = 0;
-                let errorCount = 0;
-
-                try {
-                    if (!Array.isArray(dataArray)) {
-                        throw new Error('Dados recebidos não são um array válido');
-                    }
-                    
-                    for (let index = 0; index < dataArray.length; index++) {
-                        const serverItem = dataArray[index];
-                        
-                        if (!serverItem || typeof serverItem !== 'object') {
-                            console.warn(`⚠️ Item ${index} inválido:`, serverItem);
-                            errorCount++;
-                            continue;
-                        }
-                        
-                        try {
-                            const converted = convertServerDataToLocal(serverItem, index);
-                            
-                            if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
-                                convertedServices.push(converted);
-                                successCount++;
-                            } else {
-                                console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
-                                errorCount++;
-                            }
-                            
-                        } catch (conversionError) {
-                            console.error(`❌ Erro ao converter item ${index}:`, conversionError);
-                            console.error('📄 Item problemático:', serverItem);
-                            errorCount++;
-                        }
-                    }
-                    
-                    console.log(`✅ Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
-                    console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
-                    
-                    if (convertedServices.length === 0) {
-                        if (dataArray.length > 0) {
-                            showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
-                            console.error('📄 Dados originais do servidor:', dataArray.slice(0, 2));
-                        } else {
-                            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-                        }
-                        return false;
-                    }
-                    
-                    const validTransfers = convertedServices.filter(service => 
-                        service.id && 
-                        service.nomeCliente && 
-                        service.nomeCliente !== 'Cliente não informado' &&
-                        service.data
-                    );
-                    if (validTransfers.length < convertedServices.length) {
-                        console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
-                    }
-                    
-                    if (validTransfers.length === 0) {
-                        showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
-                        return false;
-                    }
-                    
-                    const finalServices = validTransfers;
-                    
-                } catch (processingError) {
-                    console.error('Erro durante o processamento dos dados:', processingError);
-                    showStatus(`Erro no processamento: ${processingError.message}`, 'error');
-                    return false;
-                }        
-                
-                services = convertedServices;
-                
-                saveData();
-                renderTable();
-                updateSummary();
-                
-                lastSyncTime = new Date();
-                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                updateLastSyncDisplay();
-                
-                showStatus(`${services.length} transfers carregados com sucesso do Google Sheets!`, 'success');
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao carregar transfers:', error);
-                
-                let errorMessage = 'Erro desconhecido ao carregar transfers';
-                
-                if (error.message.includes('HTTP')) {
-                    errorMessage = 'Erro de conexão com o Google Sheets';
-                } else if (error.message.includes('JSON')) {
-                    errorMessage = 'Erro no formato dos dados recebidos';
-                } else if (error.message.includes('CORS')) {
-                    errorMessage = 'Erro de permissões de acesso';
-                } else {
-                    errorMessage = error.message;
-                }
-                
-                showStatus(`${errorMessage}`, 'error');
+            // Valida transfers convertidos
+            const validTransfers = convertedServices.filter(service => 
+                service.id && 
+                service.nomeCliente && 
+                service.nomeCliente !== 'Cliente não informado' &&
+                service.data
+            );
+            
+            if (validTransfers.length < convertedServices.length) {
+                console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
+            }
+            
+            if (validTransfers.length === 0) {
+                showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
                 return false;
+            }
+            
+        } catch (processingError) {
+            console.error('Erro durante o processamento dos dados:', processingError);
+            showStatus(`Erro no processamento: ${processingError.message}`, 'error');
+            return false;
+        }
+        
+        // === FASE 4: MERGE INTELIGENTE COM DADOS LOCAIS ===
+        console.log('🔀 Iniciando merge inteligente...');
+        console.log(`   📊 Dados locais atuais: ${services.length} registros`);
+        console.log(`   📊 Dados do servidor: ${convertedServices.length} registros`);
+        
+        const mergeResult = mergeServerDataWithLocal(convertedServices);
+        
+        // === FASE 5: ATUALIZAR SISTEMA ===
+        services = mergeResult.finalData;
+        
+        // Atualiza próximo ID disponível
+        if (services.length > 0) {
+            const maxId = Math.max(...services.map(s => parseInt(s.id) || 0));
+            if (typeof nextAvailableId !== 'undefined') {
+                nextAvailableId = maxId + 1;
             }
         }
+        
+        // Salva dados atualizados
+        saveData();
+        
+        // Atualiza interface
+        renderTable();
+        updateSummary();
+        
+        // Atualiza timestamp de sincronização
+        lastSyncTime = new Date();
+        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+        if (typeof updateLastSyncDisplay === 'function') {
+            updateLastSyncDisplay();
+        }
+        
+        // === FASE 6: FEEDBACK AO USUÁRIO ===
+        const statusMsg = `✅ Sincronização concluída! 
+            ${mergeResult.updated} atualizados | 
+            ${mergeResult.added} novos | 
+            ${mergeResult.removed} removidos | 
+            ${mergeResult.unchanged} sem alterações`;
+        
+        console.log(statusMsg);
+        
+        showStatus(
+            `${services.length} transfers sincronizados: ` +
+            `${mergeResult.updated} atualizados, ` +
+            `${mergeResult.added} novos, ` +
+            `${mergeResult.removed} removidos`, 
+            'success'
+        );
+        
+        // Marca conexão como estabelecida
+        if (typeof isConnected !== 'undefined') {
+            isConnected = true;
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar transfers:', error);
+        
+        // Tratamento inteligente de erros
+        let errorMessage = 'Erro desconhecido ao carregar transfers';
+        
+        if (error.message.includes('HTTP')) {
+            errorMessage = 'Erro de conexão com o Google Sheets';
+        } else if (error.message.includes('JSON')) {
+            errorMessage = 'Erro no formato dos dados recebidos';
+        } else if (error.message.includes('CORS')) {
+            errorMessage = 'Erro de permissões de acesso (CORS)';
+        } else if (error.message.includes('URL')) {
+            errorMessage = 'URL do Google Apps Script não configurada';
+        } else {
+            errorMessage = error.message;
+        }
+        
+        showStatus(`${errorMessage}`, 'error');
+        
+        if (typeof isConnected !== 'undefined') {
+            isConnected = false;
+        }
+        
+        return false;
+        
+    } finally {
+        // Sempre libera flag de sincronização
+        if (typeof syncInProgress !== 'undefined') {
+            syncInProgress = false;
+        }
+        if (typeof hideSyncIndicator === 'function') {
+            hideSyncIndicator();
+        }
+    }
+}
+
+        // =====================================================
+// MERGE INTELIGENTE DE DADOS DO SERVIDOR COM LOCAL
+// =====================================================
+/**
+ * Faz merge dos dados do servidor (planilha) com os dados locais
+ * PRIORIDADE: Dados do servidor SEMPRE sobrescrevem dados locais
+ * 
+ * Funcionalidades:
+ * - Atualiza registros existentes que foram editados manualmente na planilha
+ * - Adiciona novos registros encontrados na planilha
+ * - Remove registros que foram deletados da planilha
+ * - Preserva integridade dos IDs
+ * - Detecta alterações campo por campo
+ * 
+ * @param {Array} serverData - Dados convertidos vindos do Google Sheets
+ * @returns {Object} Resultado do merge com estatísticas detalhadas
+ */
+function mergeServerDataWithLocal(serverData) {
+    console.log('🔀 === INICIANDO MERGE INTELIGENTE ===');
+    console.log(`📊 Dados locais antes do merge: ${services.length} registros`);
+    console.log(`📊 Dados do servidor para merge: ${serverData.length} registros`);
+    
+    // Estatísticas do merge
+    const stats = {
+        updated: 0,      // Registros que foram modificados na planilha
+        added: 0,        // Registros novos da planilha
+        removed: 0,      // Registros deletados da planilha
+        unchanged: 0,    // Registros sem alterações
+        finalData: []    // Array final após merge
+    };
+    
+    // Se não há dados locais, todos os registros do servidor são novos
+    if (!services || services.length === 0) {
+        console.log('📋 Nenhum dado local - todos os registros do servidor serão adicionados');
+        stats.added = serverData.length;
+        stats.finalData = [...serverData];
+        
+        console.log('✅ Merge concluído - todos os registros são novos');
+        logMergeStats(stats);
+        return stats;
+    }
+    
+    // Cria mapas para busca rápida O(1) por ID
+    const localMap = new Map();
+    services.forEach(service => {
+        if (service.id) {
+            localMap.set(service.id.toString(), service);
+        }
+    });
+    
+    const serverMap = new Map();
+    serverData.forEach(service => {
+        if (service.id) {
+            serverMap.set(service.id.toString(), service);
+        }
+    });
+    
+    console.log(`🗺️ Mapa local criado: ${localMap.size} registros indexados`);
+    console.log(`🗺️ Mapa servidor criado: ${serverMap.size} registros indexados`);
+    
+    // === PASSO 1: Processar todos os registros do servidor ===
+    console.log('📥 PASSO 1: Processando registros do servidor...');
+    
+    serverData.forEach((serverService, index) => {
+        const serverId = serverService.id ? serverService.id.toString() : null;
+        
+        if (!serverId) {
+            console.warn(`⚠️ Registro ${index} sem ID - pulando`);
+            return;
+        }
+        
+        const localService = localMap.get(serverId);
+        
+        if (localService) {
+            // Registro já existe - verifica se houve alterações
+            const changes = detectChanges(localService, serverService);
+            
+            if (changes.hasChanges) {
+                console.log(`📝 [ID ${serverId}] ATUALIZADO - ${changes.changedFields.length} campo(s) alterado(s)`);
+                changes.changedFields.forEach(field => {
+                    console.log(`   🔹 ${field.name}: "${field.oldValue}" → "${field.newValue}"`);
+                });
+                stats.updated++;
+                stats.finalData.push({...serverService}); // Prioriza dados do servidor
+            } else {
+                console.log(`✓ [ID ${serverId}] Sem alterações`);
+                stats.unchanged++;
+                stats.finalData.push({...serverService}); // Mantém dados do servidor mesmo sem alterações
+            }
+        } else {
+            // Registro novo do servidor
+            console.log(`➕ [ID ${serverId}] NOVO REGISTRO adicionado`);
+            stats.added++;
+            stats.finalData.push({...serverService});
+        }
+    });
+    
+    // === PASSO 2: Identificar registros deletados da planilha ===
+    console.log('🗑️ PASSO 2: Verificando registros removidos...');
+    
+    services.forEach(localService => {
+        const serverId = localService.id ? localService.id.toString() : null;
+        
+        if (!serverId) return;
+        
+        if (!serverMap.has(serverId)) {
+            console.log(`🗑️ [ID ${serverId}] REMOVIDO da planilha - deletando localmente`);
+            stats.removed++;
+            // Não adiciona ao finalData (efetua a remoção)
+        }
+    });
+    
+    // === PASSO 3: Ordenar por ID para manter consistência ===
+    stats.finalData.sort((a, b) => {
+        const idA = parseInt(a.id) || 0;
+        const idB = parseInt(b.id) || 0;
+        return idA - idB;
+    });
+    
+    console.log('✅ === MERGE CONCLUÍDO COM SUCESSO ===');
+    logMergeStats(stats);
+    
+    return stats;
+}
+
+        // =====================================================
+// DETECTAR ALTERAÇÕES ENTRE REGISTROS LOCAL E SERVIDOR
+// =====================================================
+/**
+ * Compara dois registros e detecta alterações campo por campo
+ * Retorna objeto detalhado com campos alterados
+ * 
+ * @param {Object} local - Registro local (dados atuais)
+ * @param {Object} server - Registro do servidor (dados da planilha)
+ * @returns {Object} Objeto com hasChanges (boolean) e changedFields (array)
+ */
+function detectChanges(local, server) {
+    // Campos críticos que podem ser editados manualmente na planilha
+    const fieldsToCompare = [
+        { key: 'data', label: 'Data' },
+        { key: 'hora', label: 'Hora' },
+        { key: 'nomeCliente', label: 'Cliente' },
+        { key: 'telefoneCliente', label: 'Telefone' },
+        { key: 'emailCliente', label: 'Email' },
+        { key: 'origem', label: 'Origem' },
+        { key: 'destino', label: 'Destino' },
+        { key: 'preco', label: 'Preço' },
+        { key: 'tipoServico', label: 'Tipo de Serviço' },
+        { key: 'status', label: 'Status' },
+        { key: 'observacoes', label: 'Observações' },
+        { key: 'numeroPassageiros', label: 'Passageiros' },
+        { key: 'numeroBagagens', label: 'Bagagens' },
+        { key: 'numeroVooChegada', label: 'Voo Chegada' },
+        { key: 'numeroVooPartida', label: 'Voo Partida' },
+        { key: 'horaVooChegada', label: 'Hora Voo Chegada' },
+        { key: 'horaVooPartida', label: 'Hora Voo Partida' }
+    ];
+    
+    const result = {
+        hasChanges: false,
+        changedFields: []
+    };
+    
+    /**
+     * Normaliza valores para comparação consistente
+     */
+    const normalize = (value) => {
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'string') return value.trim().toLowerCase();
+        if (typeof value === 'number') return String(value);
+        return String(value).trim().toLowerCase();
+    };
+    
+    // Compara cada campo
+    for (const field of fieldsToCompare) {
+        const localValue = normalize(local[field.key]);
+        const serverValue = normalize(server[field.key]);
+        
+        if (localValue !== serverValue) {
+            result.hasChanges = true;
+            result.changedFields.push({
+                name: field.label,
+                key: field.key,
+                oldValue: local[field.key] || '',
+                newValue: server[field.key] || ''
+            });
+        }
+    }
+    
+    return result;
+}
+
+        // =====================================================
+// LOG DETALHADO DE ESTATÍSTICAS DO MERGE
+// =====================================================
+/**
+ * Exibe log formatado das estatísticas do merge
+ * 
+ * @param {Object} stats - Estatísticas do merge
+ */
+function logMergeStats(stats) {
+    console.log('📊 === ESTATÍSTICAS DO MERGE ===');
+    console.log(`   ✅ ${stats.finalData.length} registros totais após merge`);
+    console.log(`   📝 ${stats.updated} registros atualizados (editados na planilha)`);
+    console.log(`   ➕ ${stats.added} novos registros (adicionados na planilha)`);
+    console.log(`   🗑️ ${stats.removed} registros removidos (deletados da planilha)`);
+    console.log(`   ✓ ${stats.unchanged} registros sem alterações`);
+    console.log('================================');
+}
 
         function isValidResponse(result) {
             if (result.status === 'success') return true;
