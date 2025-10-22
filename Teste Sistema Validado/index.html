@@ -5,53 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TESTE Sistema - HUB Transfer</title>
     
-// =====================================================
-// INICIALIZAÇÃO DE VARIÁVEIS DE CONTROLE DE SINCRONIZAÇÃO
-// =====================================================
+// ====================================================================
+// CONTROLE DE SINCRONIZAÇÃO MANUAL - VERSÃO ECONÔMICA
+// ====================================================================
 
-// FORÇA CRIAÇÃO DA VARIÁVEL GLOBAL (não permite duplicatas locais)
-Object.defineProperty(window, 'syncInProgress', {
-    value: false,
-    writable: true,
-    configurable: true,
-    enumerable: true
-});
+// Variáveis de controle (simples e diretas)
+let syncInProgress = false;
+const SYNC_TIMEOUT_MS = 30000; // 30 segundos para timeout da requisição
 
-Object.defineProperty(window, 'lastSyncAttempt', {
-    value: null,
-    writable: true,
-    configurable: true,
-    enumerable: true
-});
+console.log('✅ Sistema de sincronização manual inicializado');
 
-console.log('✅ Flag syncInProgress inicializada como propriedade global: false');
+// ====================================================================
+// FUNÇÃO DE SINCRONIZAÇÃO - CHAMADA APENAS PELO BOTÃO
+// ====================================================================
 
-// Timeout máximo entre sincronizações (em milissegundos)
-const SYNC_TIMEOUT_MS = 30000; // 30 segundos
-
-// Auto-reset da flag se passar do timeout
-setInterval(() => {
-    if (window.syncInProgress && window.lastSyncAttempt) {
-        const timeSinceLastAttempt = Date.now() - window.lastSyncAttempt;
-        
-        if (timeSinceLastAttempt > SYNC_TIMEOUT_MS) {
-            console.warn('⚠️ AUTO-RESET: Flag de sincronização travada há mais de 30s');
-            console.warn(`   Tempo desde última tentativa: ${Math.round(timeSinceLastAttempt / 1000)}s`);
-            window.syncInProgress = false;
-            window.lastSyncAttempt = null;
-            
-            if (typeof hideSyncIndicator === 'function') {
-                hideSyncIndicator();
-            }
-            
-            showStatus('⚠️ Sincronização foi resetada automaticamente (timeout)', 'warning');
-            console.log('✅ Flag resetada automaticamente');
-        }
-    }
-}, 5000); // Verifica a cada 5 segundos
-
-console.log('✅ Sistema de auto-reset de sincronização ativado');
+/**
+ * Sincroniza dados com Google Sheets
+ * Chamada SOMENTE quando usuário clicar no botão "ATUALIZAR DADOS"
+ */
+async function syncWithGoogleSheets() {
+  // Prevenir múltiplos cliques no botão
+  if (syncInProgress) {
+    console.warn('⏳ Sincronização já em andamento, aguarde...');
+    alert('⏳ Aguarde a sincronização atual terminar');
+    return false;
+  }
+  
+  console.log('🔄 === INICIANDO SINCRONIZAÇÃO ===');
+  syncInProgress = true;
+  
+  try {
+    // URL do Google Apps Script (ATUALIZE AQUI)
+    const scriptUrl = 'https://script.google.com/macros/s/SEU_ID_AQUI/exec';
+    const url = `${scriptUrl}?action=getAllData&timestamp=${Date.now()}`;
     
+    console.log('📡 Conectando:', url);
+    
+    // Mostrar loading no botão
+    const btnAtualizar = document.querySelector('button:contains("ATUALIZAR DADOS")') || 
+                         document.getElementById('btnAtualizar');
+    if (btnAtualizar) {
+      btnAtualizar.disabled = true;
+      btnAtualizar.innerHTML = '⏳ Sincronizando...';
+    }
+    
+    // Fazer requisição com timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    console.log('📥 Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('📦 Dados recebidos:', data);
+    
+    if (data.success && Array.isArray(data.data)) {
+      console.log(`✅ ${data.data.length} registros sincronizados`);
+      
+      // Atualizar dados globais
+      window.allTransfers = data.data;
+      window.lastSyncTime = new Date();
+      
+      // Atualizar interface
+      if (typeof updateTransfersList === 'function') {
+        updateTransfersList(data.data);
+      }
+      
+      if (typeof updateDashboardStats === 'function') {
+        updateDashboardStats(data.data);
+      }
+      
+      // Mostrar sucesso
+      alert(`✅ ${data.data.length} registros sincronizados com sucesso!`);
+      return true;
+      
+    } else {
+      throw new Error(data.message || 'Formato de resposta inválido');
+    }
+    
+  } catch (error) {
+    console.error('❌ ERRO NA SINCRONIZAÇÃO:', error);
+    
+    let mensagemErro = 'Erro ao sincronizar: ';
+    
+    if (error.name === 'AbortError') {
+      mensagemErro += 'Timeout (demorou mais de 30 segundos)';
+    } else {
+      mensagemErro += error.message;
+    }
+    
+    alert(`❌ ${mensagemErro}`);
+    return false;
+    
+  } finally {
+    // SEMPRE resetar flag e botão
+    syncInProgress = false;
+    
+    // Restaurar botão
+    const btnAtualizar = document.querySelector('button:contains("ATUALIZAR")') || 
+                         document.getElementById('btnAtualizar');
+    if (btnAtualizar) {
+      btnAtualizar.disabled = false;
+      btnAtualizar.innerHTML = '🔄 ATUALIZAR DADOS';
+    }
+    
+    console.log('🏁 Sincronização finalizada');
+  }
+}
+
+console.log('✅ Sistema pronto. Sincronização ocorrerá APENAS ao clicar no botão.');    
     <!-- Google Maps API -->
     <script>
         function initMap() {
