@@ -2270,18 +2270,16 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         }
 
 // =====================================================
-// CARREGAR TRANSFERS DO GOOGLE SHEETS (VERSÃO FINAL CORRIGIDA)
+// FUNÇÃO LOADTRANSFERSFROMSHEETS - VERSÃO LIMPA SEM EMOJIS
+// Cole esta função substituindo a atual (linha 2277-2523)
 // =====================================================
-/**
- * Carrega transfers do Google Sheets e faz merge inteligente
- * VERSÃO FINAL: Com auto-reset e proteção total contra travamentos
- */
+
 async function loadTransfersFromSheets() {
     const startTime = Date.now();
-    console.log('🔄 === INICIANDO SINCRONIZAÇÃO ===');
-    console.log('⏰ Timestamp:', new Date().toISOString());
+    console.log('=== INICIANDO SINCRONIZACAO ===');
+    console.log('Timestamp:', new Date().toISOString());
     
-    // PROTEÇÃO 1: Verificar flag com auto-correção
+    // PROTECAO 1: Verificar flag com auto-correcao
     if (window.syncInProgress === true) {
         const timeSinceLastAttempt = window.lastSyncAttempt 
             ? Date.now() - window.lastSyncAttempt 
@@ -2289,47 +2287,47 @@ async function loadTransfersFromSheets() {
         
         // Se passou mais de 30 segundos, considera travamento e reseta
         if (timeSinceLastAttempt > SYNC_TIMEOUT_MS) {
-            console.warn('⚠️ Flag travada detectada - forçando reset');
+            console.warn('Flag travada detectada - forcando reset');
             window.syncInProgress = false;
             window.lastSyncAttempt = null;
         } else {
-            console.warn('⚠️ BLOQUEADO: Sincronização em andamento');
-            console.warn(`   Tempo desde última tentativa: ${Math.round(timeSinceLastAttempt / 1000)}s`);
-            showStatus('⚠️ Sincronização já em andamento, aguarde...', 'warning');
+            console.warn('BLOQUEADO: Sincronizacao em andamento');
+            console.warn('Tempo desde ultima tentativa: ' + Math.round(timeSinceLastAttempt / 1000) + 's');
+            showStatus('Sincronizacao ja em andamento, aguarde...', 'warning');
             return false;
         }
     }
     
-    // Marca início da sincronização
+    // Marca inicio da sincronizacao
     window.syncInProgress = true;
     window.lastSyncAttempt = Date.now();
-    console.log('🔒 Flag syncInProgress = true');
+    console.log('Flag syncInProgress = true');
     
-    // PROTEÇÃO 2: Garantir reset em caso de qualquer erro
+    // PROTECAO 2: Garantir reset em caso de qualquer erro
     const guaranteeReset = () => {
         window.syncInProgress = false;
         window.lastSyncAttempt = null;
-        console.log('🔓 Flag syncInProgress = false (reset garantido)');
+        console.log('Flag syncInProgress = false (reset garantido)');
     };
     
     try {
-        // Obtém URL configurada
+        // Obtem URL configurada
         const webappUrl = getWebAppUrl();
-        console.log('🔗 URL configurada:', webappUrl);
+        console.log('URL configurada:', webappUrl);
         
         if (!webappUrl || webappUrl.trim() === '') {
-            throw new Error('URL do Google Apps Script não configurada');
+            throw new Error('URL do Google Apps Script nao configurada');
         }
         
         // Exibe indicadores
-        showStatus('⏳ Carregando dados do Google Sheets...', 'warning');
+        showStatus('Carregando dados do Google Sheets...', 'warning');
         if (typeof showSyncIndicator === 'function') {
             showSyncIndicator('Sincronizando...');
         }
         
         // === FASE 1: BUSCAR DADOS ===
-        console.log('📡 FASE 1: Buscando dados...');
-        const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+        console.log('FASE 1: Buscando dados...');
+        const dataUrl = webappUrl + '?action=getAllData&_=' + Date.now();
         
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
@@ -2350,16 +2348,16 @@ async function loadTransfersFromSheets() {
             clearTimeout(timeoutId);
         }
         
-        console.log('📊 Status:', response.status, response.statusText);
+        console.log('Status:', response.status, response.statusText);
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
         }
         
         // === FASE 2: PROCESSAR RESPOSTA ===
-        console.log('📄 FASE 2: Processando resposta...');
+        console.log('FASE 2: Processando resposta...');
         const textResponse = await response.text();
-        console.log('   Tamanho:', textResponse.length, 'caracteres');
+        console.log('Tamanho:', textResponse.length, 'caracteres');
         
         if (!textResponse || textResponse.trim() === '') {
             throw new Error('Resposta vazia do servidor');
@@ -2368,10 +2366,10 @@ async function loadTransfersFromSheets() {
         let result;
         try {
             result = JSON.parse(textResponse);
-            console.log('✅ JSON parseado');
+            console.log('JSON parseado');
         } catch (parseError) {
-            console.error('❌ Erro parse JSON:', parseError.message);
-            throw new Error('Resposta não é JSON válido');
+            console.error('Erro parse JSON:', parseError.message);
+            throw new Error('Resposta nao e JSON valido');
         }
         
         if (result.success === false) {
@@ -2384,20 +2382,20 @@ async function loadTransfersFromSheets() {
             dataArray = [];
         }
         
-        console.log(`📊 ${dataArray.length} registros recebidos`);
+        console.log(dataArray.length + ' registros recebidos');
         
         if (dataArray.length === 0) {
-            console.log('📭 Nenhum dado na planilha');
+            console.log('Nenhum dado na planilha');
             services = [];
             saveData();
             renderTable();
             updateSummary();
-            showStatus('📭 Nenhum transfer na planilha', 'warning');
+            showStatus('Nenhum transfer na planilha', 'warning');
             return true;
         }
         
         // === FASE 3: CONVERTER ===
-        console.log('🔄 FASE 3: Convertendo dados...');
+        console.log('FASE 3: Convertendo dados...');
         const convertedServices = [];
         let successCount = 0;
         let errorCount = 0;
@@ -2413,103 +2411,67 @@ async function loadTransfersFromSheets() {
             try {
                 const converted = convertServerDataToLocal(serverItem, index);
                 
-                if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
+                if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente nao informado') {
                     convertedServices.push(converted);
                     successCount++;
                 } else {
                     errorCount++;
                 }
             } catch (conversionError) {
-                console.error(`❌ Erro item ${index}:`, conversionError.message);
+                console.error('Erro item ' + index + ':', conversionError.message);
                 errorCount++;
             }
         }
         
-        console.log(`✅ Convertidos: ${successCount} sucessos, ${errorCount} erros`);
+        console.log('Convertidos: ' + successCount + ' sucessos, ' + errorCount + ' erros');
         
         if (convertedServices.length === 0) {
-            throw new Error('Nenhum registro válido processado');
+            throw new Error('Nenhum registro valido processado');
         }
         
         // Valida
         const validTransfers = convertedServices.filter(s => 
-            s.id && s.nomeCliente && s.nomeCliente !== 'Cliente não informado' && s.data
+            s.id && s.nomeCliente && s.nomeCliente !== 'Cliente nao informado' && s.data
         );
         
         if (validTransfers.length === 0) {
             throw new Error('Nenhum transfer com dados completos');
         }
         
-// === FASE 4: SUBSTITUIÇÃO COMPLETA (SEM MERGE) ===
-        console.log('🔄 FASE 4: Substituindo dados locais por dados da planilha...');
-        console.log(`📊 Dados locais antes: ${services.length} registros`);
-        console.log(`📊 Dados da planilha: ${validTransfers.length} registros`);
+        // === FASE 4: MERGE ===
+        console.log('FASE 4: Merge inteligente...');
+        const mergeResult = mergeServerDataWithLocal(validTransfers);
         
-        // Contadores para estatísticas
-        const dadosAntigos = services.length;
-        const dadosNovos = validTransfers.length;
-        const diferenca = dadosNovos - dadosAntigos;
+        // === FASE 5: ATUALIZAR ===
+        console.log('FASE 5: Atualizando sistema...');
+        services = mergeResult.finalData;
         
-        // SUBSTITUIÇÃO COMPLETA - Dados da planilha sobrescrevem tudo
-        services = [...validTransfers]; // Cria cópia para evitar referências
-        
-        console.log('✅ Substituição concluída:');
-        console.log(`   🗑️ ${dadosAntigos} registros locais removidos`);
-        console.log(`   ➕ ${dadosNovos} registros da planilha carregados`);
-        if (diferenca > 0) {
-            console.log(`   📈 ${diferenca} registros a mais na planilha`);
-        } else if (diferenca < 0) {
-            console.log(`   📉 ${Math.abs(diferenca)} registros a menos na planilha`);
-        } else {
-            console.log(`   ✓ Mesmo número de registros`);
-        }
-        
-        // === FASE 5: ATUALIZAR SISTEMA ===
-        console.log('💾 FASE 5: Atualizando sistema...');
-        
-        // Atualiza próximo ID disponível
         if (services.length > 0) {
             const maxId = Math.max(...services.map(s => parseInt(s.id) || 0));
             if (typeof window.nextAvailableId !== 'undefined') {
                 window.nextAvailableId = maxId + 1;
             }
-            console.log(`🔢 Próximo ID disponível: ${window.nextAvailableId}`);
         }
         
-        // Salva dados localmente
         saveData();
-        console.log('💾 Dados salvos no localStorage');
-        
-        // Atualiza interface
         renderTable();
-        console.log('🖼️ Tabela renderizada');
-        
         updateSummary();
-        console.log('📊 Resumo atualizado');
         
-        // Registra horário da sincronização
         lastSyncTime = new Date();
         localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
         if (typeof updateLastSyncDisplay === 'function') {
             updateLastSyncDisplay();
         }
-        console.log(`🕐 Última sincronização: ${lastSyncTime.toLocaleString('pt-PT')}`);
         
-        // === FEEDBACK FINAL ===
+        // === FEEDBACK ===
         const duration = Math.round((Date.now() - startTime) / 1000);
-        console.log(`✅ === SINCRONIZAÇÃO CONCLUÍDA EM ${duration}s ===`);
-        console.log(`📦 TOTAL: ${services.length} registros carregados da planilha`);
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('=== SUCESSO EM ' + duration + 's ===');
+        logMergeStats(mergeResult);
         
-        // Mensagem para o usuário
-        let statusMessage = `✅ ${dadosNovos} registros carregados da planilha`;
-        if (diferenca > 0) {
-            statusMessage += ` (+${diferenca} novos)`;
-        } else if (diferenca < 0) {
-            statusMessage += ` (${diferenca} removidos)`;
-        }
-        
-        showStatus(statusMessage, 'success');
+        showStatus(
+            services.length + ' transfers: ' + mergeResult.updated + ' atualizados, ' +
+            mergeResult.added + ' novos, ' + mergeResult.removed + ' removidos',
+            'success'
         );
         
         if (typeof window.isConnected !== 'undefined') {
@@ -2519,27 +2481,27 @@ async function loadTransfersFromSheets() {
         return true;
         
     } catch (error) {
-        console.error('❌ === ERRO NA SINCRONIZAÇÃO ===');
+        console.error('=== ERRO NA SINCRONIZACAO ===');
         console.error('Mensagem:', error.message);
         console.error('Stack:', error.stack);
         
         let userMessage = 'Erro desconhecido';
         
         if (error.name === 'AbortError') {
-            userMessage = 'Timeout: Sincronização excedeu 30 segundos';
+            userMessage = 'Timeout: Sincronizacao excedeu 30 segundos';
         } else if (error.message.includes('HTTP')) {
-            userMessage = 'Erro de conexão com servidor';
+            userMessage = 'Erro de conexao com servidor';
         } else if (error.message.includes('JSON')) {
-            userMessage = 'Formato de dados inválido';
+            userMessage = 'Formato de dados invalido';
         } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-            userMessage = 'Erro de rede - verifique conexão';
+            userMessage = 'Erro de rede - verifique conexao';
         } else if (error.message.includes('URL')) {
-            userMessage = 'URL não configurada';
+            userMessage = 'URL nao configurada';
         } else {
             userMessage = error.message;
         }
         
-        showStatus(`❌ ${userMessage}`, 'error');
+        showStatus(userMessage, 'error');
         
         if (typeof window.isConnected !== 'undefined') {
             window.isConnected = false;
@@ -2556,7 +2518,7 @@ async function loadTransfersFromSheets() {
         }
         
         const totalDuration = Math.round((Date.now() - startTime) / 1000);
-        console.log(`=== FIM (${totalDuration}s) ===\n`);
+        console.log('=== FIM (' + totalDuration + 's) ===');
     }
 }
         
