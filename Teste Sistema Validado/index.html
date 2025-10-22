@@ -2438,40 +2438,76 @@ async function loadTransfersFromSheets() {
             throw new Error('Nenhum transfer com dados completos');
         }
         
-        // === FASE 4: MERGE ===
-        console.log('🔀 FASE 4: Merge inteligente...');
-        const mergeResult = mergeServerDataWithLocal(validTransfers);
+// === FASE 4: SUBSTITUIÇÃO COMPLETA (SEM MERGE) ===
+        console.log('🔄 FASE 4: Substituindo dados locais por dados da planilha...');
+        console.log(`📊 Dados locais antes: ${services.length} registros`);
+        console.log(`📊 Dados da planilha: ${validTransfers.length} registros`);
         
-        // === FASE 5: ATUALIZAR ===
+        // Contadores para estatísticas
+        const dadosAntigos = services.length;
+        const dadosNovos = validTransfers.length;
+        const diferenca = dadosNovos - dadosAntigos;
+        
+        // SUBSTITUIÇÃO COMPLETA - Dados da planilha sobrescrevem tudo
+        services = [...validTransfers]; // Cria cópia para evitar referências
+        
+        console.log('✅ Substituição concluída:');
+        console.log(`   🗑️ ${dadosAntigos} registros locais removidos`);
+        console.log(`   ➕ ${dadosNovos} registros da planilha carregados`);
+        if (diferenca > 0) {
+            console.log(`   📈 ${diferenca} registros a mais na planilha`);
+        } else if (diferenca < 0) {
+            console.log(`   📉 ${Math.abs(diferenca)} registros a menos na planilha`);
+        } else {
+            console.log(`   ✓ Mesmo número de registros`);
+        }
+        
+        // === FASE 5: ATUALIZAR SISTEMA ===
         console.log('💾 FASE 5: Atualizando sistema...');
-        services = mergeResult.finalData;
         
+        // Atualiza próximo ID disponível
         if (services.length > 0) {
             const maxId = Math.max(...services.map(s => parseInt(s.id) || 0));
             if (typeof window.nextAvailableId !== 'undefined') {
                 window.nextAvailableId = maxId + 1;
             }
+            console.log(`🔢 Próximo ID disponível: ${window.nextAvailableId}`);
         }
         
+        // Salva dados localmente
         saveData();
-        renderTable();
-        updateSummary();
+        console.log('💾 Dados salvos no localStorage');
         
+        // Atualiza interface
+        renderTable();
+        console.log('🖼️ Tabela renderizada');
+        
+        updateSummary();
+        console.log('📊 Resumo atualizado');
+        
+        // Registra horário da sincronização
         lastSyncTime = new Date();
         localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
         if (typeof updateLastSyncDisplay === 'function') {
             updateLastSyncDisplay();
         }
+        console.log(`🕐 Última sincronização: ${lastSyncTime.toLocaleString('pt-PT')}`);
         
-        // === FEEDBACK ===
+        // === FEEDBACK FINAL ===
         const duration = Math.round((Date.now() - startTime) / 1000);
-        console.log(`✅ === SUCESSO EM ${duration}s ===`);
-        logMergeStats(mergeResult);
+        console.log(`✅ === SINCRONIZAÇÃO CONCLUÍDA EM ${duration}s ===`);
+        console.log(`📦 TOTAL: ${services.length} registros carregados da planilha`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         
-        showStatus(
-            `✅ ${services.length} transfers: ${mergeResult.updated} atualizados, ` +
-            `${mergeResult.added} novos, ${mergeResult.removed} removidos`,
-            'success'
+        // Mensagem para o usuário
+        let statusMessage = `✅ ${dadosNovos} registros carregados da planilha`;
+        if (diferenca > 0) {
+            statusMessage += ` (+${diferenca} novos)`;
+        } else if (diferenca < 0) {
+            statusMessage += ` (${diferenca} removidos)`;
+        }
+        
+        showStatus(statusMessage, 'success');
         );
         
         if (typeof window.isConnected !== 'undefined') {
