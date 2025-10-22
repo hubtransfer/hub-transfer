@@ -5,55 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TESTE Sistema - HUB Transfer</title>
     
-    <script>
-// =====================================================
-// INICIALIZAÇÃO DE VARIÁVEIS DE CONTROLE DE SINCRONIZAÇÃO
-// =====================================================
-
-// FORÇA CRIAÇÃO DA VARIÁVEL GLOBAL (não permite duplicatas locais)
-Object.defineProperty(window, 'syncInProgress', {
-    value: false,
-    writable: true,
-    configurable: true,
-    enumerable: true
-});
-
-Object.defineProperty(window, 'lastSyncAttempt', {
-    value: null,
-    writable: true,
-    configurable: true,
-    enumerable: true
-});
-
-console.log('✅ Flag syncInProgress inicializada como propriedade global: false');
-
-// Timeout máximo entre sincronizações (em milissegundos)
-const SYNC_TIMEOUT_MS = 30000; // 30 segundos
-
-// Auto-reset da flag se passar do timeout
-setInterval(() => {
-    if (window.syncInProgress && window.lastSyncAttempt) {
-        const timeSinceLastAttempt = Date.now() - window.lastSyncAttempt;
-        
-        if (timeSinceLastAttempt > SYNC_TIMEOUT_MS) {
-            console.warn('⚠️ AUTO-RESET: Flag de sincronização travada há mais de 30s');
-            console.warn(`   Tempo desde última tentativa: ${Math.round(timeSinceLastAttempt / 1000)}s`);
-            window.syncInProgress = false;
-            window.lastSyncAttempt = null;
-            
-            if (typeof hideSyncIndicator === 'function') {
-                hideSyncIndicator();
-            }
-            
-            showStatus('⚠️ Sincronização foi resetada automaticamente (timeout)', 'warning');
-            console.log('✅ Flag resetada automaticamente');
-        }
-    }
-}, 5000); // Verifica a cada 5 segundos
-
-console.log('✅ Sistema de auto-reset de sincronização ativado');
-    </script>
-    
     <!-- Google Maps API -->
     <script>
         function initMap() {
@@ -1439,7 +1390,7 @@ console.log('✅ Sistema de auto-reset de sincronização ativado');
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycbxKuqWn4zJRVaLefrKXcUbNRb697YYiq-tymbYrKoIW5jjUWLpnOuFVTojHcXzGoMxSZg/exec" 
+       value="https://script.google.com/macros/s/AKfycbwi3D0Kaa41t7dzh4SHS7qcMs-2-N4nmrZa5RABcxzcbKthshOmPaz2XoUGUfW_uZOFsw/exec" 
        placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1942,7 +1893,7 @@ console.log('✅ Sistema de auto-reset de sincronização ativado');
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxKuqWn4zJRVaLefrKXcUbNRb697YYiq-tymbYrKoIW5jjUWLpnOuFVTojHcXzGoMxSZg/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwi3D0Kaa41t7dzh4SHS7qcMs-2-N4nmrZa5RABcxzcbKthshOmPaz2XoUGUfW_uZOFsw/exec';
 const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
 const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
@@ -2269,530 +2220,189 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             </a>`;
         }
 
-// =====================================================
-// FUNÇÃO LOADTRANSFERSFROMSHEETS - VERSÃO LIMPA SEM EMOJIS
-// Cole esta função substituindo a atual (linha 2277-2523)
-// =====================================================
-
-async function loadTransfersFromSheets() {
-    const startTime = Date.now();
-    console.log('=== INICIANDO SINCRONIZACAO ===');
-    console.log('Timestamp:', new Date().toISOString());
-    
-    // PROTECAO 1: Verificar flag com auto-correcao
-    if (window.syncInProgress === true) {
-        const timeSinceLastAttempt = window.lastSyncAttempt 
-            ? Date.now() - window.lastSyncAttempt 
-            : 0;
-        
-        // Se passou mais de 30 segundos, considera travamento e reseta
-        if (timeSinceLastAttempt > SYNC_TIMEOUT_MS) {
-            console.warn('Flag travada detectada - forcando reset');
-            window.syncInProgress = false;
-            window.lastSyncAttempt = null;
-        } else {
-            console.warn('BLOQUEADO: Sincronizacao em andamento');
-            console.warn('Tempo desde ultima tentativa: ' + Math.round(timeSinceLastAttempt / 1000) + 's');
-            showStatus('Sincronizacao ja em andamento, aguarde...', 'warning');
-            return false;
-        }
-    }
-    
-    // Marca inicio da sincronizacao
-    window.syncInProgress = true;
-    window.lastSyncAttempt = Date.now();
-    console.log('Flag syncInProgress = true');
-    
-    // PROTECAO 2: Garantir reset em caso de qualquer erro
-    const guaranteeReset = () => {
-        window.syncInProgress = false;
-        window.lastSyncAttempt = null;
-        console.log('Flag syncInProgress = false (reset garantido)');
-    };
-    
-    try {
-        // Obtem URL configurada
-        const webappUrl = getWebAppUrl();
-        console.log('URL configurada:', webappUrl);
-        
-        if (!webappUrl || webappUrl.trim() === '') {
-            throw new Error('URL do Google Apps Script nao configurada');
-        }
-        
-        // Exibe indicadores
-        showStatus('Carregando dados do Google Sheets...', 'warning');
-        if (typeof showSyncIndicator === 'function') {
-            showSyncIndicator('Sincronizando...');
-        }
-        
-        // === FASE 1: BUSCAR DADOS ===
-        console.log('FASE 1: Buscando dados...');
-        const dataUrl = webappUrl + '?action=getAllData&_=' + Date.now();
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
-        
-        let response;
-        try {
-            response = await fetch(dataUrl, {
-                method: 'GET',
-                mode: 'cors',
-                cache: 'no-cache',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                signal: controller.signal
-            });
-        } finally {
-            clearTimeout(timeoutId);
-        }
-        
-        console.log('Status:', response.status, response.statusText);
-        
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-        }
-        
-        // === FASE 2: PROCESSAR RESPOSTA ===
-        console.log('FASE 2: Processando resposta...');
-        const textResponse = await response.text();
-        console.log('Tamanho:', textResponse.length, 'caracteres');
-        
-        if (!textResponse || textResponse.trim() === '') {
-            throw new Error('Resposta vazia do servidor');
-        }
-        
-        let result;
-        try {
-            result = JSON.parse(textResponse);
-            console.log('JSON parseado');
-        } catch (parseError) {
-            console.error('Erro parse JSON:', parseError.message);
-            throw new Error('Resposta nao e JSON valido');
-        }
-        
-        if (result.success === false) {
-            throw new Error(result.error || result.message || 'Erro no servidor');
-        }
-        
-        let dataArray = result.data || result || [];
-        
-        if (!Array.isArray(dataArray)) {
-            dataArray = [];
-        }
-        
-        console.log(dataArray.length + ' registros recebidos');
-        
-        if (dataArray.length === 0) {
-            console.log('Nenhum dado na planilha');
-            services = [];
-            saveData();
-            renderTable();
-            updateSummary();
-            showStatus('Nenhum transfer na planilha', 'warning');
-            return true;
-        }
-        
-        // === FASE 3: CONVERTER ===
-        console.log('FASE 3: Convertendo dados...');
-        const convertedServices = [];
-        let successCount = 0;
-        let errorCount = 0;
-        
-        for (let index = 0; index < dataArray.length; index++) {
-            const serverItem = dataArray[index];
+        // =====================================================
+        // FUNÇÃO PRINCIPAL PARA CARREGAR TRANSFERS
+        // =====================================================
+        async function loadTransfersFromSheets() {
+            console.log('📥 Iniciando carregamento de transfers do Google Sheets...');
             
-            if (!serverItem || typeof serverItem !== 'object') {
-                errorCount++;
-                continue;
+            const webappUrl = getWebAppUrl();
+            console.log('🔗 URL configurada:', webappUrl);
+            
+            if (!webappUrl) {
+                showStatus('❌ URL do Google Apps Script não configurada', 'error');
+                return false;
             }
             
             try {
-                const converted = convertServerDataToLocal(serverItem, index);
+                showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
                 
-                if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente nao informado') {
-                    convertedServices.push(converted);
-                    successCount++;
-                } else {
-                    errorCount++;
-                }
-            } catch (conversionError) {
-                console.error('Erro item ' + index + ':', conversionError.message);
-                errorCount++;
-            }
-        }
-        
-        console.log('Convertidos: ' + successCount + ' sucessos, ' + errorCount + ' erros');
-        
-        if (convertedServices.length === 0) {
-            throw new Error('Nenhum registro valido processado');
-        }
-        
-        // Valida
-        const validTransfers = convertedServices.filter(s => 
-            s.id && s.nomeCliente && s.nomeCliente !== 'Cliente nao informado' && s.data
-        );
-        
-        if (validTransfers.length === 0) {
-            throw new Error('Nenhum transfer com dados completos');
-        }
-        
-        // === FASE 4: MERGE ===
-        console.log('FASE 4: Merge inteligente...');
-        const mergeResult = mergeServerDataWithLocal(validTransfers);
-        
-        // === FASE 5: ATUALIZAR ===
-        console.log('FASE 5: Atualizando sistema...');
-        services = mergeResult.finalData;
-        
-        if (services.length > 0) {
-            const maxId = Math.max(...services.map(s => parseInt(s.id) || 0));
-            if (typeof window.nextAvailableId !== 'undefined') {
-                window.nextAvailableId = maxId + 1;
-            }
-        }
-        
-        saveData();
-        renderTable();
-        updateSummary();
-        
-        lastSyncTime = new Date();
-        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-        if (typeof updateLastSyncDisplay === 'function') {
-            updateLastSyncDisplay();
-        }
-        
-        // === FEEDBACK ===
-        const duration = Math.round((Date.now() - startTime) / 1000);
-        console.log('=== SUCESSO EM ' + duration + 's ===');
-        logMergeStats(mergeResult);
-        
-        showStatus(
-            services.length + ' transfers: ' + mergeResult.updated + ' atualizados, ' +
-            mergeResult.added + ' novos, ' + mergeResult.removed + ' removidos',
-            'success'
-        );
-        
-        if (typeof window.isConnected !== 'undefined') {
-            window.isConnected = true;
-        }
-        
-        return true;
-        
-    } catch (error) {
-        console.error('=== ERRO NA SINCRONIZACAO ===');
-        console.error('Mensagem:', error.message);
-        console.error('Stack:', error.stack);
-        
-        let userMessage = 'Erro desconhecido';
-        
-        if (error.name === 'AbortError') {
-            userMessage = 'Timeout: Sincronizacao excedeu 30 segundos';
-        } else if (error.message.includes('HTTP')) {
-            userMessage = 'Erro de conexao com servidor';
-        } else if (error.message.includes('JSON')) {
-            userMessage = 'Formato de dados invalido';
-        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-            userMessage = 'Erro de rede - verifique conexao';
-        } else if (error.message.includes('URL')) {
-            userMessage = 'URL nao configurada';
-        } else {
-            userMessage = error.message;
-        }
-        
-        showStatus(userMessage, 'error');
-        
-        if (typeof window.isConnected !== 'undefined') {
-            window.isConnected = false;
-        }
-        
-        return false;
-        
-    } finally {
-        // GARANTIA ABSOLUTA DE RESET
-        guaranteeReset();
-        
-        if (typeof hideSyncIndicator === 'function') {
-            hideSyncIndicator();
-        }
-        
-        const totalDuration = Math.round((Date.now() - startTime) / 1000);
-        console.log('=== FIM (' + totalDuration + 's) ===');
-    }
-}
-        
-// =====================================================
-// RESET MANUAL DA FLAG DE SINCRONIZAÇÃO (EMERGÊNCIA)
-// =====================================================
-/**
- * Função de emergência para resetar flag de sincronização
- * Use se o sistema travar com "Sincronização em andamento"
- * 
- * Uso no console: resetSyncFlag()
- */
-function resetSyncFlag() {
-    console.log('🔧 Resetando flag de sincronização manualmente...');
-    
-    const wasLocked = window.syncInProgress;
-    window.syncInProgress = false;
-    
-    if (typeof hideSyncIndicator === 'function') {
-        hideSyncIndicator();
-    }
-    
-    console.log('✅ Flag resetada com sucesso');
-    console.log(`   Estado anterior: ${wasLocked ? 'TRAVADA' : 'OK'}`);
-    console.log(`   Estado atual: ${window.syncInProgress}`);
-    
-    showStatus('Flag de sincronização resetada manualmente', 'success');
-    
-    return {
-        wasLocked: wasLocked,
-        currentState: window.syncInProgress
-    };
-}
-
-window.resetSyncFlag = resetSyncFlag;
-
-        // =====================================================
-// MONITORAR ESTADO DA SINCRONIZAÇÃO
-// =====================================================
-/**
- * Exibe informações detalhadas sobre o estado da sincronização
- * 
- * Uso no console: checkSyncStatus()
- */
-function checkSyncStatus() {
-    console.log('📊 === STATUS DA SINCRONIZAÇÃO ===');
-    console.log('Flag syncInProgress:', window.syncInProgress || false);
-    console.log('isConnected:', typeof window.isConnected !== 'undefined' ? window.isConnected : 'não definido');
-    console.log('Última sincronização:', lastSyncTime ? lastSyncTime.toLocaleString('pt-PT') : 'nunca');
-    console.log('Total de registros:', services.length);
-    console.log('URL configurada:', getWebAppUrl() || 'NÃO CONFIGURADA');
-    console.log('================================');
-    
-    return {
-        syncInProgress: window.syncInProgress || false,
-        isConnected: window.isConnected,
-        lastSync: lastSyncTime,
-        totalRecords: services.length,
-        webappUrl: getWebAppUrl()
-    };
-}
-
-// Expõe função para console
-window.checkSyncStatus = checkSyncStatus;
-        
-// =====================================================
-// MERGE INTELIGENTE DE DADOS DO SERVIDOR COM LOCAL
-// =====================================================
-/**
- * Faz merge dos dados do servidor (planilha) com os dados locais
- * PRIORIDADE: Dados do servidor SEMPRE sobrescrevem dados locais
- * 
- * Funcionalidades:
- * - Atualiza registros existentes que foram editados manualmente na planilha
- * - Adiciona novos registros encontrados na planilha
- * - Remove registros que foram deletados da planilha
- * - Preserva integridade dos IDs
- * - Detecta alterações campo por campo
- * 
- * @param {Array} serverData - Dados convertidos vindos do Google Sheets
- * @returns {Object} Resultado do merge com estatísticas detalhadas
- */
-function mergeServerDataWithLocal(serverData) {
-    console.log('🔀 === INICIANDO MERGE INTELIGENTE ===');
-    console.log(`📊 Dados locais antes do merge: ${services.length} registros`);
-    console.log(`📊 Dados do servidor para merge: ${serverData.length} registros`);
-    
-    // Estatísticas do merge
-    const stats = {
-        updated: 0,      // Registros que foram modificados na planilha
-        added: 0,        // Registros novos da planilha
-        removed: 0,      // Registros deletados da planilha
-        unchanged: 0,    // Registros sem alterações
-        finalData: []    // Array final após merge
-    };
-    
-    // Se não há dados locais, todos os registros do servidor são novos
-    if (!services || services.length === 0) {
-        console.log('📋 Nenhum dado local - todos os registros do servidor serão adicionados');
-        stats.added = serverData.length;
-        stats.finalData = [...serverData];
-        
-        console.log('✅ Merge concluído - todos os registros são novos');
-        logMergeStats(stats);
-        return stats;
-    }
-    
-    // Cria mapas para busca rápida O(1) por ID
-    const localMap = new Map();
-    services.forEach(service => {
-        if (service.id) {
-            localMap.set(service.id.toString(), service);
-        }
-    });
-    
-    const serverMap = new Map();
-    serverData.forEach(service => {
-        if (service.id) {
-            serverMap.set(service.id.toString(), service);
-        }
-    });
-    
-    console.log(`🗺️ Mapa local criado: ${localMap.size} registros indexados`);
-    console.log(`🗺️ Mapa servidor criado: ${serverMap.size} registros indexados`);
-    
-    // === PASSO 1: Processar todos os registros do servidor ===
-    console.log('📥 PASSO 1: Processando registros do servidor...');
-    
-    serverData.forEach((serverService, index) => {
-        const serverId = serverService.id ? serverService.id.toString() : null;
-        
-        if (!serverId) {
-            console.warn(`⚠️ Registro ${index} sem ID - pulando`);
-            return;
-        }
-        
-        const localService = localMap.get(serverId);
-        
-        if (localService) {
-            // Registro já existe - verifica se houve alterações
-            const changes = detectChanges(localService, serverService);
-            
-            if (changes.hasChanges) {
-                console.log(`📝 [ID ${serverId}] ATUALIZADO - ${changes.changedFields.length} campo(s) alterado(s)`);
-                changes.changedFields.forEach(field => {
-                    console.log(`   🔹 ${field.name}: "${field.oldValue}" → "${field.newValue}"`);
+                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+                console.log('📡 Fazendo requisição para:', dataUrl);
+                
+                const response = await fetch(dataUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
-                stats.updated++;
-                stats.finalData.push({...serverService}); // Prioriza dados do servidor
-            } else {
-                console.log(`✓ [ID ${serverId}] Sem alterações`);
-                stats.unchanged++;
-                stats.finalData.push({...serverService}); // Mantém dados do servidor mesmo sem alterações
+                
+                console.log('📊 Status da resposta:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const textResponse = await response.text();
+                console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
+                
+                if (!textResponse || textResponse.trim() === '') {
+                    throw new Error('Resposta vazia do servidor');
+                }
+                
+                let result;
+                try {
+                    result = JSON.parse(textResponse);
+                } catch (parseError) {
+                    console.error('❌ Erro ao fazer parse do JSON:', parseError);
+                    console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
+                    throw new Error('Resposta do servidor não é um JSON válido');
+                }
+                
+                console.log('📊 Dados parseados:', result);
+                
+                if (!result) {
+                    throw new Error('Resposta nula do servidor');
+                }
+                
+                if (result.success === false) {
+                    const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
+                    throw new Error(errorMsg);
+                }
+                
+                let dataArray = result.data || result || [];
+
+                if (!Array.isArray(dataArray)) {
+                    console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
+                    dataArray = [];
+                }
+
+                console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
+
+                if (dataArray.length === 0) {
+                    showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+                    services = [];
+                    renderTable();
+                    updateSummary();
+                    return true;
+                }
+
+                const convertedServices = [];
+                let successCount = 0;
+                let errorCount = 0;
+
+                try {
+                    if (!Array.isArray(dataArray)) {
+                        throw new Error('Dados recebidos não são um array válido');
+                    }
+                    
+                    for (let index = 0; index < dataArray.length; index++) {
+                        const serverItem = dataArray[index];
+                        
+                        if (!serverItem || typeof serverItem !== 'object') {
+                            console.warn(`⚠️ Item ${index} inválido:`, serverItem);
+                            errorCount++;
+                            continue;
+                        }
+                        
+                        try {
+                            const converted = convertServerDataToLocal(serverItem, index);
+                            
+                            if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
+                                convertedServices.push(converted);
+                                successCount++;
+                            } else {
+                                console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
+                                errorCount++;
+                            }
+                            
+                        } catch (conversionError) {
+                            console.error(`❌ Erro ao converter item ${index}:`, conversionError);
+                            console.error('📄 Item problemático:', serverItem);
+                            errorCount++;
+                        }
+                    }
+                    
+                    console.log(`✅ Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
+                    console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
+                    
+                    if (convertedServices.length === 0) {
+                        if (dataArray.length > 0) {
+                            showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
+                            console.error('📄 Dados originais do servidor:', dataArray.slice(0, 2));
+                        } else {
+                            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+                        }
+                        return false;
+                    }
+                    
+                    const validTransfers = convertedServices.filter(service => 
+                        service.id && 
+                        service.nomeCliente && 
+                        service.nomeCliente !== 'Cliente não informado' &&
+                        service.data
+                    );
+                    if (validTransfers.length < convertedServices.length) {
+                        console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
+                    }
+                    
+                    if (validTransfers.length === 0) {
+                        showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
+                        return false;
+                    }
+                    
+                    const finalServices = validTransfers;
+                    
+                } catch (processingError) {
+                    console.error('Erro durante o processamento dos dados:', processingError);
+                    showStatus(`Erro no processamento: ${processingError.message}`, 'error');
+                    return false;
+                }        
+                
+                services = convertedServices;
+                
+                saveData();
+                renderTable();
+                updateSummary();
+                
+                lastSyncTime = new Date();
+                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                updateLastSyncDisplay();
+                
+                showStatus(`${services.length} transfers carregados com sucesso do Google Sheets!`, 'success');
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao carregar transfers:', error);
+                
+                let errorMessage = 'Erro desconhecido ao carregar transfers';
+                
+                if (error.message.includes('HTTP')) {
+                    errorMessage = 'Erro de conexão com o Google Sheets';
+                } else if (error.message.includes('JSON')) {
+                    errorMessage = 'Erro no formato dos dados recebidos';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = 'Erro de permissões de acesso';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                showStatus(`${errorMessage}`, 'error');
+                return false;
             }
-        } else {
-            // Registro novo do servidor
-            console.log(`➕ [ID ${serverId}] NOVO REGISTRO adicionado`);
-            stats.added++;
-            stats.finalData.push({...serverService});
         }
-    });
-    
-    // === PASSO 2: Identificar registros deletados da planilha ===
-    console.log('🗑️ PASSO 2: Verificando registros removidos...');
-    
-    services.forEach(localService => {
-        const serverId = localService.id ? localService.id.toString() : null;
-        
-        if (!serverId) return;
-        
-        if (!serverMap.has(serverId)) {
-            console.log(`🗑️ [ID ${serverId}] REMOVIDO da planilha - deletando localmente`);
-            stats.removed++;
-            // Não adiciona ao finalData (efetua a remoção)
-        }
-    });
-    
-    // === PASSO 3: Ordenar por ID para manter consistência ===
-    stats.finalData.sort((a, b) => {
-        const idA = parseInt(a.id) || 0;
-        const idB = parseInt(b.id) || 0;
-        return idA - idB;
-    });
-    
-    console.log('✅ === MERGE CONCLUÍDO COM SUCESSO ===');
-    logMergeStats(stats);
-    
-    return stats;
-}
-
-        // =====================================================
-// DETECTAR ALTERAÇÕES ENTRE REGISTROS LOCAL E SERVIDOR
-// =====================================================
-/**
- * Compara dois registros e detecta alterações campo por campo
- * Retorna objeto detalhado com campos alterados
- * 
- * @param {Object} local - Registro local (dados atuais)
- * @param {Object} server - Registro do servidor (dados da planilha)
- * @returns {Object} Objeto com hasChanges (boolean) e changedFields (array)
- */
-function detectChanges(local, server) {
-    // Campos críticos que podem ser editados manualmente na planilha
-    const fieldsToCompare = [
-        { key: 'data', label: 'Data' },
-        { key: 'hora', label: 'Hora' },
-        { key: 'nomeCliente', label: 'Cliente' },
-        { key: 'telefoneCliente', label: 'Telefone' },
-        { key: 'emailCliente', label: 'Email' },
-        { key: 'origem', label: 'Origem' },
-        { key: 'destino', label: 'Destino' },
-        { key: 'preco', label: 'Preço' },
-        { key: 'tipoServico', label: 'Tipo de Serviço' },
-        { key: 'status', label: 'Status' },
-        { key: 'observacoes', label: 'Observações' },
-        { key: 'numeroPassageiros', label: 'Passageiros' },
-        { key: 'numeroBagagens', label: 'Bagagens' },
-        { key: 'numeroVooChegada', label: 'Voo Chegada' },
-        { key: 'numeroVooPartida', label: 'Voo Partida' },
-        { key: 'horaVooChegada', label: 'Hora Voo Chegada' },
-        { key: 'horaVooPartida', label: 'Hora Voo Partida' }
-    ];
-    
-    const result = {
-        hasChanges: false,
-        changedFields: []
-    };
-    
-    /**
-     * Normaliza valores para comparação consistente
-     */
-    const normalize = (value) => {
-        if (value === null || value === undefined) return '';
-        if (typeof value === 'string') return value.trim().toLowerCase();
-        if (typeof value === 'number') return String(value);
-        return String(value).trim().toLowerCase();
-    };
-    
-    // Compara cada campo
-    for (const field of fieldsToCompare) {
-        const localValue = normalize(local[field.key]);
-        const serverValue = normalize(server[field.key]);
-        
-        if (localValue !== serverValue) {
-            result.hasChanges = true;
-            result.changedFields.push({
-                name: field.label,
-                key: field.key,
-                oldValue: local[field.key] || '',
-                newValue: server[field.key] || ''
-            });
-        }
-    }
-    
-    return result;
-}
-
-        // =====================================================
-// LOG DETALHADO DE ESTATÍSTICAS DO MERGE
-// =====================================================
-/**
- * Exibe log formatado das estatísticas do merge
- * 
- * @param {Object} stats - Estatísticas do merge
- */
-function logMergeStats(stats) {
-    console.log('📊 === ESTATÍSTICAS DO MERGE ===');
-    console.log(`   ✅ ${stats.finalData.length} registros totais após merge`);
-    console.log(`   📝 ${stats.updated} registros atualizados (editados na planilha)`);
-    console.log(`   ➕ ${stats.added} novos registros (adicionados na planilha)`);
-    console.log(`   🗑️ ${stats.removed} registros removidos (deletados da planilha)`);
-    console.log(`   ✓ ${stats.unchanged} registros sem alterações`);
-    console.log('================================');
-}
 
         function isValidResponse(result) {
             if (result.status === 'success') return true;
@@ -4765,230 +4375,27 @@ function parseServiceDate(dateStr) {
         });
 
         // =====================================================
-// FUNÇÕES DE DEBUG E DESENVOLVIMENTO (VERSÃO UNIFICADA)
-// =====================================================
-
-/**
- * Informações completas de debug do sistema
- * Uso: debugInfo()
- */
-function debugInfo() {
-    console.log('=== 🔍 DEBUG INFO SISTEMA v9.0 ===');
-    console.log('📊 DADOS:');
-    console.log('   Services:', services.length);
-    console.log('   Filtered Data:', filteredData.length);
-    console.log('   Server Data:', serverData.length);
-    console.log('   Next Available ID:', nextAvailableId);
-    console.log('');
-    console.log('🔌 CONEXÃO:');
-    console.log('   Connected:', isConnected);
-    console.log('   Sync In Progress:', window.syncInProgress);
-    console.log('   Last Sync Time:', lastSyncTime ? lastSyncTime.toLocaleString('pt-PT') : 'nunca');
-    console.log('   Last Sync Attempt:', window.lastSyncAttempt ? new Date(window.lastSyncAttempt).toLocaleString('pt-PT') : 'nunca');
-    console.log('');
-    console.log('⚙️ CONFIGURAÇÃO:');
-    console.log('   Saved URL:', localStorage.getItem('webappUrl'));
-    console.log('   WEBAPP URL:', WEBAPP_URL);
-    console.log('   Email de Teste:', TEST_EMAIL);
-    console.log('');
-    console.log('📝 ESTADO DA INTERFACE:');
-    console.log('   Editing ID:', editingId);
-    console.log('   Service Type:', currentServiceType);
-    console.log('   Admin Mode:', isAdminMode);
-    console.log('   Phone Input:', phoneInput);
-    console.log('   Active Filters:', activeFilters);
-    console.log('======================================');
-    
-    // Verifica se há problemas
-    if (window.syncInProgress) {
-        const timeSince = window.lastSyncAttempt 
-            ? Math.round((Date.now() - window.lastSyncAttempt) / 1000) 
-            : 0;
-        if (timeSince > 30) {
-            console.warn('⚠️ ATENÇÃO: Sincronização travada há', timeSince, 'segundos!');
-            console.warn('   Execute: forceResetSync()');
+        // FUNÇÕES DE DEBUG E DESENVOLVIMENTO
+        // =====================================================
+        function debugInfo() {
+            console.log('=== DEBUG INFO SISTEMA v9.0 ===');
+            console.log('Services:', services.length);
+            console.log('Connected:', isConnected);
+            console.log('Editing ID:', editingId);
+            console.log('Phone Input:', phoneInput);
+            console.log('Saved URL:', localStorage.getItem('webappUrl'));
+            console.log('WEBAPP URL:', WEBAPP_URL);
+            console.log('Email de Teste:', TEST_EMAIL);
+            console.log('Service Type:', currentServiceType);
+            console.log('Admin Mode:', isAdminMode);
+            console.log('Active Filters:', activeFilters);
+            console.log('Filtered Data:', filteredData.length);
+            console.log('Sync In Progress:', syncInProgress);
+            console.log('Last Sync Time:', lastSyncTime);
+            console.log('Server Data:', serverData.length);
+            console.log('Next Available ID:', nextAvailableId);
+            console.log('=====================================');
         }
-    }
-}
-
-/**
- * Status detalhado da sincronização
- * Uso: syncStatus()
- */
-function syncStatus() {
-    const now = Date.now();
-    const timeSinceAttempt = window.lastSyncAttempt 
-        ? Math.round((now - window.lastSyncAttempt) / 1000) 
-        : null;
-    
-    console.log('📊 === STATUS SINCRONIZAÇÃO ===');
-    console.log('Flag travada:', window.syncInProgress ? '🔴 SIM' : '🟢 NÃO');
-    console.log('Última tentativa:', window.lastSyncAttempt 
-        ? `${new Date(window.lastSyncAttempt).toLocaleString('pt-PT')} (há ${timeSinceAttempt}s)` 
-        : '❌ nunca');
-    console.log('Última sincronização bem-sucedida:', lastSyncTime 
-        ? `✅ ${lastSyncTime.toLocaleString('pt-PT')}` 
-        : '❌ nunca');
-    console.log('Total registros:', services.length);
-    console.log('URL configurada:', getWebAppUrl() ? '✅ SIM' : '❌ NÃO CONFIGURADA');
-    console.log('Conectado ao servidor:', typeof window.isConnected !== 'undefined' 
-        ? (window.isConnected ? '✅ SIM' : '❌ NÃO') 
-        : '⚠️ indefinido');
-    console.log('================================');
-    
-    // Sugere ação se travado
-    if (window.syncInProgress && timeSinceAttempt > 30) {
-        console.warn('⚠️ ATENÇÃO: Flag travada há mais de 30 segundos!');
-        console.warn('   Execute: forceResetSync() para resolver');
-    } else if (window.syncInProgress) {
-        console.info('ℹ️ Sincronização em andamento há', timeSinceAttempt, 'segundos');
-    }
-    
-    return {
-        syncInProgress: window.syncInProgress || false,
-        isConnected: window.isConnected,
-        lastSync: lastSyncTime,
-        lastAttempt: window.lastSyncAttempt,
-        totalRecords: services.length,
-        webappUrl: getWebAppUrl(),
-        timeSinceAttempt: timeSinceAttempt
-    };
-}
-
-/**
- * Reset manual forçado da flag de sincronização
- * Uso: forceResetSync() ou resetSyncFlag()
- */
-function forceResetSync() {
-    console.log('🔧 === RESET FORÇADO DA SINCRONIZAÇÃO ===');
-    
-    const wasLocked = window.syncInProgress;
-    const lastAttempt = window.lastSyncAttempt;
-    const timeSince = lastAttempt ? Math.round((Date.now() - lastAttempt) / 1000) : 0;
-    
-    // Reset das flags
-    window.syncInProgress = false;
-    window.lastSyncAttempt = null;
-    
-    // Esconde indicador de sincronização
-    if (typeof hideSyncIndicator === 'function') {
-        hideSyncIndicator();
-    }
-    
-    console.log('✅ Reset concluído com sucesso!');
-    console.log('📊 Informações do reset:');
-    console.log(`   Estado anterior: ${wasLocked ? '🔴 TRAVADO' : '🟢 OK'}`);
-    console.log(`   Última tentativa: ${lastAttempt ? new Date(lastAttempt).toLocaleString('pt-PT') + ` (há ${timeSince}s)` : 'nunca'}`);
-    console.log(`   Estado atual: ${window.syncInProgress ? '🔴 TRAVADO' : '🟢 LIVRE'}`);
-    console.log('=====================================');
-    
-    showStatus('🔧 Flag de sincronização resetada manualmente', 'success');
-    
-    return {
-        wasLocked: wasLocked,
-        timeSinceLast: timeSince,
-        currentState: window.syncInProgress
-    };
-}
-
-/**
- * Reset completo do sistema (dados locais + flags)
- * Uso: resetSystem()
- */
-function resetSystem() {
-    if (confirm('ATENÇÃO: Esta ação irá resetar COMPLETAMENTE o sistema!\n\nTodos os dados locais serão perdidos. Continuar?')) {
-        console.log('🔄 === RESET COMPLETO DO SISTEMA ===');
-        
-        // Limpa localStorage
-        localStorage.clear();
-        
-        // Reseta variáveis globais
-        services = [];
-        activeFilters = {
-            dateStart: null,
-            dateEnd: null,
-            status: '',
-            cliente: '',
-            quickPeriod: '',
-            tipoServico: ''
-        };
-        filteredData = [];
-        serverData = [];
-        lastSyncTime = null;
-        nextAvailableId = 1;
-        
-        // Reseta flags de sincronização
-        window.syncInProgress = false;
-        window.lastSyncAttempt = null;
-        
-        // Atualiza interface
-        renderTable();
-        updateSummary();
-        clearForm();
-        
-        if (typeof hideSyncIndicator === 'function') {
-            hideSyncIndicator();
-        }
-        
-        console.log('✅ Sistema resetado completamente');
-        showStatus('✅ Sistema resetado com sucesso!', 'success');
-    } else {
-        console.log('❌ Reset cancelado pelo usuário');
-    }
-}
-
-// =====================================================
-// EXPOSIÇÃO DAS FUNÇÕES PARA O CONSOLE
-// =====================================================
-
-// Funções de debug
-window.debugInfo = debugInfo;
-window.syncStatus = syncStatus;
-window.forceResetSync = forceResetSync;
-window.resetSyncFlag = forceResetSync; // Alias para compatibilidade
-window.resetSystem = resetSystem;
-
-// Funções de sincronização
-window.syncWithServer = syncWithServer;
-window.testConnection = testConnection;
-window.loadTransfersFromSheets = loadTransfersFromSheets;
-window.testBasicConnectivity = testBasicConnectivity;
-
-// Funções de configuração
-window.toggleConfig = toggleConfig;
-window.clearAllData = clearAllData;
-window.clearTestData = clearTestData;
-window.toggleClearData = toggleClearData;
-
-// =====================================================
-// LOG DE INICIALIZAÇÃO
-// =====================================================
-console.log('%c🚀 TESTE Sistema de Transfers HUB Transfer v9.0', 'color: #3498db; font-size: 16px; font-weight: bold;');
-console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #3498db;');
-console.log('📧 Email configurado para testes:', TEST_EMAIL);
-console.log('🔗 URL do WebApp:', WEBAPP_URL);
-console.log('🔐 Senha admin: admin2025');
-console.log('');
-console.log('%c📋 FUNÇÕES DISPONÍVEIS NO CONSOLE:', 'color: #2ecc71; font-weight: bold;');
-console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #2ecc71;');
-console.log('');
-console.log('🔍 DEBUG:');
-console.log('   • debugInfo() ..................... Ver informações completas do sistema');
-console.log('   • syncStatus() .................... Ver status da sincronização');
-console.log('');
-console.log('🔧 MANUTENÇÃO:');
-console.log('   • forceResetSync() ................ Resetar flag de sincronização travada');
-console.log('   • resetSyncFlag() ................. Alias para forceResetSync()');
-console.log('   • resetSystem() ................... Reset completo do sistema (CUIDADO!)');
-console.log('');
-console.log('🔄 SINCRONIZAÇÃO:');
-console.log('   • loadTransfersFromSheets() ....... Carregar/atualizar dados do Google Sheets');
-console.log('   • syncWithServer() ................ Sincronização manual com servidor');
-console.log('   • testConnection() ................ Testar conexão com servidor');
-console.log('   • testBasicConnectivity() ......... Teste básico de conectividade');
-console.log('');
-console.log('%c✅ Sistema inicializado e pronto para uso!', 'color: #27ae60; font-weight: bold;');
-console.log('');
 
         function resetSystem() {
             if (confirm('ATENÇÃO: Esta ação irá resetar COMPLETAMENTE o sistema!\n\nTodos os dados locais serão perdidos. Continuar?')) {
