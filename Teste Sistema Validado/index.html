@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TESTE Sistema - HUB Transfer</title>
     
-    <!-- Google Maps API -->
+    <!-- Google Maps API - CORRIGIDO -->
     <script>
+        // Callback quando o Maps carregar com sucesso
         function initMap() {
-            console.log('Google Maps carregado com sucesso!');
+            console.log('✅ Google Maps carregado com sucesso!');
             if (typeof initializeAutocomplete === 'function') {
-                initializeAutocomplete();
+                // Aguardar um pouco para garantir que o DOM está pronto
+                setTimeout(initializeAutocomplete, 100);
             }
         }
         
+        // Handler para erros de autenticação
         window.gm_authFailure = function() {
-            console.error('Erro de autenticação do Google Maps');
-            console.log('Usando sistema de sugestões local');
+            console.error('❌ Erro de autenticação do Google Maps');
+            console.log('ℹ️ Verifique se a chave API está correta');
+            console.log('ℹ️ Sistema continuará funcionando sem autocomplete');
         };
     </script>
     
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap"
-        onerror="console.warn('Erro ao carregar Google Maps - continuando sem autocomplete')">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap&loading=async"
+        onerror="console.error('❌ Erro ao carregar Google Maps'); console.log('ℹ️ Sistema continuará sem autocomplete');">
     </script>
     
     <!-- Telefone internacional -->
@@ -2762,14 +2766,26 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 }
             }
             
+            // Verificar se os elementos existem antes de acessá-los
+            const webappUrlInput = document.getElementById('webappUrl');
+            const syncBtn = document.getElementById('syncBtn');
+            
             if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
+                if (webappUrlInput) {
+                    webappUrlInput.value = savedUrl;
+                }
+                if (syncBtn) {
+                    syncBtn.style.display = 'inline-block';
+                }
                 isConnected = true;
             } else {
-                document.getElementById('webappUrl').value = WEBAPP_URL;
-                localStorage.setItem('webappUrl', WEBAPP_URL);
-                document.getElementById('syncBtn').style.display = 'inline-block';
+                if (webappUrlInput) {
+                    webappUrlInput.value = WEBAPP_URL;
+                    localStorage.setItem('webappUrl', WEBAPP_URL);
+                }
+                if (syncBtn) {
+                    syncBtn.style.display = 'inline-block';
+                }
                 isConnected = true;
             }
             
@@ -4331,44 +4347,62 @@ function parseServiceDate(dateStr) {
         }
 
         // =====================================================
-        // INICIALIZAÇÃO DO GOOGLE MAPS
+        // INICIALIZAÇÃO DO GOOGLE MAPS - CORRIGIDO
         // =====================================================
         function initializeAutocomplete() {
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                try {
-                    const origemInput = document.getElementById('origem');
-                    const destinoInput = document.getElementById('destino');
-                    
-                    if (origemInput && destinoInput) {
-                        const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
-                            types: ['establishment', 'geocode'],
-                            componentRestrictions: { country: 'pt' }
-                        });
+            // Verificar se Google Maps está disponível
+            if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+                console.log('⏳ Google Maps ainda não carregou, tentando novamente em 1s...');
+                setTimeout(initializeAutocomplete, 1000);
+                return;
+            }
 
-                        const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-                            types: ['establishment', 'geocode'],
-                            componentRestrictions: { country: 'pt' }
-                        });
+            try {
+                // Verificar se os elementos existem no DOM
+                const origemInput = document.getElementById('origem');
+                const destinoInput = document.getElementById('destino');
+                
+                if (!origemInput || !destinoInput) {
+                    console.warn('⚠️ Elementos de input não encontrados, tentando novamente...');
+                    setTimeout(initializeAutocomplete, 500);
+                    return;
+                }
+                
+                // Inicializar autocomplete para origem
+                const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
+                    types: ['establishment', 'geocode'],
+                    componentRestrictions: { country: 'pt' },
+                    fields: ['formatted_address', 'geometry', 'name']
+                });
 
-                        origemInput.addEventListener('input', function() {
-                            document.querySelectorAll('.origem-btn').forEach(btn => btn.classList.remove('active'));
-                        });
+                // Inicializar autocomplete para destino
+                const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
+                    types: ['establishment', 'geocode'],
+                    componentRestrictions: { country: 'pt' },
+                    fields: ['formatted_address', 'geometry', 'name']
+                });
 
-                        destinoInput.addEventListener('input', function() {
-                            document.querySelectorAll('.destino-btn').forEach(btn => btn.classList.remove('active'));
-                        });
-                        
-                        console.log('Google Maps Autocomplete inicializado com sucesso');
+                // Event listeners para limpar botões quando usuário digita
+                origemInput.addEventListener('input', function() {
+                    const btns = document.querySelectorAll('.origem-btn');
+                    if (btns) {
+                        btns.forEach(btn => btn.classList.remove('active'));
                     }
-                    
-                } catch (error) {
-                    console.warn('Erro ao inicializar Google Maps Autocomplete:', error);
-                }
-            } else {
-                if (typeof google === 'undefined') {
-                    console.log('Google Maps ainda não carregou, tentando novamente em 2s...');
-                    setTimeout(initializeAutocomplete, 2000);
-                }
+                });
+
+                destinoInput.addEventListener('input', function() {
+                    const btns = document.querySelectorAll('.destino-btn');
+                    if (btns) {
+                        btns.forEach(btn => btn.classList.remove('active'));
+                    }
+                });
+                
+                console.log('✅ Google Maps Autocomplete inicializado com sucesso');
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar Google Maps Autocomplete:', error);
+                // Continuar sem autocomplete - o sistema ainda funciona
+                console.log('ℹ️ Sistema continuará funcionando sem autocomplete do Google Maps');
             }
         }
 
