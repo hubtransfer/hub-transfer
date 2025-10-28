@@ -2323,7 +2323,6 @@ console.log('✅ Resposta recebida', {
             throw new Error(`Erro HTTP: ${response.status}`);
         }
 
-        const contentType = response.headers.get('content-type');
         console.log('Content-Type:', contentType);
 
 const loadTime = Date.now() - startTime;
