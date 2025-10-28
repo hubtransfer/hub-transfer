@@ -1694,7 +1694,6 @@
                     <button type="submit" class="btn btn-primary" id="submitBtn">📋 Solicitar Transfer</button>
                     <button type="button" class="btn btn-clear" onclick="clearForm()">🧹 Limpar</button>
                     <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
-                    <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">🔄 Atualizar Dados</button>
                     <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
                     <button type="button" class="btn btn-danger" onclick="toggleClearData()">🗑️ Limpar Dados</button>
                 </div>
@@ -2029,7 +2028,6 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 } else {
                     if (buttonId === 'testBtn') button.textContent = '✅ Testar Conexão';
                     else if (buttonId === 'submitBtn') button.textContent = '📋 Solicitar Transfer';
-                    else if (buttonId === 'syncBtn') button.textContent = '🔄 Atualizar Dados';
                     else if (buttonId === 'clearDataBtn') button.textContent = '🗑️ Limpar Todos os Dados';
                     else if (buttonId === 'clearTestBtn') button.textContent = '🧪 Limpar Apenas Testes';
                 }
