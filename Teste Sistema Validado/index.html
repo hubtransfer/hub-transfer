@@ -2059,7 +2059,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                     isConnected = true;
                     showStatus('✅ Conexão funcionando perfeitamente!', 'success');
                     saveWebappUrl();
-                    document.getElementById('syncBtn').style.display = 'inline-block';
+                // Botão syncBtn removido
                 } else {
                     throw new Error('Resposta não OK');
                 }
@@ -2090,13 +2090,13 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         }
 
         function saveWebappUrl() {
-            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
-            if (url) {
-                localStorage.setItem('webappUrl', url);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            }
-        }
+    const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+    if (url) {
+        localStorage.setItem('webappUrl', url);
+        // Botão syncBtn removido
+        isConnected = true;
+    }
+}
 
         function getWebAppUrl() {
             const inputUrl = document.getElementById('webappUrl');
@@ -2471,25 +2471,12 @@ function updateConnectionStatus(connected) {
         }
 
         function showSyncLoading(show) {
-            const button = document.getElementById('syncBtn');
-            if (button) {
-                if (show) {
-                    button.textContent = 'Sincronizando...';
-                    button.disabled = true;
-                    button.classList.add('loading');
-                } else {
-                    button.textContent = 'Atualizar Dados';
-                    button.disabled = false;
-                    button.classList.remove('loading');
-                }
-            }
-            
-            const indicator = document.getElementById('syncIndicator');
-            if (indicator) {
-                indicator.style.display = show ? 'block' : 'none';
-            }
-        }
-
+    // Botão syncBtn foi removido - apenas controla o indicador
+    const indicator = document.getElementById('syncIndicator');
+    if (indicator) {
+        indicator.style.display = show ? 'block' : 'none';
+    }
+}
         function showSyncSuccess(count) {
             showStatus(`${count} transfers sincronizados com sucesso!`, 'success');
             updateLastSyncDisplay();
@@ -2570,17 +2557,16 @@ function updateConnectionStatus(connected) {
                     services = [];
                 }
             }
-            
             if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            } else {
-                document.getElementById('webappUrl').value = WEBAPP_URL;
-                localStorage.setItem('webappUrl', WEBAPP_URL);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            }
+    document.getElementById('webappUrl').value = savedUrl;
+    // Botão syncBtn removido
+    isConnected = true;
+} else {
+    document.getElementById('webappUrl').value = WEBAPP_URL;
+    localStorage.setItem('webappUrl', WEBAPP_URL);
+    // Botão syncBtn removido
+    isConnected = true;
+}
             
             const lastSync = localStorage.getItem('lastSyncTime');
             if (lastSync) {
