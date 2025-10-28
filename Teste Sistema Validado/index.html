@@ -2280,14 +2280,23 @@ async function loadTransfersFromSheets() {
         console.log('Content-Type:', contentType);
 
         const data = await response.json();
-        const loadTime = Date.now() - startTime;
-        
-        console.log('✅ Resposta recebida', {
-            tempo: `${loadTime}ms`,
-            sucesso: data.success || data.sucesso,
-            totalDados: (data.data || data.dados || []).length
-        });
+const loadTime = Date.now() - startTime;
 
+// 🔥 DEBUG DETALHADO
+console.log('📦 RESPOSTA COMPLETA DO SERVIDOR:', JSON.stringify(data, null, 2));
+console.log('📊 Tipo da resposta:', typeof data);
+console.log('📋 Chaves da resposta:', Object.keys(data));
+
+console.log('✅ Resposta recebida', {
+    tempo: `${loadTime}ms`,
+    sucesso: data.success || data.sucesso,
+    totalDados: (data.data || data.dados || []).length,
+    temSuccess: 'success' in data,
+    temSucesso: 'sucesso' in data,
+    temData: 'data' in data,
+    temDados: 'dados' in data,
+    temErro: data.error || data.erro
+});
         // 🔥 CORREÇÃO: Aceitar tanto formato inglês (success) quanto português (sucesso)
         if (!data.success && !data.sucesso) {
             throw new Error(data.error || data.erro || 'Erro ao carregar dados');
