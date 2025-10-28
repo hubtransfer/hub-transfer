@@ -2251,231 +2251,155 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
 // =====================================================
 
 /**
- * Carrega transfers do Google Sheets - VERSÃO FORÇADA (SEM CACHE)
- * Substitui COMPLETAMENTE os dados locais com os dados do servidor
- * NÃO faz merge - SUBSTITUI tudo
+ * CARREGAR TRANSFERS DO GOOGLE SHEETS - VERSÃO CORRIGIDA V2
+ * Sincronização manual forçada com tratamento robusto de erros
  */
 async function loadTransfersFromSheets() {
-    console.log('📥 ============================================');
-    console.log('📥 CARREGAMENTO FORÇADO DO GOOGLE SHEETS');
-    console.log('📥 ============================================');
-    console.log('⏰ Timestamp:', new Date().toISOString());
+    console.log('🔄 Iniciando carregamento de transfers do Google Sheets...');
     
-    const webappUrl = getWebAppUrl();
-    console.log('🔗 URL configurada:', webappUrl);
-    
-    if (!webappUrl) {
-        console.error('❌ URL do Google Apps Script não configurada');
-        showStatus('❌ URL do Google Apps Script não configurada', 'error');
-        return false;
+    // Desabilitar botão durante sincronização
+    const btnAtualizar = document.querySelector('button[onclick="loadTransfersFromSheets()"]');
+    if (btnAtualizar) {
+        btnAtualizar.disabled = true;
+        btnAtualizar.textContent = '⏳ Sincronizando...';
     }
     
     try {
-        showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
+        // Verificar se WEBAPP_URL está configurado
+        if (!WEBAPP_URL || WEBAPP_URL === 'SUA_URL_WEBAPP_AQUI') {
+            console.error('❌ WEBAPP_URL não configurado');
+            showStatus('Configure a URL do WebApp primeiro', 'error');
+            return;
+        }
         
-        // 🔥 ADICIONAR TIMESTAMP PARA FORÇAR BYPASS DE CACHE
-        const timestamp = new Date().getTime();
-        const randomToken = Math.random().toString(36).substring(7);
-        const dataUrl = `${webappUrl}?action=getAllData&_t=${timestamp}&_r=${randomToken}`;
+        console.log('📡 URL do WebApp:', WEBAPP_URL);
         
-        console.log('📡 Fazendo requisição para:', dataUrl);
-        console.log('🔥 Cache bypass: timestamp=' + timestamp);
+        // Fazer requisição com timeout e retry
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
         
-        // 🔥 REQUISIÇÃO COM HEADERS ANTI-CACHE
-        const response = await fetch(dataUrl, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-store', // Nunca usar cache
+        const response = await fetch(WEBAPP_URL, {
+            method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'getTransfers'
+            }),
+            signal: controller.signal
         });
         
-        console.log('📊 Status da resposta:', response.status, response.statusText);
+        clearTimeout(timeoutId);
+        
+        console.log('📥 Resposta recebida:', response.status);
         
         if (!response.ok) {
-            throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        // Ler resposta como texto primeiro
-        const textResponse = await response.text();
-        console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
-        console.log('📄 Primeiros 200 caracteres:', textResponse.substring(0, 200));
+        const data = await response.json();
+        console.log('📦 Dados recebidos:', data);
         
-        if (!textResponse || textResponse.trim() === '') {
-            throw new Error('Resposta vazia do servidor');
+        // Validar estrutura da resposta
+        if (!data || typeof data !== 'object') {
+            throw new Error('Resposta inválida do servidor (não é objeto)');
         }
         
-        // Fazer parse do JSON
-        let result;
-        try {
-            result = JSON.parse(textResponse);
-        } catch (parseError) {
-            console.error('❌ Erro ao fazer parse do JSON:', parseError);
-            console.log('📄 Resposta bruta (primeiros 500 chars):', textResponse.substring(0, 500));
-            throw new Error('Resposta do servidor não é um JSON válido');
+        // Verificar diferentes formatos de resposta possíveis
+        let transfersData = [];
+        
+        if (data.success && Array.isArray(data.data)) {
+            transfersData = data.data;
+        } else if (data.sucesso && Array.isArray(data.dados)) {
+            transfersData = data.dados;
+        } else if (Array.isArray(data.transfers)) {
+            transfersData = data.transfers;
+        } else if (Array.isArray(data)) {
+            transfersData = data;
+        } else {
+            console.error('❌ Formato de dados não reconhecido:', data);
+            throw new Error('Formato de resposta inválido');
         }
         
-        console.log('📊 Dados parseados:', result);
+        console.log(`📊 ${transfersData.length} transfers recebidos do servidor`);
         
-        if (!result) {
-            throw new Error('Resposta nula do servidor');
-        }
-        
-        if (result.success === false) {
-            const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
-            throw new Error(errorMsg);
-        }
-        
-        // Pegar array de dados
-        let dataArray = result.data || result || [];
-
-        if (!Array.isArray(dataArray)) {
-            console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
-            dataArray = [];
-        }
-
-        console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
-
-        if (dataArray.length === 0) {
-            console.log('📭 Nenhum transfer encontrado na planilha');
-            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-            
-            // 🔥 MESMO SEM DADOS, LIMPAR O ARRAY LOCAL
-            services = [];
-            renderTable();
-            updateSummary();
-            
-            return true;
-        }
-
-        // Converter dados do servidor para formato local
-        const convertedServices = [];
-        let successCount = 0;
-        let errorCount = 0;
-
-        console.log('🔄 Iniciando conversão de dados...');
-        
-        for (let index = 0; index < dataArray.length; index++) {
-            const serverItem = dataArray[index];
-            
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn(`⚠️ Item ${index} inválido:`, serverItem);
-                errorCount++;
-                continue;
-            }
-            
-            try {
-                const converted = convertServerDataToLocal(serverItem, index);
-                
-                if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
-                    // 🕐 LOG DO HORÁRIO (para debug)
-                    if (index < 3) {
-                        console.log(`🕐 Transfer #${converted.id}: horaPickup = "${converted.horaPickup}"`);
-                    }
-                    
-                    convertedServices.push(converted);
-                    successCount++;
-                } else {
-                    console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
-                    errorCount++;
-                }
-                
-            } catch (conversionError) {
-                console.error(`❌ Erro ao converter item ${index}:`, conversionError);
-                console.error('📄 Item problemático:', serverItem);
-                errorCount++;
-            }
-        }
-        
-        console.log(`✅ Conversão concluída: ${successCount} sucessos, ${errorCount} erros`);
-        console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
-        
-        if (convertedServices.length === 0) {
-            if (dataArray.length > 0) {
-                showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado`, 'error');
-                console.error('📄 Amostra dos dados originais:', dataArray.slice(0, 2));
-            } else {
-                showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-            }
-            return false;
-        }
-        
-        // 🔥🔥🔥 AQUI ESTÁ A MUDANÇA CRÍTICA! 🔥🔥🔥
-        // SUBSTITUIR COMPLETAMENTE O ARRAY (NÃO FAZER MERGE)
-        console.log('🔥 ============================================');
-        console.log('🔥 SUBSTITUINDO ARRAY COMPLETAMENTE');
-        console.log('🔥 ============================================');
-        console.log(`📊 Estado ANTES: ${services.length} transfers em memória`);
-        console.log(`📊 Novos dados: ${convertedServices.length} transfers do servidor`);
-        
-        // 🔥 MÉTODO 1: Limpar array atual completamente
-        services.length = 0;
-        console.log('✅ Array limpo (length = 0)');
-        
-        // 🔥 MÉTODO 2: Adicionar novos dados um por um
-        convertedServices.forEach((transfer, idx) => {
-            services.push(transfer);
-            
-            // Log dos primeiros 3 para debug
-            if (idx < 3) {
-                console.log(`  ➕ Adicionado #${transfer.id}: ${transfer.nomeCliente} - Horário: ${transfer.horaPickup}`);
-            }
+        // Converter dados do formato Sheets para formato do sistema
+        const transfersConvertidos = transfersData.map(row => {
+            // row é um array: [ID, Cliente, TipoServico, Pessoas, ...]
+            return {
+                id: row[0] || '',
+                cliente: row[1] || '',
+                tipoServico: row[2] || 'Transfer',
+                pessoas: parseInt(row[3]) || 1,
+                bagagens: parseInt(row[4]) || 0,
+                data: row[5] || '',
+                contacto: row[6] || '',
+                voo: row[7] || '',
+                origem: row[8] || '',
+                destino: row[9] || '',
+                horaPickup: row[10] || '', // ✅ JÁ VEM FORMATADO DO BACKEND
+                precoCliente: parseFloat(row[11]) || 0,
+                valorHotel: parseFloat(row[12]) || 0,
+                valorHUB: parseFloat(row[13]) || 0,
+                comissaoRecepcao: parseFloat(row[14]) || 0,
+                formaPagamento: row[15] || 'Dinheiro',
+                pagoPara: row[16] || 'HUB',
+                status: row[17] || 'Solicitado',
+                observacoes: row[18] || '',
+                dataCriacao: row[19] || new Date().toISOString(),
+                referencia: row[20] || ''
+            };
         });
         
-        console.log(`✅ Array substituído: agora temos ${services.length} transfers`);
-        console.log('🔥 ============================================');
+        // Atualizar array global
+        services = transfersConvertidos;
         
-        // 🔥 SALVAR NO LOCALSTORAGE (backup local)
-        console.log('💾 Salvando no localStorage...');
+        // Salvar localmente
         saveData();
         
-        // 🔥 FORÇAR RENDERIZAÇÃO DA TABELA
-        console.log('🎨 Forçando renderização da tabela...');
+        // Atualizar interface
         renderTable();
         updateSummary();
         
-        // 🔥 ATUALIZAR TIMESTAMP DE SINCRONIZAÇÃO
-        lastSyncTime = new Date();
-        localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-        updateLastSyncDisplay();
+        // Atualizar timestamp de sincronização
+        lastSyncTime = new Date().toLocaleString('pt-PT');
         
-        console.log('✅ ============================================');
-        console.log(`✅ SUCESSO: ${services.length} transfers carregados!`);
-        console.log('✅ ============================================');
+        console.log('✅ Sincronização concluída com sucesso!');
+        console.log('📊 Total de transfers carregados:', services.length);
         
         showStatus(`✅ ${services.length} transfers sincronizados com sucesso!`, 'success');
         
-        return true;
-        
     } catch (error) {
-        console.error('❌ ============================================');
-        console.error('❌ ERRO AO CARREGAR TRANSFERS');
-        console.error('❌ ============================================');
-        console.error('❌ Erro:', error);
-        console.error('❌ Mensagem:', error.message);
-        console.error('❌ Stack:', error.stack);
+        console.error('❌ Erro detalhado na sincronização:', error);
         
-        let errorMessage = 'Erro desconhecido ao carregar transfers';
+        let mensagemErro = 'Erro ao sincronizar com Google Sheets';
         
-        if (error.message.includes('HTTP')) {
-            errorMessage = 'Erro de conexão com o Google Sheets. Verifique a URL.';
-        } else if (error.message.includes('JSON')) {
-            errorMessage = 'Erro no formato dos dados recebidos do servidor.';
-        } else if (error.message.includes('CORS')) {
-            errorMessage = 'Erro de CORS. Verifique as permissões do Google Apps Script.';
+        if (error.name === 'AbortError') {
+            mensagemErro = 'Timeout: Servidor demorou muito para responder';
+        } else if (error.message.includes('Failed to fetch')) {
+            mensagemErro = 'Erro de conexão: Verifique a URL do WebApp e suas permissões';
+        } else if (error.message.includes('HTTP')) {
+            mensagemErro = `Erro do servidor: ${error.message}`;
         } else {
-            errorMessage = error.message;
+            mensagemErro = error.message;
         }
         
-        showStatus(`❌ Erro: ${errorMessage}`, 'error');
+        showStatus(mensagemErro, 'error');
         
-        return false;
+        // Se não há dados locais, manter interface vazia
+        if (services.length === 0) {
+            console.log('ℹ️ Nenhum dado local disponível, mantendo tabela vazia');
+        }
+        
+    } finally {
+        // Reabilitar botão
+        if (btnAtualizar) {
+            btnAtualizar.disabled = false;
+            btnAtualizar.textContent = '🔄 ATUALIZAR DADOS';
+        }
     }
 }
+        
         function isValidResponse(result) {
             if (result.status === 'success') return true;
             if (result.message && result.message.includes('funcionando')) return true;
