@@ -2220,21 +2220,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             </a>`;
         }
 
-        // =====================================================
-        // FUNÇÃO PRINCIPAL PARA CARREGAR TRANSFERS
-        // =====================================================
-        /**
- * FUNÇÃO CORRIGIDA: loadTransfersFromSheets()
- * LOCALIZAÇÃO NO FRONTEND: Substituir função nas linhas 2755-2988
- * 
- * CORREÇÕES IMPLEMENTADAS:
- * 1. Prioriza SEMPRE dados do servidor (planilha)
- * 2. Sobrescreve dados locais com dados da planilha
- * 3. Normaliza horários para formato consistente
- * 4. Garante sincronização completa de TODAS as alterações manuais
- */
-
-async function loadTransfersFromSheets() {
+        async function loadTransfersFromSheets() {
     if (syncInProgress) {
         console.log('Sincronização já em andamento, aguardando...');
         showStatus('Sincronização em andamento...', 'info');
@@ -2244,7 +2230,8 @@ async function loadTransfersFromSheets() {
     syncInProgress = true;
     
     try {
-        console.log('🔄 Iniciando carregamento do Google Sheets...');
+        console.log('🔄 Iniciando carregamento COMPLETO do Google Sheets...');
+        console.log('⚠️ MODO: Substituição total - dados locais serão SOBRESCRITOS');
         showStatus('Sincronizando com servidor...', 'info');
         
         const loadingElement = document.getElementById('loading');
@@ -2278,39 +2265,32 @@ async function loadTransfersFromSheets() {
         const contentType = response.headers.get('content-type');
         console.log('Content-Type:', contentType);
 
-        // Pegar resposta como texto para debug
+        // Pegar resposta como texto
         const textoResposta = await response.text();
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         console.log('📡 RESPOSTA DO SERVIDOR');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📄 Primeiros 500 caracteres:', textoResposta.substring(0, 500));
+        console.log('📄 Primeiros 300 caracteres:', textoResposta.substring(0, 300));
 
         // Parsear JSON
         let data;
         try {
             data = JSON.parse(textoResposta);
             console.log('✅ JSON parseado com sucesso!');
-            console.log('📦 Estrutura:', {
-                temSuccess: 'success' in data,
-                temData: 'data' in data,
-                temError: 'error' in data,
-                total: data.data ? data.data.length : 0
-            });
         } catch (erro) {
             console.error('❌ ERRO ao parsear JSON:', erro);
             console.log('Resposta completa:', textoResposta);
             throw new Error('Resposta do servidor não é JSON válido');
         }
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         const loadTime = Date.now() - startTime;
 
-        // Verificar sucesso (aceita inglês e português)
+        // Verificar sucesso
         if (!data.success && !data.sucesso) {
             throw new Error(data.error || data.erro || 'Erro ao carregar dados');
         }
 
-        // Pegar array de dados (aceita inglês e português)
+        // Pegar array de dados
         const transfersArray = data.data || data.dados || [];
         
         if (!Array.isArray(transfersArray)) {
@@ -2320,25 +2300,27 @@ async function loadTransfersFromSheets() {
         }
 
         console.log(`📦 ${transfersArray.length} transfers recebidos do servidor`);
+        console.log('🗑️ Limpando dados locais antigos...');
 
-        // Normalizar dados do servidor
-        const serverDataMap = new Map();
-        
-        transfersArray.forEach(transfer => {
-            // Normalizar campos (backend usa nomes com acentos e espaços)
-            const normalizado = {
+        // 🔥 MUDANÇA CRÍTICA: LIMPAR TUDO E CRIAR ARRAY NOVO
+        // NÃO FAZER MERGE - SUBSTITUIR COMPLETAMENTE
+        const novosTransfers = [];
+
+        transfersArray.forEach((transfer, index) => {
+            // Normalizar campos do backend para formato do frontend
+            const transferNormalizado = {
                 id: transfer.ID || transfer.id,
-                nomeCliente: transfer.Cliente || transfer.nomeCliente,
+                nomeCliente: transfer.Cliente || transfer.nomeCliente || '',
                 referencia: transfer.Referência || transfer.referencia || '',
                 tipoServico: transfer['Tipo Serviço'] || transfer.tipoServico || 'Transfer',
                 tourSelecionado: transfer.tourSelecionado || '',
                 numeroPessoas: parseInt(transfer.Pessoas || transfer.numeroPessoas) || 0,
                 numeroBagagens: parseInt(transfer.Bagagens || transfer.numeroBagagens) || 0,
-                data: transfer.Data || transfer.data,
+                data: transfer.Data || transfer.data || '',
                 contacto: transfer.Contacto || transfer.contacto || '',
                 numeroVoo: transfer.Voo || transfer.numeroVoo || '',
-                origem: transfer.Origem || transfer.origem,
-                destino: transfer.Destino || transfer.destino,
+                origem: transfer.Origem || transfer.origem || '',
+                destino: transfer.Destino || transfer.destino || '',
                 horaPickup: transfer['Hora Pick-up'] || transfer.horaPickup || '',
                 valorTotal: parseFloat(transfer['Preço Cliente (€)'] || transfer.precoCliente || transfer.valorTotal) || 0,
                 valorHotel: parseFloat(transfer['Valor Impire Marques Hotel (€)'] || transfer.valorHotel) || 0,
@@ -2351,68 +2333,71 @@ async function loadTransfersFromSheets() {
                 created: transfer['Data Criação'] || transfer.created || ''
             };
             
-            // Normalizar horário
-            if (normalizado.horaPickup) {
-                if (typeof normalizado.horaPickup === 'object' && normalizado.horaPickup.getHours) {
-                    const h = normalizado.horaPickup.getHours().toString().padStart(2, '0');
-                    const m = normalizado.horaPickup.getMinutes().toString().padStart(2, '0');
-                    normalizado.horaPickup = `${h}:${m}`;
-                } else if (typeof normalizado.horaPickup === 'string') {
-                    const match = normalizado.horaPickup.match(/(\d{1,2}):(\d{2})/);
+            // 🔥 NORMALIZAR HORÁRIO SEMPRE
+            if (transferNormalizado.horaPickup) {
+                // Se é objeto Date
+                if (typeof transferNormalizado.horaPickup === 'object' && transferNormalizado.horaPickup.getHours) {
+                    const h = transferNormalizado.horaPickup.getHours().toString().padStart(2, '0');
+                    const m = transferNormalizado.horaPickup.getMinutes().toString().padStart(2, '0');
+                    transferNormalizado.horaPickup = `${h}:${m}`;
+                    console.log(`   Horário ID ${transferNormalizado.id}: Date object → ${transferNormalizado.horaPickup}`);
+                }
+                // Se é string
+                else if (typeof transferNormalizado.horaPickup === 'string') {
+                    const match = transferNormalizado.horaPickup.match(/(\d{1,2}):(\d{2})/);
                     if (match) {
-                        normalizado.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
+                        transferNormalizado.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
+                        console.log(`   Horário ID ${transferNormalizado.id}: String normalizada → ${transferNormalizado.horaPickup}`);
                     }
                 }
             }
             
-            serverDataMap.set(normalizado.id, normalizado);
+            // Adicionar ao novo array
+            novosTransfers.push(transferNormalizado);
+            
+            console.log(`✅ Transfer ${index + 1}/${transfersArray.length}: ID ${transferNormalizado.id} - ${transferNormalizado.nomeCliente} - ${transferNormalizado.horaPickup}`);
         });
 
-        console.log('Dados locais antes:', services.length);
+        // 🔥 SUBSTITUIR COMPLETAMENTE O ARRAY GLOBAL
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🔄 SUBSTITUINDO DADOS:');
+        console.log(`   Antes: ${services.length} transfers`);
+        
+        services = novosTransfers;
+        
+        console.log(`   Depois: ${services.length} transfers`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-        // Sincronizar: servidor tem prioridade
-        services.forEach((localTransfer, index) => {
-            if (serverDataMap.has(localTransfer.id)) {
-                const serverTransfer = serverDataMap.get(localTransfer.id);
-                services[index] = { ...serverTransfer };
-                console.log(`✅ Atualizado ID ${localTransfer.id}`);
-                serverDataMap.delete(localTransfer.id);
-            }
-        });
-
-        // Adicionar novos do servidor
-        serverDataMap.forEach((serverTransfer) => {
-            services.push({ ...serverTransfer });
-            console.log(`➕ Adicionado ID ${serverTransfer.id}`);
-        });
-
-        console.log('Dados locais depois:', services.length);
-
-        // Atualizar dados
+        // Atualizar variáveis globais
         serverData = [...transfersArray];
         lastSyncTime = new Date();
 
+        // Salvar no localStorage
         saveData();
+        
+        // Atualizar interface
         renderTable();
         updateSummary();
 
-        console.log('✅ Sincronização completa', {
+        console.log('✅ Sincronização COMPLETA', {
             total: services.length,
-            tempo: `${loadTime}ms`
+            tempo: `${loadTime}ms`,
+            modo: 'SUBSTITUIÇÃO TOTAL'
         });
 
-        showStatus(`✅ ${services.length} transfers sincronizados!`, 'success');
+        showStatus(`✅ ${services.length} transfers sincronizados (substituição total)!`, 'success');
 
+        // Atualizar status de conexão
         isConnected = true;
         updateConnectionStatus(true);
 
         return true;
 
     } catch (error) {
-        console.error('❌ Erro:', error);
+        console.error('❌ Erro na sincronização:', error);
         console.error('Stack:', error.stack);
         
-        showStatus(`Erro: ${error.message}`, 'error');
+        showStatus(`Erro ao sincronizar: ${error.message}`, 'error');
         
         isConnected = false;
         updateConnectionStatus(false);
