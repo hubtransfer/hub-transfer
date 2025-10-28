@@ -2259,95 +2259,58 @@ async function loadTransfersFromSheets() {
         const startTime = Date.now();
         console.log('Fazendo requisição para:', WEBAPP_URL);
 
-        // 🔥 CORREÇÃO: Action correta é getAllData (não obterTodos)
         const response = await fetch(`${WEBAPP_URL}?action=getAllData&_t=${Date.now()}`, {
-    method: 'GET',
-    headers: {
-        'Accept': 'application/json'
-    },
-    mode: 'cors',
-    cache: 'no-cache',
-    redirect: 'follow'
-});
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+            redirect: 'follow'
+        });
 
-console.log('Status da resposta:', response.status);
-
-if (!response.ok) {
-    throw new Error(`Erro HTTP: ${response.status}`);
-}
-
-const contentType = response.headers.get('content-type');
-console.log('Content-Type:', contentType);
-
-// 🔥 DEBUG: Pegar resposta como texto primeiro
-const textoResposta = await response.text();
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('📡 RESPOSTA DO SERVIDOR');
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('📄 Primeiros 500 caracteres:', textoResposta.substring(0, 500));
-
-let data;
-try {
-    data = JSON.parse(textoResposta);
-    console.log('✅ JSON parseado com sucesso!');
-    console.log('📦 Estrutura da resposta:', {
-        temSuccess: 'success' in data,
-        temData: 'data' in data,
-        temError: 'error' in data,
-        totalDados: data.data ? data.data.length : 0
-    });
-    console.log('📋 Resposta completa:', JSON.stringify(data, null, 2));
-} catch (erro) {
-    console.error('❌ ERRO ao parsear JSON:', erro);
-    console.log('📄 Resposta completa (não é JSON):', textoResposta);
-    throw new Error('Resposta do servidor não é JSON válido');
-}
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-const loadTime = Date.now() - startTime;
-
-console.log('✅ Resposta recebida', {
-    tempo: `${loadTime}ms`,
-    sucesso: data.success || data.sucesso,
-    totalDados: (data.data || data.dados || []).length,
-    temSuccess: 'success' in data,
-    temSucesso: 'sucesso' in data,
-    temData: 'data' in data,
-    temDados: 'dados' in data,
-    temErro: data.error || data.erro
-});
-        
         console.log('Status da resposta:', response.status);
 
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status}`);
         }
 
+        const contentType = response.headers.get('content-type');
         console.log('Content-Type:', contentType);
 
-const loadTime = Date.now() - startTime;
+        // Pegar resposta como texto para debug
+        const textoResposta = await response.text();
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📡 RESPOSTA DO SERVIDOR');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📄 Primeiros 500 caracteres:', textoResposta.substring(0, 500));
 
-// 🔥 DEBUG DETALHADO
-console.log('📦 RESPOSTA COMPLETA DO SERVIDOR:', JSON.stringify(data, null, 2));
-console.log('📊 Tipo da resposta:', typeof data);
-console.log('📋 Chaves da resposta:', Object.keys(data));
+        // Parsear JSON
+        let data;
+        try {
+            data = JSON.parse(textoResposta);
+            console.log('✅ JSON parseado com sucesso!');
+            console.log('📦 Estrutura:', {
+                temSuccess: 'success' in data,
+                temData: 'data' in data,
+                temError: 'error' in data,
+                total: data.data ? data.data.length : 0
+            });
+        } catch (erro) {
+            console.error('❌ ERRO ao parsear JSON:', erro);
+            console.log('Resposta completa:', textoResposta);
+            throw new Error('Resposta do servidor não é JSON válido');
+        }
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-console.log('✅ Resposta recebida', {
-    tempo: `${loadTime}ms`,
-    sucesso: data.success || data.sucesso,
-    totalDados: (data.data || data.dados || []).length,
-    temSuccess: 'success' in data,
-    temSucesso: 'sucesso' in data,
-    temData: 'data' in data,
-    temDados: 'dados' in data,
-    temErro: data.error || data.erro
-});
-        // 🔥 CORREÇÃO: Aceitar tanto formato inglês (success) quanto português (sucesso)
+        const loadTime = Date.now() - startTime;
+
+        // Verificar sucesso (aceita inglês e português)
         if (!data.success && !data.sucesso) {
             throw new Error(data.error || data.erro || 'Erro ao carregar dados');
         }
 
-        // 🔥 CORREÇÃO: Aceitar tanto 'data' (inglês) quanto 'dados' (português)
+        // Pegar array de dados (aceita inglês e português)
         const transfersArray = data.data || data.dados || [];
         
         if (!Array.isArray(transfersArray)) {
@@ -2358,12 +2321,12 @@ console.log('✅ Resposta recebida', {
 
         console.log(`📦 ${transfersArray.length} transfers recebidos do servidor`);
 
-        // 🔥 NORMALIZAÇÃO: Converter campos do backend para formato do frontend
+        // Normalizar dados do servidor
         const serverDataMap = new Map();
         
         transfersArray.forEach(transfer => {
-            // Normalizar nomes dos campos (backend usa nomes diferentes)
-            const normalizedTransfer = {
+            // Normalizar campos (backend usa nomes com acentos e espaços)
+            const normalizado = {
                 id: transfer.ID || transfer.id,
                 nomeCliente: transfer.Cliente || transfer.nomeCliente,
                 referencia: transfer.Referência || transfer.referencia || '',
@@ -2388,81 +2351,68 @@ console.log('✅ Resposta recebida', {
                 created: transfer['Data Criação'] || transfer.created || ''
             };
             
-            // 🔥 NORMALIZAR HORÁRIO RECEBIDO DO SERVIDOR
-            if (normalizedTransfer.horaPickup) {
-                // Se veio como objeto Date
-                if (typeof normalizedTransfer.horaPickup === 'object' && normalizedTransfer.horaPickup.getHours) {
-                    const h = normalizedTransfer.horaPickup.getHours().toString().padStart(2, '0');
-                    const m = normalizedTransfer.horaPickup.getMinutes().toString().padStart(2, '0');
-                    normalizedTransfer.horaPickup = `${h}:${m}`;
-                }
-                // Se é string, garantir formato HH:MM
-                else if (typeof normalizedTransfer.horaPickup === 'string') {
-                    const match = normalizedTransfer.horaPickup.match(/(\d{1,2}):(\d{2})/);
+            // Normalizar horário
+            if (normalizado.horaPickup) {
+                if (typeof normalizado.horaPickup === 'object' && normalizado.horaPickup.getHours) {
+                    const h = normalizado.horaPickup.getHours().toString().padStart(2, '0');
+                    const m = normalizado.horaPickup.getMinutes().toString().padStart(2, '0');
+                    normalizado.horaPickup = `${h}:${m}`;
+                } else if (typeof normalizado.horaPickup === 'string') {
+                    const match = normalizado.horaPickup.match(/(\d{1,2}):(\d{2})/);
                     if (match) {
-                        normalizedTransfer.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
+                        normalizado.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
                     }
                 }
             }
             
-            serverDataMap.set(normalizedTransfer.id, normalizedTransfer);
+            serverDataMap.set(normalizado.id, normalizado);
         });
 
-        console.log('Dados locais antes da sincronização:', services.length);
+        console.log('Dados locais antes:', services.length);
 
-        // 🔥 ESTRATÉGIA DE SINCRONIZAÇÃO CORRIGIDA
-        // 1. Primeiro, atualizar/sobrescrever todos os registros que existem no servidor
+        // Sincronizar: servidor tem prioridade
         services.forEach((localTransfer, index) => {
             if (serverDataMap.has(localTransfer.id)) {
-                // 🔥 SERVIDOR TEM PRIORIDADE - Sobrescreve COMPLETAMENTE
                 const serverTransfer = serverDataMap.get(localTransfer.id);
                 services[index] = { ...serverTransfer };
-                
-                console.log(`✅ Atualizado transfer ID ${localTransfer.id} com dados do servidor`);
-                
-                // Marcar como processado
+                console.log(`✅ Atualizado ID ${localTransfer.id}`);
                 serverDataMap.delete(localTransfer.id);
             }
         });
 
-        // 2. Adicionar novos registros que existem no servidor mas não localmente
+        // Adicionar novos do servidor
         serverDataMap.forEach((serverTransfer) => {
             services.push({ ...serverTransfer });
-            console.log(`➕ Adicionado novo transfer ID ${serverTransfer.id} do servidor`);
+            console.log(`➕ Adicionado ID ${serverTransfer.id}`);
         });
 
-        console.log('Dados locais após sincronização:', services.length);
+        console.log('Dados locais depois:', services.length);
 
-        // Atualizar serverData
+        // Atualizar dados
         serverData = [...transfersArray];
         lastSyncTime = new Date();
 
-        // 3. Salvar dados sincronizados localmente
         saveData();
-
-        // 4. Atualizar interface
         renderTable();
         updateSummary();
 
-        console.log('✅ Sincronização concluída com sucesso', {
+        console.log('✅ Sincronização completa', {
             total: services.length,
-            tempo: `${loadTime}ms`,
-            ultimaSync: lastSyncTime.toLocaleString('pt-PT')
+            tempo: `${loadTime}ms`
         });
 
-        showStatus(`✅ ${services.length} transfers sincronizados com sucesso!`, 'success');
+        showStatus(`✅ ${services.length} transfers sincronizados!`, 'success');
 
-        // Atualizar indicador de conexão
         isConnected = true;
         updateConnectionStatus(true);
 
         return true;
 
     } catch (error) {
-        console.error('❌ Erro ao carregar do Google Sheets:', error);
+        console.error('❌ Erro:', error);
         console.error('Stack:', error.stack);
         
-        showStatus(`Erro ao sincronizar: ${error.message}`, 'error');
+        showStatus(`Erro: ${error.message}`, 'error');
         
         isConnected = false;
         updateConnectionStatus(false);
@@ -2479,9 +2429,6 @@ console.log('✅ Resposta recebida', {
     }
 }
 
-/**
- * Atualizar status de conexão
- */
 function updateConnectionStatus(connected) {
     const syncIndicator = document.getElementById('syncIndicator');
     if (syncIndicator) {
@@ -2489,7 +2436,6 @@ function updateConnectionStatus(connected) {
             syncIndicator.textContent = '🟢 Conectado';
             syncIndicator.style.background = '#28a745';
             syncIndicator.style.display = 'block';
-            
             setTimeout(() => {
                 syncIndicator.style.display = 'none';
             }, 3000);
@@ -2500,221 +2446,6 @@ function updateConnectionStatus(connected) {
         }
     }
 }
-/**
- * FUNÇÃO AUXILIAR: Atualizar status de conexão
- */
-function updateConnectionStatus(connected) {
-    const syncIndicator = document.getElementById('syncIndicator');
-    if (syncIndicator) {
-        if (connected) {
-            syncIndicator.textContent = '🟢 Conectado';
-            syncIndicator.style.background = '#28a745';
-            syncIndicator.style.display = 'block';
-            
-            // Esconder após 3 segundos
-            setTimeout(() => {
-                syncIndicator.style.display = 'none';
-            }, 3000);
-        } else {
-            syncIndicator.textContent = '🔴 Desconectado';
-            syncIndicator.style.background = '#dc3545';
-            syncIndicator.style.display = 'block';
-        }
-    }
-}
-
-        function isValidResponse(result) {
-            if (result.status === 'success') return true;
-            if (result.message && result.message.includes('funcionando')) return true;
-            if (result.data && Array.isArray(result.data)) return true;
-            if (Array.isArray(result)) return true;
-            if (result.success === true) return true;
-            return false;
-        }
-
-        function convertServerDataToLocal(serverItem, index) {
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn('Item inválido do servidor:', serverItem);
-                return null;
-            }
-            
-            try {
-                if (index === 0) {
-                    console.log('Exemplo de item do servidor:', Object.keys(serverItem));
-                }
-                
-                const getValue = (item, keys, defaultValue = '') => {
-                    for (const key of keys) {
-                        if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-                            return item[key];
-                        }
-                    }
-                    return defaultValue;
-                };
-                
-                const getNumericValue = (item, keys, defaultValue = 0) => {
-                    const value = getValue(item, keys, defaultValue);
-                    const parsed = parseFloat(value);
-                    return isNaN(parsed) ? defaultValue : parsed;
-                };
-                
-                const getIntegerValue = (item, keys, defaultValue = 0) => {
-                    const value = getValue(item, keys, defaultValue);
-                    const parsed = parseInt(value);
-                    return isNaN(parsed) ? defaultValue : parsed;
-                };
-                
-                const formatPickupTime = (timeValue) => {
-                    if (!timeValue) return '00:00';
-                    
-                    console.log('Valor da hora recebido:', timeValue, typeof timeValue);
-                    
-                    if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-                        return timeValue;
-                    }
-                    
-                    if (typeof timeValue === 'string') {
-                        const timeMatch = timeValue.match(/(\d{2}):(\d{2}):(\d{2})/);
-                        if (timeMatch) {
-                            return `${timeMatch[1]}:${timeMatch[2]}`;
-                        }
-                        
-                        const shortTimeMatch = timeValue.match(/(\d{2}):(\d{2})/);
-                        if (shortTimeMatch) {
-                            return `${shortTimeMatch[1]}:${shortTimeMatch[2]}`;
-                        }
-                    }
-                    
-                    if (timeValue && typeof timeValue === 'object') {
-                        try {
-                            const timeStr = timeValue.toString();
-                            console.log('String da hora:', timeStr);
-                            
-                            const timeMatch = timeStr.match(/(\d{2}):(\d{2}):(\d{2})/);
-                            if (timeMatch) {
-                                return `${timeMatch[1]}:${timeMatch[2]}`;
-                            }
-                            
-                            if (timeValue.getHours && timeValue.getMinutes) {
-                                const hours = timeValue.getHours().toString().padStart(2, '0');
-                                const minutes = timeValue.getMinutes().toString().padStart(2, '0');
-                                return `${hours}:${minutes}`;
-                            }
-                        } catch (e) {
-                            console.error('Erro ao processar objeto de hora:', e);
-                        }
-                    }
-                    
-                    console.warn('Não foi possível formatar a hora:', timeValue);
-                    return '00:00';
-                };
-
-                const convertedData = {
-                    id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
-                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
-                    referencia: getValue(serverItem, ['Referência', 'Referencia', 'Ref', 'referencia', 'Coluna U'], ''),
-                    tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
-                    tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
-                    numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
-                    numeroBagagens: getIntegerValue(serverItem, ['Bagagens', 'Num Bagagens', 'NumBagagens', 'bagagens'], 0),
-                    data: formatDateFromServer(getValue(serverItem, ['Data', 'Data Transfer', 'DataTransfer', 'data'])),
-                    contacto: getValue(serverItem, ['Contacto', 'Contato', 'Telefone', 'contacto'], 'Sem contacto'),
-                    numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
-                    origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
-                    destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-                    horaPickup: formatPickupTime(serverItem['Hora Pick-up'] || serverItem.Hora_Pickup || serverItem.HoraPickup),
-                    valorTotal: getNumericValue(serverItem, [
-                        'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
-                        'Preco Cliente', 'Total', 'valor_total'
-                    ], 0),
-                    valorHotel: getNumericValue(serverItem, [
-                        'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Hotel (€)',
-                        'Valor Hotel', 'valor_hotel'
-                    ], 0),
-                    valorHUB: getNumericValue(serverItem, [
-                        'Valor HUB', 'Valor_HUB', 'ValorHUB', 'Valor HUB Transfer (€)',
-                        'HUB Transfer', 'valor_hub'
-                    ], 0),
-                    comissaoRecepcao: getNumericValue(serverItem, [
-                        'Comissão Recepção', 'Comissao_Recepcao', 'ComissaoRecepcao', 'Comissão Recepção (€)',
-                        'Comissao', 'comissao'
-                    ], 0),
-                    modoPagamento: getValue(serverItem, [
-                        'Pagamento', 'Forma Pagamento', 'FormaPagamento', 'Modo Pagamento', 
-                        'ModoPagamento', 'Payment'
-                    ], 'Não informado'),
-                    pagoParaQuem: getValue(serverItem, [
-                        'Pago Para', 'Pago_Para', 'PagoPara', 'Paid To', 'pago_para'
-                    ], 'Não informado'),
-                    status: getValue(serverItem, ['Status', 'Estado', 'State', 'status'], 'Solicitado'),
-                    observacoes: getValue(serverItem, [
-                        'Observações', 'Observacoes', 'Obs', 'Notes', 'Comentarios', 'observacoes'
-                    ], ''),
-                    created: getValue(serverItem, [
-                        'Data Criação', 'Data_Criacao', 'DataCriacao', 'Created', 'Timestamp'
-                    ], new Date().toISOString())
-                };
-                
-                if (!convertedData.nomeCliente || convertedData.nomeCliente === 'Cliente não informado') {
-                    console.warn(`Item ${index}: Cliente não informado ou vazio`);
-                }
-                
-                if (!convertedData.data) {
-                    console.warn(`Item ${index}: Data inválida ou vazia`);
-                }
-                
-                if (convertedData.valorTotal > 0) {
-                    if (convertedData.valorHotel === 0) {
-                        convertedData.valorHotel = convertedData.valorTotal * 0.30;
-                    }
-                    
-                    if (convertedData.comissaoRecepcao === 0) {
-                        convertedData.comissaoRecepcao = convertedData.tipoServico.includes('Tour') ? 5.00 : 2.00;
-                    }
-                    
-                    if (convertedData.valorHUB === 0) {
-                        convertedData.valorHUB = convertedData.valorTotal - convertedData.valorHotel - convertedData.comissaoRecepcao;
-                    }
-                }
-                
-                return convertedData;
-                
-            } catch (error) {
-                console.error('Erro ao converter dados do servidor:', error);
-                console.error('Item problemático:', serverItem);
-                console.error('Index:', index);
-                return null;
-            }
-        }
-
-        function formatDateFromServer(dateStr) {
-            if (!dateStr) return '';
-            
-            try {
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                    return dateStr;
-                }
-                
-                if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                    const [day, month, year] = dateStr.split('/');
-                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                }
-                
-                const date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                
-                return dateStr;
-                
-            } catch (error) {
-                console.error('Erro ao formatar data do servidor:', dateStr, error);
-                return dateStr;
-            }
-        }
 
         // =====================================================
         // SINCRONIZAÇÃO COM SERVIDOR
