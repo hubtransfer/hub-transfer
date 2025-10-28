@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TESTE Sistema - HUB Transfer</title>
     
-    <!-- Google Maps API -->
     <script>
         function initMap() {
             console.log('Google Maps carregado com sucesso!');
@@ -25,7 +24,6 @@
         onerror="console.warn('Erro ao carregar Google Maps - continuando sem autocomplete')">
     </script>
     
-    <!-- Telefone internacional -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"
             onerror="console.warn('Biblioteca de telefone não carregou - usando input simples')"></script>
     
@@ -1366,6 +1364,41 @@
         .btn-danger.pulse {
             animation: pulse 1s infinite;
         }
+
+        .sync-button-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-sync-main {
+            font-size: 1.2rem;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-sync-main:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-sync-main:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -1375,23 +1408,21 @@
             <h1>TESTE Sistema</h1>
             <p>TESTE Sistema - Gestão de Transfers</p>
             <div class="company-logos">
-    <div class="company-logo">🧪 TESTE Sistema</div>
-    <div class="company-logo">🚗 HUB Transfer</div>
-</div>
+                <div class="company-logo">🧪 TESTE Sistema</div>
+                <div class="company-logo">🚗 HUB Transfer</div>
+            </div>
         </div>
 
-        <!-- Indicador de Sincronização -->
         <div class="sync-indicator" id="syncIndicator">🔄 Sincronizando...</div>
 
-        <!-- Seção de Configuração -->
         <div class="config-section" id="configSection">
             <div class="config-title">⚙️ Configuração do Google Sheets</div>
             <div class="config-form">
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycbzShqzms3a0YFD6_U6-7FO8Lq22CFgNX2D0pYweRZdzQFk30UYSxEOVGz_dpTV6wGDVyw/exec" 
-       placeholder="https://script.google.com/macros/s/...">
+                           value="https://script.google.com/macros/s/AKfycbyqpIz11DUl62y7Yipm12urbibumkYJfzi1iPx4-3cyjUhKWbJqrKOjgBnq_3tTIQUcJw/exec" 
+                           placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
                     ✅ Testar Conexão
@@ -1403,7 +1434,6 @@
             <div id="connectionStatus" class="status-message"></div>
         </div>
 
-        <!-- Seção de Limpeza de Dados -->
         <div class="clear-data-section" id="clearDataSection">
             <div class="clear-data-title">🧹 Limpeza de Dados</div>
             <div class="clear-data-warning">
@@ -1429,14 +1459,14 @@
             <form id="transferForm">
                 <div class="form-grid">
                     <div class="form-group">
-    <label for="nomeCliente">👤 Nome do Cliente *</label>
-    <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
-</div>
+                        <label for="nomeCliente">👤 Nome do Cliente *</label>
+                        <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+                    </div>
 
-<div class="form-group">
-    <label for="referencia">📋 Referência da Reserva</label>
-    <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
-</div>
+                    <div class="form-group">
+                        <label for="referencia">📋 Referência da Reserva</label>
+                        <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
+                    </div>
                     
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
@@ -1549,10 +1579,7 @@
                             <button type="button" class="btn-time" onclick="setTime('22:00')">🕙 22:00</button>
                             <button type="button" class="btn-time" onclick="setTime('23:00')">🕚 23:00</button>
                         </div>
-                        <input type="time" id="horaPickup" required>
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            ⏰ Formato: HH:MM (ex: 09:30)
-                        </small>
+                        <input type="text" id="horaPickup" required placeholder="HH:MM" pattern="[0-9]{2}:[0-9]{2}" maxlength="5">
                     </div>
                     
                     <div class="form-group">
@@ -1574,8 +1601,8 @@
                                 ✈️ Aeroporto de Lisboa
                             </button>
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Hotel Principal')">
-    🏨 Hotel Principal
-</button>
+                                🏨 Hotel Principal
+                            </button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
                     </div>
@@ -1584,8 +1611,8 @@
                         <label for="destino">🎯 Local de Destino *</label>
                         <div class="location-buttons">
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Hotel Principal')">
-    🏨 Hotel Principal
-</button>
+                                🏨 Hotel Principal
+                            </button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
@@ -1656,7 +1683,6 @@
                     </div>
                 </div>
 
-                <!-- Box de Cálculo de Preço -->
                 <div class="price-calculation-box" id="priceCalculationBox">
                     <div class="calculation-header">💹 Cálculo do Valor Total</div>
                     <div class="calculation-details">
@@ -1676,7 +1702,6 @@
                     <div class="calculation-total">
                         💰 VALOR TOTAL: €<span id="calcTotal">0</span>
                     </div>
-                    <!-- Campos Admin -->
                     <div class="admin-fields" id="adminFields">
                         <div class="calculation-row">
                             <span class="calculation-label">🏨 Valor Hotel (30%):</span>
@@ -1705,7 +1730,6 @@
         </div>
 
         <div class="summary-section">
-            <!-- Indicador de Filtros -->
             <div class="filter-indicator" id="filterIndicator"></div>
 
             <div class="summary-grid">
@@ -1817,6 +1841,12 @@
                     <span id="lastSyncDisplay" style="font-size: 12px; color: #666; margin-left: 10px;"></span>
                 </div>
             </div>
+
+            <div class="sync-button-container">
+                <button type="button" class="btn-sync-main" onclick="sincronizarDados()" id="syncMainBtn">
+                    🔄 ATUALIZAR DADOS
+                </button>
+            </div>
             
             <div class="services-table">
                 <div class="table-container" id="tableContainer">
@@ -1848,7 +1878,7 @@
                             <tr>
                                 <td colspan="19" class="empty-state">
                                     <h3>📭 Nenhum serviço cadastrado</h3>
-                                    <p>Use o botão "📥 Carregar Transfers" para sincronizar com o Google Sheets</p>
+                                    <p>Use o botão "🔄 ATUALIZAR DADOS" para sincronizar com o Google Sheets</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -1859,35 +1889,9 @@
         </div>
     </div>
 
-    <!-- Botão Admin -->
     <div class="admin-toggle" onclick="toggleAdminMode()">👨‍💻 Admin</div>
 
     <script>
-    /**
-     * Garante que horário esteja no formato HH:MM
-     */
-    function formatarHorarioParaTexto(horario) {
-        if (!horario) return '';
-        
-        // Se já está no formato correto, retorna
-        if (/^\d{2}:\d{2}$/.test(horario)) {
-            return horario;
-        }
-        
-        // Tenta extrair HH:MM
-        const match = horario.toString().match(/(\d{1,2}):(\d{2})/);
-        if (match) {
-            const h = match[1].padStart(2, '0');
-            const m = match[2];
-            return `${h}:${m}`;
-        }
-        
-        return '';
-    }
-        
-        // =====================================================
-        // VARIÁVEIS GLOBAIS
-        // =====================================================
         let services = [];
         let editingId = null;
         let phoneInput = null;
@@ -1911,18 +1915,14 @@
         
         let filteredData = [];
         let isFiltering = false;
-
-        // Variáveis de paginação
         let currentPage = 1;
         let itemsPerPage = 10;
         let totalPages = 1;
 
-        // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzShqzms3a0YFD6_U6-7FO8Lq22CFgNX2D0pYweRZdzQFk30UYSxEOVGz_dpTV6wGDVyw/exec';
-const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
-const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyqpIz11DUl62y7Yipm12urbibumkYJfzi1iPx4-3cyjUhKWbJqrKOjgBnq_3tTIQUcJw/exec';
+        const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
+        const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
-        // TOURS E PREÇOS
         const TOURS_DATA = {
             'tour-sintra-cascais': { name: 'Sintra e Cascais (8h)', price: 67, type: 'regular' },
             'tour-fatima-obidos': { name: 'Fátima e Óbidos (8h)', price: 83, type: 'regular' },
@@ -1933,9 +1933,102 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             'private-arrabida': { name: 'Private Arrábida', priceSmall: 347, priceLarge: 492, type: 'private' }
         };
 
-        // =====================================================
-        // FUNÇÕES DE PAGINAÇÃO
-        // =====================================================
+        function validarHorario(horario) {
+            const regex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+            if (!regex.test(horario)) {
+                alert('Formato de horário inválido! Use HH:MM (exemplo: 14:30)');
+                return false;
+            }
+            return true;
+        }
+
+        async function sincronizarDados() {
+            const URL_BACKEND = getWebAppUrl();
+            
+            if (!URL_BACKEND || URL_BACKEND === 'COLE_SUA_URL_AQUI') {
+                alert('⚠️ Configure a URL do backend primeiro!');
+                return;
+            }
+            
+            try {
+                mostrarMensagem('Sincronizando dados...', 'info');
+                setButtonLoading('syncMainBtn', true);
+                
+                const response = await fetch(URL_BACKEND, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acao: 'sincronizar' })
+                });
+                
+                const resultado = await response.json();
+                
+                if (resultado.sucesso || resultado.success) {
+                    const dados = resultado.dados || resultado.data || [];
+                    atualizarTabela(dados);
+                    mostrarMensagem('✅ Dados atualizados com sucesso!', 'sucesso');
+                } else {
+                    mostrarMensagem('❌ Erro: ' + (resultado.erro || resultado.error || 'Erro desconhecido'), 'erro');
+                }
+            } catch (erro) {
+                console.error('Erro na sincronização:', erro);
+                mostrarMensagem('❌ Erro ao conectar com o servidor', 'erro');
+            } finally {
+                setButtonLoading('syncMainBtn', false);
+            }
+        }
+
+        function atualizarTabela(dados) {
+            const tbody = document.getElementById('servicesTableBody');
+            tbody.innerHTML = '';
+            
+            if (!Array.isArray(dados) || dados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="19" class="empty-state">
+                            <h3>📭 Nenhum transfer encontrado</h3>
+                            <p>Use o botão "🔄 ATUALIZAR DADOS" para sincronizar com o Google Sheets</p>
+                        </td>
+                    </tr>
+                `;
+                services = [];
+                updateSummary();
+                return;
+            }
+            
+            services = dados.map((registro, index) => ({
+                id: registro.id || registro.ID || (Date.now() + index),
+                nomeCliente: registro.nomeCliente || registro.Cliente || 'Cliente não informado',
+                referencia: registro.referencia || registro.Referência || '',
+                tipoServico: registro.tipoServico || registro['Tipo Serviço'] || 'Transfer',
+                tourSelecionado: registro.tourSelecionado || registro.Tour || '',
+                numeroPessoas: parseInt(registro.numeroPessoas || registro.Pessoas) || 1,
+                numeroBagagens: parseInt(registro.numeroBagagens || registro.Bagagens) || 0,
+                data: registro.data || registro.Data || '',
+                horaPickup: registro.horaPickup || registro['Hora Pick-up'] || '00:00',
+                contacto: registro.contacto || registro.Contacto || 'Sem contacto',
+                numeroVoo: registro.numeroVoo || registro.Voo || '',
+                origem: registro.origem || registro.Origem || 'Origem não informada',
+                destino: registro.destino || registro.Destino || 'Destino não informado',
+                valorTotal: parseFloat(registro.valorTotal || registro['Valor Total']) || 0,
+                valorHotel: parseFloat(registro.valorHotel || registro['Valor Hotel']) || 0,
+                valorHUB: parseFloat(registro.valorHUB || registro['Valor HUB']) || 0,
+                comissaoRecepcao: parseFloat(registro.comissaoRecepcao || registro['Comissão Recepção']) || 0,
+                modoPagamento: registro.modoPagamento || registro.Pagamento || 'Não informado',
+                pagoParaQuem: registro.pagoParaQuem || registro['Pago Para'] || 'Não informado',
+                status: registro.status || registro.Status || 'Solicitado',
+                observacoes: registro.observacoes || registro.Observações || '',
+                created: registro.created || registro['Data Criação'] || new Date().toISOString()
+            }));
+            
+            saveData();
+            renderTable();
+            updateSummary();
+        }
+
+        function mostrarMensagem(mensagem, tipo) {
+            showStatus(mensagem, tipo === 'sucesso' ? 'success' : tipo === 'erro' ? 'error' : 'warning');
+        }
+
         function updatePagination() {
             const totalItems = services.length;
             totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -1997,9 +2090,6 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             return services.slice(startIndex, endIndex);
         }
 
-        // =====================================================
-        // FUNÇÕES DE CONFIGURAÇÃO E STATUS
-        // =====================================================
         function toggleConfig() {
             const configSection = document.getElementById('configSection');
             if (configSection) {
@@ -2055,15 +2145,13 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                     if (buttonId === 'testBtn') button.textContent = '✅ Testar Conexão';
                     else if (buttonId === 'submitBtn') button.textContent = '📋 Solicitar Transfer';
                     else if (buttonId === 'syncBtn') button.textContent = '🔄 Atualizar Dados';
+                    else if (buttonId === 'syncMainBtn') button.textContent = '🔄 ATUALIZAR DADOS';
                     else if (buttonId === 'clearDataBtn') button.textContent = '🗑️ Limpar Todos os Dados';
                     else if (buttonId === 'clearTestBtn') button.textContent = '🧪 Limpar Apenas Testes';
                 }
             }
         }
 
-        // =====================================================
-        // FUNÇÕES DE CONEXÃO E TESTE
-        // =====================================================
         async function testConnection() {
             const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
             
@@ -2176,9 +2264,6 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             }
         }
 
-        // =====================================================
-        // FUNÇÕES DE EMOJI PARA INTERFACE
-        // =====================================================
         function getTimeEmoji(time) {
             if (!time) return '🕐';
             
@@ -2245,161 +2330,186 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
             </a>`;
         }
 
-// =====================================================
-// FUNÇÃO DE CARREGAMENTO DE DADOS DO GOOGLE SHEETS - V2.0
-// SUBSTITUIÇÃO COMPLETA (NÃO FAZ MERGE)
-// =====================================================
+        async function loadTransfersFromSheets() {
+            console.log('📥 Iniciando carregamento de transfers do Google Sheets...');
+            
+            const webappUrl = getWebAppUrl();
+            console.log('🔗 URL configurada:', webappUrl);
+            
+            if (!webappUrl) {
+                showStatus('❌ URL do Google Apps Script não configurada', 'error');
+                return false;
+            }
+            
+            try {
+                showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
+                
+                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
+                console.log('📡 Fazendo requisição para:', dataUrl);
+                
+                const response = await fetch(dataUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('📊 Status da resposta:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const textResponse = await response.text();
+                console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
+                
+                if (!textResponse || textResponse.trim() === '') {
+                    throw new Error('Resposta vazia do servidor');
+                }
+                
+                let result;
+                try {
+                    result = JSON.parse(textResponse);
+                } catch (parseError) {
+                    console.error('❌ Erro ao fazer parse do JSON:', parseError);
+                    console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
+                    throw new Error('Resposta do servidor não é um JSON válido');
+                }
+                
+                console.log('📊 Dados parseados:', result);
+                
+                if (!result) {
+                    throw new Error('Resposta nula do servidor');
+                }
+                
+                if (result.success === false) {
+                    const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
+                    throw new Error(errorMsg);
+                }
+                
+                let dataArray = result.data || result || [];
 
-/**
- * CARREGAR TRANSFERS DO GOOGLE SHEETS - VERSÃO CORRIGIDA V2
- * Sincronização manual forçada com tratamento robusto de erros
- */
-async function loadTransfersFromSheets() {
-    console.log('🔄 Iniciando carregamento de transfers do Google Sheets...');
-    
-    // Desabilitar botão durante sincronização
-    const btnAtualizar = document.querySelector('button[onclick="loadTransfersFromSheets()"]');
-    if (btnAtualizar) {
-        btnAtualizar.disabled = true;
-        btnAtualizar.textContent = '⏳ Sincronizando...';
-    }
-    
-    try {
-        // Verificar se WEBAPP_URL está configurado
-        if (!WEBAPP_URL || WEBAPP_URL === 'SUA_URL_WEBAPP_AQUI') {
-            console.error('❌ WEBAPP_URL não configurado');
-            showStatus('Configure a URL do WebApp primeiro', 'error');
-            return;
+                if (!Array.isArray(dataArray)) {
+                    console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
+                    dataArray = [];
+                }
+
+                console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
+
+                if (dataArray.length === 0) {
+                    showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+                    services = [];
+                    renderTable();
+                    updateSummary();
+                    return true;
+                }
+
+                const convertedServices = [];
+                let successCount = 0;
+                let errorCount = 0;
+
+                try {
+                    if (!Array.isArray(dataArray)) {
+                        throw new Error('Dados recebidos não são um array válido');
+                    }
+                    
+                    for (let index = 0; index < dataArray.length; index++) {
+                        const serverItem = dataArray[index];
+                        
+                        if (!serverItem || typeof serverItem !== 'object') {
+                            console.warn(`⚠️ Item ${index} inválido:`, serverItem);
+                            errorCount++;
+                            continue;
+                        }
+                        
+                        try {
+                            const converted = convertServerDataToLocal(serverItem, index);
+                            
+                            if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
+                                convertedServices.push(converted);
+                                successCount++;
+                            } else {
+                                console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
+                                errorCount++;
+                            }
+                            
+                        } catch (conversionError) {
+                            console.error(`❌ Erro ao converter item ${index}:`, conversionError);
+                            console.error('📄 Item problemático:', serverItem);
+                            errorCount++;
+                        }
+                    }
+                    
+                    console.log(`✅ Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
+                    console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
+                    
+                    if (convertedServices.length === 0) {
+                        if (dataArray.length > 0) {
+                            showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
+                            console.error('📄 Dados originais do servidor:', dataArray.slice(0, 2));
+                        } else {
+                            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
+                        }
+                        return false;
+                    }
+                    
+                    const validTransfers = convertedServices.filter(service => 
+                        service.id && 
+                        service.nomeCliente && 
+                        service.nomeCliente !== 'Cliente não informado' &&
+                        service.data
+                    );
+                    
+                    if (validTransfers.length < convertedServices.length) {
+                        console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
+                    }
+                    
+                    if (validTransfers.length === 0) {
+                        showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
+                        return false;
+                    }
+                    
+                } catch (processingError) {
+                    console.error('Erro durante o processamento dos dados:', processingError);
+                    showStatus(`Erro no processamento: ${processingError.message}`, 'error');
+                    return false;
+                }        
+                
+                services = convertedServices;
+                
+                saveData();
+                renderTable();
+                updateSummary();
+                
+                lastSyncTime = new Date();
+                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+                updateLastSyncDisplay();
+                
+                showStatus(`${services.length} transfers carregados com sucesso do Google Sheets!`, 'success');
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao carregar transfers:', error);
+                
+                let errorMessage = 'Erro desconhecido ao carregar transfers';
+                
+                if (error.message.includes('HTTP')) {
+                    errorMessage = 'Erro de conexão com o Google Sheets';
+                } else if (error.message.includes('JSON')) {
+                    errorMessage = 'Erro no formato dos dados recebidos';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = 'Erro de permissões de acesso';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                showStatus(`${errorMessage}`, 'error');
+                return false;
+            }
         }
-        
-        console.log('📡 URL do WebApp:', WEBAPP_URL);
-        
-        // Fazer requisição com timeout e retry
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-        
-        const response = await fetch(WEBAPP_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'getTransfers'
-            }),
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        console.log('📥 Resposta recebida:', response.status);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log('📦 Dados recebidos:', data);
-        
-        // Validar estrutura da resposta
-        if (!data || typeof data !== 'object') {
-            throw new Error('Resposta inválida do servidor (não é objeto)');
-        }
-        
-        // Verificar diferentes formatos de resposta possíveis
-        let transfersData = [];
-        
-        if (data.success && Array.isArray(data.data)) {
-            transfersData = data.data;
-        } else if (data.sucesso && Array.isArray(data.dados)) {
-            transfersData = data.dados;
-        } else if (Array.isArray(data.transfers)) {
-            transfersData = data.transfers;
-        } else if (Array.isArray(data)) {
-            transfersData = data;
-        } else {
-            console.error('❌ Formato de dados não reconhecido:', data);
-            throw new Error('Formato de resposta inválido');
-        }
-        
-        console.log(`📊 ${transfersData.length} transfers recebidos do servidor`);
-        
-        // Converter dados do formato Sheets para formato do sistema
-        const transfersConvertidos = transfersData.map(row => {
-            // row é um array: [ID, Cliente, TipoServico, Pessoas, ...]
-            return {
-                id: row[0] || '',
-                cliente: row[1] || '',
-                tipoServico: row[2] || 'Transfer',
-                pessoas: parseInt(row[3]) || 1,
-                bagagens: parseInt(row[4]) || 0,
-                data: row[5] || '',
-                contacto: row[6] || '',
-                voo: row[7] || '',
-                origem: row[8] || '',
-                destino: row[9] || '',
-                horaPickup: row[10] || '', // ✅ JÁ VEM FORMATADO DO BACKEND
-                precoCliente: parseFloat(row[11]) || 0,
-                valorHotel: parseFloat(row[12]) || 0,
-                valorHUB: parseFloat(row[13]) || 0,
-                comissaoRecepcao: parseFloat(row[14]) || 0,
-                formaPagamento: row[15] || 'Dinheiro',
-                pagoPara: row[16] || 'HUB',
-                status: row[17] || 'Solicitado',
-                observacoes: row[18] || '',
-                dataCriacao: row[19] || new Date().toISOString(),
-                referencia: row[20] || ''
-            };
-        });
-        
-        // Atualizar array global
-        services = transfersConvertidos;
-        
-        // Salvar localmente
-        saveData();
-        
-        // Atualizar interface
-        renderTable();
-        updateSummary();
-        
-        // Atualizar timestamp de sincronização
-        lastSyncTime = new Date().toLocaleString('pt-PT');
-        
-        console.log('✅ Sincronização concluída com sucesso!');
-        console.log('📊 Total de transfers carregados:', services.length);
-        
-        showStatus(`✅ ${services.length} transfers sincronizados com sucesso!`, 'success');
-        
-    } catch (error) {
-        console.error('❌ Erro detalhado na sincronização:', error);
-        
-        let mensagemErro = 'Erro ao sincronizar com Google Sheets';
-        
-        if (error.name === 'AbortError') {
-            mensagemErro = 'Timeout: Servidor demorou muito para responder';
-        } else if (error.message.includes('Failed to fetch')) {
-            mensagemErro = 'Erro de conexão: Verifique a URL do WebApp e suas permissões';
-        } else if (error.message.includes('HTTP')) {
-            mensagemErro = `Erro do servidor: ${error.message}`;
-        } else {
-            mensagemErro = error.message;
-        }
-        
-        showStatus(mensagemErro, 'error');
-        
-        // Se não há dados locais, manter interface vazia
-        if (services.length === 0) {
-            console.log('ℹ️ Nenhum dado local disponível, mantendo tabela vazia');
-        }
-        
-    } finally {
-        // Reabilitar botão
-        if (btnAtualizar) {
-            btnAtualizar.disabled = false;
-            btnAtualizar.textContent = '🔄 ATUALIZAR DADOS';
-        }
-    }
-}
-        
+
         function isValidResponse(result) {
             if (result.status === 'success') return true;
             if (result.message && result.message.includes('funcionando')) return true;
@@ -2593,264 +2703,79 @@ async function loadTransfersFromSheets() {
             }
         }
 
-// =====================================================
-// SISTEMA DE SINCRONIZAÇÃO COM GOOGLE SHEETS - V2.0
-// VERSÃO FORÇADA COM LIMPEZA DE CACHE
-// =====================================================
-
-/**
- * Sincroniza dados com Google Sheets - VERSÃO FORÇADA
- * Garante que busca dados FRESCOS, não cache
- * Esta função é chamada quando o usuário clica em "🔄 Atualizar Dados"
- */
-async function syncWithServer(showLoading = true) {
-    console.log('🔄 Sincronização FORÇADA iniciada pelo usuário...');
-    console.log('⏰ Timestamp da requisição:', new Date().toISOString());
-    
-    // Verificar se já tem sincronização em andamento
-    if (syncInProgress) {
-        console.log('⚠️ Sincronização já em andamento, aguarde...');
-        showStatus('Sincronização já em andamento, aguarde...', 'warning');
-        return false;
-    }
-    
-    // Marcar que sincronização está em progresso
-    syncInProgress = true;
-    
-    // Mostrar indicador visual de loading
-    if (showLoading) {
-        showSyncLoading(true);
-    }
-    
-    try {
-        // 🔥 PASSO 1: LIMPAR CACHE LOCAL
-        console.log('🧹 Limpando cache local antes da sincronização...');
-        console.log(`📊 Estado atual: ${services.length} transfers em memória`);
-        
-        // 🔥 PASSO 2: BUSCAR DADOS FRESCOS DO SERVIDOR
-        console.log('📡 Iniciando busca de dados FRESCOS do Google Sheets...');
-        const result = await loadTransfersFromSheets();
-        
-        // 🔥 PASSO 3: VERIFICAR RESULTADO
-        if (result) {
-            console.log(`✅ Sincronização concluída com sucesso!`);
-            console.log(`📊 Estado após sync: ${services.length} transfers carregados`);
+        async function syncWithServer(showLoading = true) {
+            if (syncInProgress) {
+                console.log('Sincronização já em andamento...');
+                return false;
+            }
             
-            // 🔥 PASSO 4: FORÇAR RENDERIZAÇÃO COMPLETA DA INTERFACE
-            console.log('🎨 Forçando re-renderização completa da tabela...');
-            renderTable();
-            updateSummary();
+            syncInProgress = true;
             
-            // 🔥 PASSO 5: ATUALIZAR TIMESTAMP DA ÚLTIMA SINCRONIZAÇÃO
-            lastSyncTime = new Date();
-            localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
+            if (showLoading) {
+                showSyncLoading(true);
+            }
             
-            // Mostrar mensagem de sucesso
-            showSyncSuccess(services.length);
+            try {
+                const result = await loadTransfersFromSheets();
+                
+                if (result) {
+                    showSyncSuccess(services.length);
+                    return true;
+                } else {
+                    showSyncError('Falha na sincronização com Google Sheets');
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Erro na sincronização:', error);
+                showSyncError(error.message);
+                return false;
+                
+            } finally {
+                syncInProgress = false;
+                if (showLoading) {
+                    showSyncLoading(false);
+                }
+            }
+        }
+
+        function showSyncLoading(show) {
+            const button = document.getElementById('syncBtn');
+            if (button) {
+                if (show) {
+                    button.textContent = 'Sincronizando...';
+                    button.disabled = true;
+                    button.classList.add('loading');
+                } else {
+                    button.textContent = 'Atualizar Dados';
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                }
+            }
             
-            return true;
-        } else {
-            console.error('❌ Falha na sincronização - resultado inválido');
-            showSyncError('Falha ao carregar dados do Google Sheets');
-            return false;
+            const indicator = document.getElementById('syncIndicator');
+            if (indicator) {
+                indicator.style.display = show ? 'block' : 'none';
+            }
         }
-        
-    } catch (error) {
-        console.error('❌ Erro crítico na sincronização:', error);
-        console.error('Stack trace:', error.stack);
-        showSyncError(error.message || 'Erro desconhecido ao sincronizar');
-        return false;
-        
-    } finally {
-        // Sempre limpar o flag de sincronização em progresso
-        syncInProgress = false;
-        
-        // Remover indicador visual de loading
-        if (showLoading) {
-            showSyncLoading(false);
+
+        function showSyncSuccess(count) {
+            showStatus(`${count} transfers sincronizados com sucesso!`, 'success');
+            updateLastSyncDisplay();
         }
-        
-        console.log('🏁 Processo de sincronização finalizado');
-    }
-}
 
-/**
- * Mostra/esconde indicador visual de loading durante sincronização
- */
-function showSyncLoading(show) {
-    const button = document.getElementById('syncBtn');
-    
-    if (button) {
-        if (show) {
-            // Estado: Sincronizando
-            button.textContent = '⏳ Sincronizando...';
-            button.disabled = true;
-            button.classList.add('loading');
-            button.style.opacity = '0.7';
-            button.style.cursor = 'not-allowed';
-        } else {
-            // Estado: Normal
-            button.textContent = '🔄 Atualizar Dados';
-            button.disabled = false;
-            button.classList.remove('loading');
-            button.style.opacity = '1';
-            button.style.cursor = 'pointer';
+        function showSyncError(message) {
+            showStatus(`Erro na sincronização: ${message}`, 'error');
         }
-    }
-    
-    // Mostrar/esconder indicador adicional se existir
-    const indicator = document.getElementById('syncIndicator');
-    if (indicator) {
-        indicator.style.display = show ? 'block' : 'none';
-    }
-    
-    // Atualizar indicador global de sincronização
-    const globalIndicator = document.querySelector('.sync-indicator');
-    if (globalIndicator) {
-        globalIndicator.style.display = show ? 'block' : 'none';
-        if (show) {
-            globalIndicator.textContent = '⏳ Sincronizando...';
-            globalIndicator.style.background = '#ffc107';
+
+        function updateLastSyncDisplay() {
+            const display = document.getElementById('lastSyncDisplay');
+            if (display && lastSyncTime) {
+                const timeStr = lastSyncTime.toLocaleString('pt-PT');
+                display.textContent = `Última sincronização: ${timeStr}`;
+            }
         }
-    }
-}
 
-/**
- * Mostra mensagem de sucesso após sincronização
- */
-function showSyncSuccess(count) {
-    console.log(`✅ Sincronização bem-sucedida: ${count} transfers`);
-    
-    // Mensagem de status
-    showStatus(`✅ ${count} transfers sincronizados com sucesso!`, 'success');
-    
-    // Atualizar display de última sincronização
-    updateLastSyncDisplay();
-    
-    // Atualizar indicador global
-    const globalIndicator = document.querySelector('.sync-indicator');
-    if (globalIndicator) {
-        globalIndicator.textContent = '✅ Sincronizado';
-        globalIndicator.style.background = '#28a745';
-        globalIndicator.style.display = 'block';
-        
-        // Esconder após 3 segundos
-        setTimeout(() => {
-            globalIndicator.style.display = 'none';
-        }, 3000);
-    }
-}
-
-/**
- * Mostra mensagem de erro durante sincronização
- */
-function showSyncError(message) {
-    console.error(`❌ Erro na sincronização: ${message}`);
-    
-    // Mensagem de status
-    showStatus(`❌ Erro na sincronização: ${message}`, 'error');
-    
-    // Atualizar indicador global
-    const globalIndicator = document.querySelector('.sync-indicator');
-    if (globalIndicator) {
-        globalIndicator.textContent = '❌ Erro na sincronização';
-        globalIndicator.style.background = '#dc3545';
-        globalIndicator.style.display = 'block';
-        
-        // Esconder após 5 segundos
-        setTimeout(() => {
-            globalIndicator.style.display = 'none';
-        }, 5000);
-    }
-}
-
-/**
- * Atualiza o display mostrando quando foi a última sincronização
- */
-function updateLastSyncDisplay() {
-    const display = document.getElementById('lastSyncDisplay');
-    
-    if (display && lastSyncTime) {
-        const timeStr = lastSyncTime.toLocaleString('pt-PT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-        
-        display.textContent = `🕐 Última sincronização: ${timeStr}`;
-        display.style.color = '#28a745';
-        display.style.fontWeight = '600';
-        
-        console.log(`📅 Última sincronização atualizada: ${timeStr}`);
-    }
-}
-
-/**
- * FUNÇÃO AUXILIAR: Sincronização automática em background
- * Pode ser chamada periodicamente se necessário (mas recomenda-se manual)
- */
-function autoSyncBackground() {
-    console.log('🔄 Auto-sincronização em background...');
-    
-    // Verificar se já passou tempo suficiente desde última sync
-    if (lastSyncTime) {
-        const agora = new Date();
-        const diffMinutos = (agora - lastSyncTime) / 1000 / 60;
-        
-        if (diffMinutos < 5) {
-            console.log(`⏰ Última sync foi há ${diffMinutos.toFixed(1)} minutos. Aguardando...`);
-            return;
-        }
-    }
-    
-    // Executar sincronização silenciosa (sem loading visual)
-    syncWithServer(false);
-}
-
-/**
- * FUNÇÃO DE DEBUG: Forçar reset completo
- */
-function forcarResetCompleto() {
-    console.log('🔄 FORÇANDO RESET COMPLETO DO SISTEMA...');
-    
-    if (!confirm('⚠️ ATENÇÃO!\n\nEsta ação irá:\n\n• Limpar TODOS os dados locais\n• Forçar nova sincronização\n• Recarregar a página\n\nContinuar?')) {
-        return;
-    }
-    
-    // Limpar localStorage
-    localStorage.removeItem('partnershipTransferData');
-    localStorage.removeItem('lastSyncTime');
-    
-    // Limpar arrays
-    services = [];
-    serverData = [];
-    filteredData = [];
-    
-    console.log('✅ Cache limpo! Recarregando página...');
-    
-    // Recarregar página
-    setTimeout(() => {
-        location.reload();
-    }, 1000);
-}
-
-// Expor funções para console (debug)
-window.syncWithServer = syncWithServer;
-window.forcarResetCompleto = forcarResetCompleto;
-window.autoSyncBackground = autoSyncBackground;
-
-console.log('✅ Sistema de sincronização V2.0 carregado!');
-console.log('💡 Funções disponíveis no console:');
-console.log('   - syncWithServer() - Sincronização manual');
-console.log('   - forcarResetCompleto() - Reset total do sistema');
-console.log('   - autoSyncBackground() - Sync automática em background');
-
-        // =====================================================
-        // ENVIO PARA GOOGLE SHEETS
-        // =====================================================
         async function sendToSheets(serviceData) {
             const url = getWebAppUrl();
             
@@ -2893,9 +2818,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             }
         }
 
-        // =====================================================
-        // GERENCIAMENTO DE DADOS LOCAL
-        // =====================================================
         function loadData() {
             const savedData = localStorage.getItem('partnershipTransferData');
             const savedUrl = localStorage.getItem('webappUrl');
@@ -2940,9 +2862,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             }
         }
 
-        // =====================================================
-        // SISTEMA DE LIMPEZA DE DADOS
-        // =====================================================
         async function clearAllData() {
             const confirmText = prompt('ATENÇÃO: Esta ação irá apagar TODOS os dados!\n\nDigite "CONFIRMAR" para continuar:');
             
@@ -3066,9 +2985,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             }
         }
 
-        // =====================================================
-        // FUNÇÕES DE SERVIÇO E CÁLCULO
-        // =====================================================
         function setServiceType(type) {
             currentServiceType = type;
             
@@ -3172,9 +3088,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             }
         }
 
-        // =====================================================
-        // FUNÇÕES DOS BOTÕES RÁPIDOS
-        // =====================================================
         function setPeople(number) {
             document.getElementById('numeroPessoas').value = number;
             document.querySelectorAll('.btn-people').forEach(btn => btn.classList.remove('active'));
@@ -3281,9 +3194,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             }, 1000);
         }
 
-// =====================================================
-        // FUNÇÕES DO TELEFONE INTERNACIONAL
-        // =====================================================
         function initializePhoneInput() {
             const phoneInputElement = document.getElementById('contacto');
             
@@ -3352,9 +3262,6 @@ console.log('   - autoSyncBackground() - Sync automática em background');
             return document.getElementById('contacto').value;
         }
 
-        // =====================================================
-        // RENDERIZAÇÃO DA TABELA PRINCIPAL
-        // =====================================================
         function renderTable() {
             const tbody = document.getElementById('servicesTableBody');
             tbody.innerHTML = '';
@@ -3364,7 +3271,7 @@ console.log('   - autoSyncBackground() - Sync automática em background');
                     <tr>
                         <td colspan="19" class="empty-state">
                             <h3>📭 Nenhum serviço cadastrado</h3>
-                            <p>Use o botão "📥 Carregar Transfers" para sincronizar com o Google Sheets</p>
+                            <p>Use o botão "🔄 ATUALIZAR DADOS" para sincronizar com o Google Sheets</p>
                         </td>
                     </tr>
                 `;
@@ -3381,7 +3288,7 @@ console.log('   - autoSyncBackground() - Sync automática em background');
                 if (service.tipoServico && (service.tipoServico.includes('Tour') || service.tipoServico === 'tour')) {
                     rowBackgroundClass = 'tour-row';
                 } else if (service.origem && service.origem.toLowerCase().includes('aeroporto') && 
-           service.destino && service.destino.toLowerCase().includes('hotel')) {
+                           service.destino && service.destino.toLowerCase().includes('hotel')) {
                     rowBackgroundClass = 'airport-to-hotel-row';
                 }
                 
@@ -3416,17 +3323,18 @@ console.log('   - autoSyncBackground() - Sync automática em background');
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
                 const referenciaDisplay = service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '' ? 
-    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
-    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
-row.innerHTML = `
-    <td><strong>#${service.id}</strong></td>
-    <td>
-        <div style="text-align: center;">${referenciaDisplay}</div>
-    </td>
-    <td>
-        <div class="client-info">${service.nomeCliente}</div>
-        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
-    </td>
+                    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
+                    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
+
+                row.innerHTML = `
+                    <td><strong>#${service.id}</strong></td>
+                    <td>
+                        <div style="text-align: center;">${referenciaDisplay}</div>
+                    </td>
+                    <td>
+                        <div class="client-info">${service.nomeCliente}</div>
+                        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
+                    </td>
                     <td>${tipoLabel}</td>
                     <td>
                         <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
@@ -3574,9 +3482,6 @@ row.innerHTML = `
             }
         }
 
-        // =====================================================
-        // SISTEMA DE FILTROS AVANÇADOS
-        // =====================================================
         function applyQuickPeriod() {
             const select = document.getElementById('quickPeriodSelect');
             const period = select.value;
@@ -3798,18 +3703,18 @@ row.innerHTML = `
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
                 const referenciaDisplay = (service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '') ? 
-    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
-    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
+                    `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
+                    '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
 
-row.innerHTML = `
-    <td><strong>#${service.id || 'N/A'}</strong></td>
-    <td>
-        <div style="text-align: center;">${referenciaDisplay}</div>
-    </td>
-    <td>
-        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
-        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
-    </td>
+                row.innerHTML = `
+                    <td><strong>#${service.id || 'N/A'}</strong></td>
+                    <td>
+                        <div style="text-align: center;">${referenciaDisplay}</div>
+                    </td>
+                    <td>
+                        <div class="client-info">${service.nomeCliente || 'Cliente não informado'}</div>
+                        <div style="font-size: 0.8rem; color: #7f8c8d;">${phoneLink}</div>
+                    </td>
                     <td>${tipoLabel}</td>
                     <td>
                         <span style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
@@ -3936,7 +3841,7 @@ row.innerHTML = `
             console.log('Todos os filtros foram limpos');
         }
 
-function parseServiceDate(dateStr) {
+        function parseServiceDate(dateStr) {
             if (!dateStr) return null;
             
             try {
@@ -4008,11 +3913,13 @@ function parseServiceDate(dateStr) {
             }
         }
 
-        // =====================================================
-        // SUBMISSÃO E VALIDAÇÃO DO FORMULÁRIO
-        // =====================================================
         document.getElementById('transferForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const horaPickup = document.getElementById('horaPickup').value;
+            if (!validarHorario(horaPickup)) {
+                return;
+            }
 
             if (!validateForm()) {
                 return;
@@ -4035,27 +3942,27 @@ function parseServiceDate(dateStr) {
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
 
             const formData = {
-    nomeCliente: document.getElementById('nomeCliente').value.trim(),
-    referencia: document.getElementById('referencia').value.trim(),
-    tipoServico: currentServiceType,
-    tourSelecionado: document.getElementById('tourSelecionado').value,
-    numeroPessoas: pessoas,
-    numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
-    data: document.getElementById('data').value,
-    contacto: getFormattedPhoneNumber(),
-    numeroVoo: document.getElementById('numeroVoo').value.trim(),
-    origem: document.getElementById('origem').value.trim(),
-    destino: document.getElementById('destino').value.trim(),
-    horaPickup: formatarHorarioParaTexto(document.getElementById('horaPickup').value),
-    valorTotal: valorTotal,
-    valorHotel: valorHotel,
-    valorHUB: valorHUB,
-    comissaoRecepcao: comissaoRecepcao,
-    modoPagamento: document.getElementById('modoPagamento').value,
-    pagoParaQuem: document.getElementById('pagoParaQuem').value,
-    observacoes: document.getElementById('observacoes').value.trim(),
-    status: 'Solicitado'
-};
+                nomeCliente: document.getElementById('nomeCliente').value.trim(),
+                referencia: document.getElementById('referencia').value.trim(),
+                tipoServico: currentServiceType,
+                tourSelecionado: document.getElementById('tourSelecionado').value,
+                numeroPessoas: pessoas,
+                numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
+                data: document.getElementById('data').value,
+                contacto: getFormattedPhoneNumber(),
+                numeroVoo: document.getElementById('numeroVoo').value.trim(),
+                origem: document.getElementById('origem').value.trim(),
+                destino: document.getElementById('destino').value.trim(),
+                horaPickup: horaPickup,
+                valorTotal: valorTotal,
+                valorHotel: valorHotel,
+                valorHUB: valorHUB,
+                comissaoRecepcao: comissaoRecepcao,
+                modoPagamento: document.getElementById('modoPagamento').value,
+                pagoParaQuem: document.getElementById('pagoParaQuem').value,
+                observacoes: document.getElementById('observacoes').value.trim(),
+                status: 'Solicitado'
+            };
 
             try {
                 if (editingId) {
@@ -4211,9 +4118,6 @@ function parseServiceDate(dateStr) {
             return finalId;
         }
 
-        // =====================================================
-        // EDIÇÃO E MANIPULAÇÃO DE SERVIÇOS
-        // =====================================================
         function editService(id) {
             const service = services.find(s => s.id === id);
             if (!service) {
@@ -4363,9 +4267,6 @@ function parseServiceDate(dateStr) {
             }
         }
 
-        // =====================================================
-        // EXPORTAÇÃO CSV
-        // =====================================================
         function exportToCSV() {
             if (services.length === 0) {
                 showStatus('Não há dados para exportar!', 'warning');
@@ -4374,7 +4275,7 @@ function parseServiceDate(dateStr) {
 
             try {
                 const headers = [
-    'ID', 'Cliente', 'Referência', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
+                    'ID', 'Cliente', 'Referência', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
                     'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor Total', 
                     'Valor Hotel', 'Valor HUB', 'Comissão Recepção', 'Pagamento', 'Pago Para', 
                     'Status', 'Observações', 'Data Criação'
@@ -4384,10 +4285,10 @@ function parseServiceDate(dateStr) {
                 
                 services.forEach(service => {
                     const row = [
-    service.id,
-    `"${service.nomeCliente}"`,
-    `"${service.referencia || ''}"`,
-    `"${service.tipoServico || 'Transfer'}"`,
+                        service.id,
+                        `"${service.nomeCliente}"`,
+                        `"${service.referencia || ''}"`,
+                        `"${service.tipoServico || 'Transfer'}"`,
                         `"${service.tourSelecionado || ''}"`,
                         service.numeroPessoas,
                         service.numeroBagagens,
@@ -4428,9 +4329,6 @@ function parseServiceDate(dateStr) {
             }
         }
 
-        // =====================================================
-        // INICIALIZAÇÃO DO GOOGLE MAPS
-        // =====================================================
         function initializeAutocomplete() {
             if (typeof google !== 'undefined' && google.maps && google.maps.places) {
                 try {
@@ -4470,9 +4368,6 @@ function parseServiceDate(dateStr) {
             }
         }
 
-        // =====================================================
-        // FUNÇÕES UTILITÁRIAS E EVENT LISTENERS
-        // =====================================================
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -4487,9 +4382,6 @@ function parseServiceDate(dateStr) {
 
         const debouncedClientFilter = debounce(updateClientFilter, 500);
 
-        // =====================================================
-        // INICIALIZAÇÃO PRINCIPAL DO SISTEMA
-        // =====================================================
         document.addEventListener('DOMContentLoaded', function() {
             try {
                 console.log('Inicializando TESTE Sistema de Transfers v9.0...');
@@ -4549,9 +4441,6 @@ function parseServiceDate(dateStr) {
             }
         });
 
-        // =====================================================
-        // FUNÇÕES DE DEBUG E DESENVOLVIMENTO
-        // =====================================================
         function debugInfo() {
             console.log('=== DEBUG INFO SISTEMA v9.0 ===');
             console.log('Services:', services.length);
@@ -4598,23 +4487,18 @@ function parseServiceDate(dateStr) {
             }
         }
 
-        // Exposição das funções de debug para o console
         window.debugInfo = debugInfo;
         window.resetSystem = resetSystem;
         window.syncWithServer = syncWithServer;
         window.testConnection = testConnection;
         window.loadTransfersFromSheets = loadTransfersFromSheets;
         window.testBasicConnectivity = testBasicConnectivity;
-
-        // Garantir que as funções estão no escopo global
         window.toggleConfig = toggleConfig;
-        window.loadTransfersFromSheets = loadTransfersFromSheets;
-        window.testBasicConnectivity = testBasicConnectivity;
         window.clearAllData = clearAllData;
         window.clearTestData = clearTestData;
         window.toggleClearData = toggleClearData;
+        window.sincronizarDados = sincronizarDados;
 
-        // Log final de inicialização
         console.log('TESTE Sistema de Transfers HUB Transfer v9.0');
         console.log('Email configurado para testes:', TEST_EMAIL);
         console.log('URL do WebApp:', WEBAPP_URL);
@@ -4625,7 +4509,7 @@ function parseServiceDate(dateStr) {
         console.log('   - syncWithServer() - Sincronização manual');
         console.log('   - testConnection() - Teste de conexão');
         console.log('   - loadTransfersFromSheets() - Carregar transfers do Google Sheets');
-                
+        console.log('   - sincronizarDados() - Sincronizar dados do backend');
     </script>
 </body>
 </html>
