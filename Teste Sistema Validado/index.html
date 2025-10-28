@@ -1390,7 +1390,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycbyUn9FZ_wo8jKjCyLthJMTKOWnsjUl6fdWUFvt4NxyOEwXTDl9IV9nkP-j6gg3RD3VdmA/exec" 
+       value="https://script.google.com/macros/s/AKfycbxc5inHt3GSfYoaKvaFuEFx_fcf4BbDXBc34LbHQuc0pR3AElBNYa_ruttcKPfyQYfCOg/exec" 
        placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1694,6 +1694,7 @@
                     <button type="submit" class="btn btn-primary" id="submitBtn">📋 Solicitar Transfer</button>
                     <button type="button" class="btn btn-clear" onclick="clearForm()">🧹 Limpar</button>
                     <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
+                    <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">🔄 Atualizar Dados</button>
                     <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
                     <button type="button" class="btn btn-danger" onclick="toggleClearData()">🗑️ Limpar Dados</button>
                 </div>
@@ -1892,7 +1893,7 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyUn9FZ_wo8jKjCyLthJMTKOWnsjUl6fdWUFvt4NxyOEwXTDl9IV9nkP-j6gg3RD3VdmA/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxc5inHt3GSfYoaKvaFuEFx_fcf4BbDXBc34LbHQuc0pR3AElBNYa_ruttcKPfyQYfCOg/exec';
 const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
 const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
@@ -2028,6 +2029,7 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 } else {
                     if (buttonId === 'testBtn') button.textContent = '✅ Testar Conexão';
                     else if (buttonId === 'submitBtn') button.textContent = '📋 Solicitar Transfer';
+                    else if (buttonId === 'syncBtn') button.textContent = '🔄 Atualizar Dados';
                     else if (buttonId === 'clearDataBtn') button.textContent = '🗑️ Limpar Todos os Dados';
                     else if (buttonId === 'clearTestBtn') button.textContent = '🧪 Limpar Apenas Testes';
                 }
