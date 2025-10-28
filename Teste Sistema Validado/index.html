@@ -1390,7 +1390,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycby6ihdB7jKB-FlMG3AWDdVoqYTplFZLybOwTO7jTY-a3Rd7NByy9kIBr3z1c-2LgO45dw/exec" 
+       value="https://script.google.com/macros/s/AKfycbxc5inHt3GSfYoaKvaFuEFx_fcf4BbDXBc34LbHQuc0pR3AElBNYa_ruttcKPfyQYfCOg/exec" 
        placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1892,7 +1892,7 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby6ihdB7jKB-FlMG3AWDdVoqYTplFZLybOwTO7jTY-a3Rd7NByy9kIBr3z1c-2LgO45dw/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxc5inHt3GSfYoaKvaFuEFx_fcf4BbDXBc34LbHQuc0pR3AElBNYa_ruttcKPfyQYfCOg/exec';
 const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
 const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
@@ -2028,7 +2028,6 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
                 } else {
                     if (buttonId === 'testBtn') button.textContent = '✅ Testar Conexão';
                     else if (buttonId === 'submitBtn') button.textContent = '📋 Solicitar Transfer';
-                    else if (buttonId === 'syncBtn') button.textContent = '🔄 Atualizar Dados';
                     else if (buttonId === 'clearDataBtn') button.textContent = '🗑️ Limpar Todos os Dados';
                     else if (buttonId === 'clearTestBtn') button.textContent = '🧪 Limpar Apenas Testes';
                 }
@@ -2412,9 +2411,63 @@ const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         }
     }
 }
+
+function updateConnectionStatus(connected) {
+    const syncIndicator = document.getElementById('syncIndicator');
+    if (syncIndicator) {
+        if (connected) {
+            syncIndicator.textContent = '🟢 Conectado';
+            syncIndicator.style.background = '#28a745';
+            syncIndicator.style.display = 'block';
+            setTimeout(() => {
+                syncIndicator.style.display = 'none';
+            }, 3000);
+        } else {
+            syncIndicator.textContent = '🔴 Desconectado';
+            syncIndicator.style.background = '#dc3545';
+            syncIndicator.style.display = 'block';
+        }
+    }
+}
+
         // =====================================================
         // SINCRONIZAÇÃO COM SERVIDOR
         // =====================================================
+        async function syncWithServer(showLoading = true) {
+            if (syncInProgress) {
+                console.log('Sincronização já em andamento...');
+                return false;
+            }
+            
+            syncInProgress = true;
+            
+            if (showLoading) {
+                showSyncLoading(true);
+            }
+            
+            try {
+                const result = await loadTransfersFromSheets();
+                
+                if (result) {
+                    showSyncSuccess(services.length);
+                    return true;
+                } else {
+                    showSyncError('Falha na sincronização com Google Sheets');
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Erro na sincronização:', error);
+                showSyncError(error.message);
+                return false;
+                
+            } finally {
+                syncInProgress = false;
+                if (showLoading) {
+                    showSyncLoading(false);
+                }
+            }
+        }
 
         function showSyncLoading(show) {
             const button = document.getElementById('syncBtn');
