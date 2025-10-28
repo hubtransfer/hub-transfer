@@ -2270,29 +2270,7 @@ async function loadTransfersFromSheets() {
     redirect: 'follow'
 });
 
-// 🔥 DEBUG COMPLETO
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('📡 RESPOSTA DO SERVIDOR - DETALHES COMPLETOS');
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('URL chamada:', `${WEBAPP_URL}?action=getAllData&_t=${Date.now()}`);
-console.log('Status HTTP:', response.status);
-console.log('Status Text:', response.statusText);
-console.log('OK?', response.ok);
-
-const responseText = await response.text();
-console.log('📄 RESPOSTA BRUTA (primeiros 500 chars):', responseText.substring(0, 500));
-
-let data;
-try {
-    data = JSON.parse(responseText);
-    console.log('✅ JSON parseado com sucesso');
-    console.log('📦 DADOS COMPLETOS:', JSON.stringify(data, null, 2));
-} catch (parseError) {
-    console.error('❌ ERRO ao parsear JSON:', parseError);
-    console.log('📄 Resposta completa:', responseText);
-    throw new Error('Resposta do servidor não é JSON válido');
-}
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('Status da resposta:', response.status);
 
 if (!response.ok) {
     throw new Error(`Erro HTTP: ${response.status}`);
@@ -2301,23 +2279,43 @@ if (!response.ok) {
 const contentType = response.headers.get('content-type');
 console.log('Content-Type:', contentType);
 
-        // Pegar o texto bruto primeiro
-const responseText = await response.text();
-console.log('📄 RESPOSTA BRUTA (primeiros 500 chars):', responseText.substring(0, 500));
+// 🔥 DEBUG: Pegar resposta como texto primeiro
+const textoResposta = await response.text();
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('📡 RESPOSTA DO SERVIDOR');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('📄 Primeiros 500 caracteres:', textoResposta.substring(0, 500));
 
-// Tentar parsear como JSON
 let data;
 try {
-    data = JSON.parse(responseText);
-    console.log('✅ JSON parseado com sucesso');
-    console.log('📦 DADOS PARSEADOS:', JSON.stringify(data, null, 2));
-} catch (parseError) {
-    console.error('❌ ERRO ao parsear JSON:', parseError);
-    console.log('📄 Resposta completa:', responseText);
+    data = JSON.parse(textoResposta);
+    console.log('✅ JSON parseado com sucesso!');
+    console.log('📦 Estrutura da resposta:', {
+        temSuccess: 'success' in data,
+        temData: 'data' in data,
+        temError: 'error' in data,
+        totalDados: data.data ? data.data.length : 0
+    });
+    console.log('📋 Resposta completa:', JSON.stringify(data, null, 2));
+} catch (erro) {
+    console.error('❌ ERRO ao parsear JSON:', erro);
+    console.log('📄 Resposta completa (não é JSON):', textoResposta);
     throw new Error('Resposta do servidor não é JSON válido');
 }
-
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+const loadTime = Date.now() - startTime;
+
+console.log('✅ Resposta recebida', {
+    tempo: `${loadTime}ms`,
+    sucesso: data.success || data.sucesso,
+    totalDados: (data.data || data.dados || []).length,
+    temSuccess: 'success' in data,
+    temSucesso: 'sucesso' in data,
+    temData: 'data' in data,
+    temDados: 'dados' in data,
+    temErro: data.error || data.erro
+});
         
         console.log('Status da resposta:', response.status);
 
