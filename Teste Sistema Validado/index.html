@@ -3164,15 +3164,37 @@ row.innerHTML = `
         }
 
         function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-PT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
+    if (!dateString) return '';
+    
+    try {
+        let date;
+        
+        // Se já está em formato DD/MM/YYYY, retorna direto
+        if (dateString.includes('/')) {
+            return dateString;
         }
-
+        
+        // Se está em formato YYYY-MM-DD (do input date)
+        if (dateString.includes('-')) {
+            const [year, month, day] = dateString.split('-');
+            date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        } else {
+            // Fallback: tenta criar Date normalmente
+            date = new Date(dateString);
+        }
+        
+        // Formata para DD/MM/YYYY
+        const dia = String(date.getDate()).padStart(2, '0');
+        const mes = String(date.getMonth() + 1).padStart(2, '0');
+        const ano = date.getFullYear();
+        
+        return `${dia}/${mes}/${ano}`;
+        
+    } catch (error) {
+        console.error('Erro ao formatar data:', dateString, error);
+        return dateString;
+    }
+}
         function updateScrollIndicator() {
             const tableContainer = document.getElementById('tableContainer');
             const scrollIndicator = document.getElementById('scrollIndicator');
@@ -3582,32 +3604,62 @@ row.innerHTML = `
         }
 
 function parseServiceDate(dateStr) {
-            if (!dateStr) return null;
-            
-            try {
-                if (dateStr.includes('/')) {
-                    const [day, month, year] = dateStr.split('/');
-                    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                } else if (dateStr.includes('-')) {
-                    return new Date(dateStr);
-                } else {
-                    return new Date(dateStr);
-                }
-            } catch (error) {
-                console.error('Erro ao processar data:', dateStr, error);
-                return null;
-            }
+    if (!dateStr) return null;
+    
+    try {
+        let date;
+        
+        // Formato DD/MM/YYYY
+        if (dateStr.includes('/')) {
+            const [day, month, year] = dateStr.split('/').map(n => parseInt(n));
+            date = new Date(year, month - 1, day);
+        } 
+        // Formato YYYY-MM-DD (do input HTML)
+        else if (dateStr.includes('-')) {
+            const [year, month, day] = dateStr.split('-').map(n => parseInt(n));
+            date = new Date(year, month - 1, day);
+        } 
+        // Fallback
+        else {
+            date = new Date(dateStr);
         }
+        
+        // Validar se a data é válida
+        if (isNaN(date.getTime())) {
+            console.warn('Data inválida:', dateStr);
+            return null;
+        }
+        
+        return date;
+        
+    } catch (error) {
+        console.error('Erro ao processar data:', dateStr, error);
+        return null;
+    }
+}
 
         function formatDateForInput(date) {
-            if (!(date instanceof Date)) return '';
-            
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}`;
+    if (!(date instanceof Date)) {
+        if (typeof date === 'string') {
+            // Se é string DD/MM/YYYY
+            if (date.includes('/')) {
+                const [day, month, year] = date.split('/');
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            // Se já é YYYY-MM-DD
+            if (date.includes('-')) {
+                return date;
+            }
         }
+        return '';
+    }
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
 
         function saveFilters() {
             try {
@@ -3686,7 +3738,7 @@ function parseServiceDate(dateStr) {
                 tourSelecionado: document.getElementById('tourSelecionado').value,
                 numeroPessoas: pessoas,
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
-                data: document.getElementById('data').value,
+                data: formatDate(document.getElementById('data').value),
                 contacto: getFormattedPhoneNumber(),
                 numeroVoo: document.getElementById('numeroVoo').value.trim(),
                 origem: document.getElementById('origem').value.trim(),
@@ -3897,7 +3949,7 @@ function parseServiceDate(dateStr) {
                 document.getElementById('referencia').value = service.referencia || '';
                 document.getElementById('numeroPessoas').value = service.numeroPessoas;
                 document.getElementById('numeroBagagens').value = service.numeroBagagens;
-                document.getElementById('data').value = service.data;
+                document.getElementById('data').value = formatDateForInput(service.data);
                 document.getElementById('numeroVoo').value = service.numeroVoo || '';
                 document.getElementById('origem').value = service.origem;
                 document.getElementById('destino').value = service.destino;
