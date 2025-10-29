@@ -1372,13 +1372,14 @@
 <body>
     <div class="container">
         <div class="header">
-    <h1>Sistema de Parceria</h1>
-    <p>Gestão de Transfers - Colaboração Empresarial</p>
-    <div class="company-logos">
-        <div class="company-logo">🏨 Empire Lisbon Hotel</div>
-        <div class="company-logo">🚗 HUB Transfer</div>
-    </div>
+            <h1>Sistema de Parceria</h1>
+            <p>Gestão de Transfers - Colaboração Empresarial</p>
+            <div class="company-logos">
+    <div class="company-logo">🧪 🏨 Empire Lisbon Hotel</div>
+    <div class="company-logo">🚗 HUB Transfer</div>
 </div>
+        </div>
+
         <!-- Indicador de Sincronização -->
         <div class="sync-indicator" id="syncIndicator">🔄 Sincronizando...</div>
 
@@ -1389,7 +1390,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycbymUO8Bn25fIQb9TmDbB0qEJHt52qLPGdze6Y7Bvn36kwGkle7qvFsKRMXFgEF37urcow/exec" 
+       value="https://script.google.com/macros/s/AKfycbwFwRI3ItCUPfK07lotiOkJnK-cWXID9DqNBr3GgumA-CZMLOqAIa_Yq2hWAHLDMEKvgw/exec" 
        placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1569,8 +1570,8 @@
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
-                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Empire Lisbon Hotel')">
-    🏨 Empire Lisbon Hotel
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('Hotel Principal')">
+    🏨 Hotel Principal
 </button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
@@ -1579,8 +1580,8 @@
                     <div class="form-group">
                         <label for="destino">🎯 Local de Destino *</label>
                         <div class="location-buttons">
-                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Empire Lisbon Hotel')">
-    🏨 Empire Lisbon Hotel
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('Hotel Principal')">
+    🏨 Hotel Principal
 </button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
@@ -1675,7 +1676,7 @@
                     <!-- Campos Admin -->
                     <div class="admin-fields" id="adminFields">
                         <div class="calculation-row">
-                            <span class="calculation-label">🏨 Valor Empire Marques Hotel (30%):</span>
+                            <span class="calculation-label">🏨 Valor Hotel (30%):</span>
                             <span class="calculation-value" id="calcHotel">€0</span>
                         </div>
                         <div class="calculation-row">
@@ -1693,7 +1694,6 @@
                     <button type="submit" class="btn btn-primary" id="submitBtn">📋 Solicitar Transfer</button>
                     <button type="button" class="btn btn-clear" onclick="clearForm()">🧹 Limpar</button>
                     <button type="button" class="btn btn-export" onclick="exportToCSV()">📊 Exportar CSV</button>
-                    <button type="button" class="btn btn-success" onclick="syncWithServer()" id="syncBtn">🔄 Atualizar Dados</button>
                     <button type="button" class="btn btn-config" onclick="toggleConfig()">⚙️ Configurar</button>
                     <button type="button" class="btn btn-danger" onclick="toggleClearData()">🗑️ Limpar Dados</button>
                 </div>
@@ -1892,9 +1892,9 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbymUO8Bn25fIQb9TmDbB0qEJHt52qLPGdze6Y7Bvn36kwGkle7qvFsKRMXFgEF37urcow/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwFwRI3ItCUPfK07lotiOkJnK-cWXID9DqNBr3GgumA-CZMLOqAIa_Yq2hWAHLDMEKvgw/exec';
 const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
-const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
+const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
         // TOURS E PREÇOS
         const TOURS_DATA = {
@@ -2059,7 +2059,7 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
                     isConnected = true;
                     showStatus('✅ Conexão funcionando perfeitamente!', 'success');
                     saveWebappUrl();
-                    document.getElementById('syncBtn').style.display = 'inline-block';
+                // Botão syncBtn removido
                 } else {
                     throw new Error('Resposta não OK');
                 }
@@ -2090,13 +2090,13 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
         }
 
         function saveWebappUrl() {
-            const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
-            if (url) {
-                localStorage.setItem('webappUrl', url);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            }
-        }
+    const url = document.getElementById('webappUrl').value.trim() || WEBAPP_URL;
+    if (url) {
+        localStorage.setItem('webappUrl', url);
+        // Botão syncBtn removido
+        isConnected = true;
+    }
+}
 
         function getWebAppUrl() {
             const inputUrl = document.getElementById('webappUrl');
@@ -2128,7 +2128,7 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
                 
                 const testData = {
                     action: 'test',
-                    message: 'Sistema Empire Marques funcionando',
+                    message: 'Sistema Empire Lisbon Hotel funcionando',
                     timestamp: new Date().toISOString()
                 };
                 
@@ -2175,7 +2175,7 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
             
             if (locationLower.includes('aeroporto') || locationLower.includes('airport')) {
                 return '✈️';
-            } else if (locationLower.includes('hotel') || locationLower.includes('empire')) {
+            } else if (locationLower.includes('hotel')) {
                 return '🏨';
             } else if (locationLower.includes('estação') || locationLower.includes('train')) {
                 return '🚂';
@@ -2219,382 +2219,217 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
             </a>`;
         }
 
-        // =====================================================
-        // FUNÇÃO PRINCIPAL PARA CARREGAR TRANSFERS
-        // =====================================================
         async function loadTransfersFromSheets() {
-            console.log('📥 Iniciando carregamento de transfers do Google Sheets...');
-            
-            const webappUrl = getWebAppUrl();
-            console.log('🔗 URL configurada:', webappUrl);
-            
-            if (!webappUrl) {
-                showStatus('❌ URL do Google Apps Script não configurada', 'error');
-                return false;
-            }
-            
-            try {
-                showStatus('⏳ Carregando transfers do Google Sheets...', 'warning');
-                
-                const dataUrl = `${webappUrl}?action=getAllData&_=${Date.now()}`;
-                console.log('📡 Fazendo requisição para:', dataUrl);
-                
-                const response = await fetch(dataUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                console.log('📊 Status da resposta:', response.status, response.statusText);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const textResponse = await response.text();
-                console.log('📄 Resposta recebida - tamanho:', textResponse.length, 'caracteres');
-                
-                if (!textResponse || textResponse.trim() === '') {
-                    throw new Error('Resposta vazia do servidor');
-                }
-                
-                let result;
-                try {
-                    result = JSON.parse(textResponse);
-                } catch (parseError) {
-                    console.error('❌ Erro ao fazer parse do JSON:', parseError);
-                    console.log('📄 Resposta bruta:', textResponse.substring(0, 500));
-                    throw new Error('Resposta do servidor não é um JSON válido');
-                }
-                
-                console.log('📊 Dados parseados:', result);
-                
-                if (!result) {
-                    throw new Error('Resposta nula do servidor');
-                }
-                
-                if (result.success === false) {
-                    const errorMsg = result.error || result.message || 'Erro desconhecido no servidor';
-                    throw new Error(errorMsg);
-                }
-                
-                let dataArray = result.data || result || [];
+    if (syncInProgress) {
+        console.log('Sincronização já em andamento, aguardando...');
+        showStatus('Sincronização em andamento...', 'info');
+        return false;
+    }
 
-                if (!Array.isArray(dataArray)) {
-                    console.warn('⚠️ Dados recebidos não são um array:', typeof dataArray);
-                    dataArray = [];
-                }
-
-                console.log(`📊 ${dataArray.length} registros recebidos do servidor`);
-
-                if (dataArray.length === 0) {
-                    showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-                    services = [];
-                    renderTable();
-                    updateSummary();
-                    return true;
-                }
-
-                const convertedServices = [];
-                let successCount = 0;
-                let errorCount = 0;
-
-                try {
-                    if (!Array.isArray(dataArray)) {
-                        throw new Error('Dados recebidos não são um array válido');
-                    }
-                    
-                    for (let index = 0; index < dataArray.length; index++) {
-                        const serverItem = dataArray[index];
-                        
-                        if (!serverItem || typeof serverItem !== 'object') {
-                            console.warn(`⚠️ Item ${index} inválido:`, serverItem);
-                            errorCount++;
-                            continue;
-                        }
-                        
-                        try {
-                            const converted = convertServerDataToLocal(serverItem, index);
-                            
-                            if (converted && converted.nomeCliente && converted.nomeCliente !== 'Cliente não informado') {
-                                convertedServices.push(converted);
-                                successCount++;
-                            } else {
-                                console.warn(`⚠️ Item ${index} convertido mas sem dados válidos:`, converted);
-                                errorCount++;
-                            }
-                            
-                        } catch (conversionError) {
-                            console.error(`❌ Erro ao converter item ${index}:`, conversionError);
-                            console.error('📄 Item problemático:', serverItem);
-                            errorCount++;
-                        }
-                    }
-                    
-                    console.log(`✅ Processamento concluído: ${successCount} sucessos, ${errorCount} erros`);
-                    console.log(`📊 ${convertedServices.length} transfers válidos convertidos`);
-                    
-                    if (convertedServices.length === 0) {
-                        if (dataArray.length > 0) {
-                            showStatus(`⚠️ ${dataArray.length} registros recebidos mas nenhum pôde ser processado corretamente`, 'error');
-                            console.error('📄 Dados originais do servidor:', dataArray.slice(0, 2));
-                        } else {
-                            showStatus('📭 Nenhum transfer encontrado na planilha Google Sheets', 'warning');
-                        }
-                        return false;
-                    }
-                    
-                    const validTransfers = convertedServices.filter(service => 
-                        service.id && 
-                        service.nomeCliente && 
-                        service.nomeCliente !== 'Cliente não informado' &&
-                        service.data
-                    );
-                    if (validTransfers.length < convertedServices.length) {
-                        console.warn(`${convertedServices.length - validTransfers.length} transfers com dados incompletos foram filtrados`);
-                    }
-                    
-                    if (validTransfers.length === 0) {
-                        showStatus('Transfers convertidos mas nenhum possui dados completos necessários', 'error');
-                        return false;
-                    }
-                    
-                    const finalServices = validTransfers;
-                    
-                } catch (processingError) {
-                    console.error('Erro durante o processamento dos dados:', processingError);
-                    showStatus(`Erro no processamento: ${processingError.message}`, 'error');
-                    return false;
-                }        
-                
-                services = convertedServices;
-                
-                saveData();
-                renderTable();
-                updateSummary();
-                
-                lastSyncTime = new Date();
-                localStorage.setItem('lastSyncTime', lastSyncTime.toISOString());
-                updateLastSyncDisplay();
-                
-                showStatus(`${services.length} transfers carregados com sucesso do Google Sheets!`, 'success');
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao carregar transfers:', error);
-                
-                let errorMessage = 'Erro desconhecido ao carregar transfers';
-                
-                if (error.message.includes('HTTP')) {
-                    errorMessage = 'Erro de conexão com o Google Sheets';
-                } else if (error.message.includes('JSON')) {
-                    errorMessage = 'Erro no formato dos dados recebidos';
-                } else if (error.message.includes('CORS')) {
-                    errorMessage = 'Erro de permissões de acesso';
-                } else {
-                    errorMessage = error.message;
-                }
-                
-                showStatus(`${errorMessage}`, 'error');
-                return false;
-            }
+    syncInProgress = true;
+    
+    try {
+        console.log('🔄 Iniciando carregamento COMPLETO do Google Sheets...');
+        console.log('⚠️ MODO: Substituição total - dados locais serão SOBRESCRITOS');
+        showStatus('Sincronizando com servidor...', 'info');
+        
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'flex';
         }
 
-        function isValidResponse(result) {
-            if (result.status === 'success') return true;
-            if (result.message && result.message.includes('funcionando')) return true;
-            if (result.data && Array.isArray(result.data)) return true;
-            if (Array.isArray(result)) return true;
-            if (result.success === true) return true;
+        if (!WEBAPP_URL) {
+            throw new Error('URL do WebApp não configurada');
+        }
+
+        const startTime = Date.now();
+        console.log('Fazendo requisição para:', WEBAPP_URL);
+
+        const response = await fetch(`${WEBAPP_URL}?action=getAllData&_t=${Date.now()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+            redirect: 'follow'
+        });
+
+        console.log('Status da resposta:', response.status);
+
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+
+        // Pegar resposta como texto
+        const textoResposta = await response.text();
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📡 RESPOSTA DO SERVIDOR');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📄 Primeiros 300 caracteres:', textoResposta.substring(0, 300));
+
+        // Parsear JSON
+        let data;
+        try {
+            data = JSON.parse(textoResposta);
+            console.log('✅ JSON parseado com sucesso!');
+        } catch (erro) {
+            console.error('❌ ERRO ao parsear JSON:', erro);
+            console.log('Resposta completa:', textoResposta);
+            throw new Error('Resposta do servidor não é JSON válido');
+        }
+
+        const loadTime = Date.now() - startTime;
+
+        // Verificar sucesso
+        if (!data.success && !data.sucesso) {
+            throw new Error(data.error || data.erro || 'Erro ao carregar dados');
+        }
+
+        // Pegar array de dados
+        const transfersArray = data.data || data.dados || [];
+        
+        if (!Array.isArray(transfersArray)) {
+            console.warn('Resposta sem dados válidos');
+            showStatus('Nenhum dado encontrado no servidor', 'warning');
             return false;
         }
 
-        function convertServerDataToLocal(serverItem, index) {
-            if (!serverItem || typeof serverItem !== 'object') {
-                console.warn('Item inválido do servidor:', serverItem);
-                return null;
+        console.log(`📦 ${transfersArray.length} transfers recebidos do servidor`);
+        console.log('🗑️ Limpando dados locais antigos...');
+
+        // 🔥 MUDANÇA CRÍTICA: LIMPAR TUDO E CRIAR ARRAY NOVO
+        // NÃO FAZER MERGE - SUBSTITUIR COMPLETAMENTE
+        const novosTransfers = [];
+
+        transfersArray.forEach((transfer, index) => {
+            // Normalizar campos do backend para formato do frontend
+            const transferNormalizado = {
+                id: transfer.ID || transfer.id,
+                nomeCliente: transfer.Cliente || transfer.nomeCliente || '',
+                referencia: transfer.Referência || transfer.referencia || '',
+                tipoServico: transfer['Tipo Serviço'] || transfer.tipoServico || 'Transfer',
+                tourSelecionado: transfer.tourSelecionado || '',
+                numeroPessoas: parseInt(transfer.Pessoas || transfer.numeroPessoas) || 0,
+                numeroBagagens: parseInt(transfer.Bagagens || transfer.numeroBagagens) || 0,
+                data: transfer.Data || transfer.data || '',
+                contacto: transfer.Contacto || transfer.contacto || '',
+                numeroVoo: transfer.Voo || transfer.numeroVoo || '',
+                origem: transfer.Origem || transfer.origem || '',
+                destino: transfer.Destino || transfer.destino || '',
+                horaPickup: transfer['Hora Pick-up'] || transfer.horaPickup || '',
+                valorTotal: parseFloat(transfer['Preço Cliente (€)'] || transfer.precoCliente || transfer.valorTotal) || 0,
+                valorHotel: parseFloat(transfer['Valor Impire Marques Hotel (€)'] || transfer.valorHotel) || 0,
+                valorHUB: parseFloat(transfer['Valor HUB Transfer (€)'] || transfer.valorHub || transfer.valorHUB) || 0,
+                comissaoRecepcao: parseFloat(transfer['Comissão Recepção (€)'] || transfer.comissaoRecepcao) || 0,
+                modoPagamento: transfer['Forma Pagamento'] || transfer.modoPagamento || '',
+                pagoParaQuem: transfer['Pago Para'] || transfer.pagoParaQuem || '',
+                status: transfer.Status || transfer.status || 'Solicitado',
+                observacoes: transfer.Observações || transfer.observacoes || '',
+                created: transfer['Data Criação'] || transfer.created || ''
+            };
+            
+            // 🔥 NORMALIZAR HORÁRIO SEMPRE
+            if (transferNormalizado.horaPickup) {
+                // Se é objeto Date
+                if (typeof transferNormalizado.horaPickup === 'object' && transferNormalizado.horaPickup.getHours) {
+                    const h = transferNormalizado.horaPickup.getHours().toString().padStart(2, '0');
+                    const m = transferNormalizado.horaPickup.getMinutes().toString().padStart(2, '0');
+                    transferNormalizado.horaPickup = `${h}:${m}`;
+                    console.log(`   Horário ID ${transferNormalizado.id}: Date object → ${transferNormalizado.horaPickup}`);
+                }
+                // Se é string
+                else if (typeof transferNormalizado.horaPickup === 'string') {
+                    const match = transferNormalizado.horaPickup.match(/(\d{1,2}):(\d{2})/);
+                    if (match) {
+                        transferNormalizado.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
+                        console.log(`   Horário ID ${transferNormalizado.id}: String normalizada → ${transferNormalizado.horaPickup}`);
+                    }
+                }
             }
             
-            try {
-                if (index === 0) {
-                    console.log('Exemplo de item do servidor:', Object.keys(serverItem));
-                }
-                
-                const getValue = (item, keys, defaultValue = '') => {
-                    for (const key of keys) {
-                        if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-                            return item[key];
-                        }
-                    }
-                    return defaultValue;
-                };
-                
-                const getNumericValue = (item, keys, defaultValue = 0) => {
-                    const value = getValue(item, keys, defaultValue);
-                    const parsed = parseFloat(value);
-                    return isNaN(parsed) ? defaultValue : parsed;
-                };
-                
-                const getIntegerValue = (item, keys, defaultValue = 0) => {
-                    const value = getValue(item, keys, defaultValue);
-                    const parsed = parseInt(value);
-                    return isNaN(parsed) ? defaultValue : parsed;
-                };
-                
-                const formatPickupTime = (timeValue) => {
-                    if (!timeValue) return '00:00';
-                    
-                    console.log('Valor da hora recebido:', timeValue, typeof timeValue);
-                    
-                    if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-                        return timeValue;
-                    }
-                    
-                    if (typeof timeValue === 'string') {
-                        const timeMatch = timeValue.match(/(\d{2}):(\d{2}):(\d{2})/);
-                        if (timeMatch) {
-                            return `${timeMatch[1]}:${timeMatch[2]}`;
-                        }
-                        
-                        const shortTimeMatch = timeValue.match(/(\d{2}):(\d{2})/);
-                        if (shortTimeMatch) {
-                            return `${shortTimeMatch[1]}:${shortTimeMatch[2]}`;
-                        }
-                    }
-                    
-                    if (timeValue && typeof timeValue === 'object') {
-                        try {
-                            const timeStr = timeValue.toString();
-                            console.log('String da hora:', timeStr);
-                            
-                            const timeMatch = timeStr.match(/(\d{2}):(\d{2}):(\d{2})/);
-                            if (timeMatch) {
-                                return `${timeMatch[1]}:${timeMatch[2]}`;
-                            }
-                            
-                            if (timeValue.getHours && timeValue.getMinutes) {
-                                const hours = timeValue.getHours().toString().padStart(2, '0');
-                                const minutes = timeValue.getMinutes().toString().padStart(2, '0');
-                                return `${hours}:${minutes}`;
-                            }
-                        } catch (e) {
-                            console.error('Erro ao processar objeto de hora:', e);
-                        }
-                    }
-                    
-                    console.warn('Não foi possível formatar a hora:', timeValue);
-                    return '00:00';
-                };
-
-                const convertedData = {
-                    id: getIntegerValue(serverItem, ['ID', 'id', 'Id'], Date.now() + index),
-                    nomeCliente: getValue(serverItem, ['Cliente', 'Nome', 'Nome Cliente', 'cliente'], 'Cliente não informado'),
-                    referencia: getValue(serverItem, ['Referência', 'Referencia', 'Ref', 'referencia', 'Coluna U'], ''),
-                    tipoServico: getValue(serverItem, ['Tipo Serviço', 'Tipo_Servico', 'TipoServico', 'Tipo'], 'Transfer'),
-                    tourSelecionado: getValue(serverItem, ['Tour', 'Tour Selecionado', 'tour'], ''),
-                    numeroPessoas: getIntegerValue(serverItem, ['Pessoas', 'Num Pessoas', 'NumPessoas', 'pessoas'], 1),
-                    numeroBagagens: getIntegerValue(serverItem, ['Bagagens', 'Num Bagagens', 'NumBagagens', 'bagagens'], 0),
-                    data: formatDateFromServer(getValue(serverItem, ['Data', 'Data Transfer', 'DataTransfer', 'data'])),
-                    contacto: getValue(serverItem, ['Contacto', 'Contato', 'Telefone', 'contacto'], 'Sem contacto'),
-                    numeroVoo: getValue(serverItem, ['Voo', 'Numero Voo', 'NumeroVoo', 'Flight', 'voo'], ''),
-                    origem: getValue(serverItem, ['Origem', 'Local Origem', 'LocalOrigem', 'From', 'origem'], 'Origem não informada'),
-                    destino: getValue(serverItem, ['Destino', 'Local Destino', 'LocalDestino', 'To', 'destino'], 'Destino não informado'),
-                    horaPickup: formatPickupTime(serverItem['Hora Pick-up'] || serverItem.Hora_Pickup || serverItem.HoraPickup),
-                    valorTotal: getNumericValue(serverItem, [
-                        'Valor Total', 'Valor_Total', 'ValorTotal', 'Preço Cliente (€)', 
-                        'Preco Cliente', 'Total', 'valor_total'
-                    ], 0),
-                    valorHotel: getNumericValue(serverItem, [
-                        'Valor Hotel (30%)', 'Valor_Hotel', 'ValorHotel', 'Valor Impire Marques Hotel (€)',
-                        'Valor Empire', 'valor_hotel'
-                    ], 0),
-                    valorHUB: getNumericValue(serverItem, [
-                        'Valor HUB', 'Valor_HUB', 'ValorHUB', 'Valor HUB Transfer (€)',
-                        'HUB Transfer', 'valor_hub'
-                    ], 0),
-                    comissaoRecepcao: getNumericValue(serverItem, [
-                        'Comissão Recepção', 'Comissao_Recepcao', 'ComissaoRecepcao', 'Comissão Recepção (€)',
-                        'Comissao', 'comissao'
-                    ], 0),
-                    modoPagamento: getValue(serverItem, [
-                        'Pagamento', 'Forma Pagamento', 'FormaPagamento', 'Modo Pagamento', 
-                        'ModoPagamento', 'Payment'
-                    ], 'Não informado'),
-                    pagoParaQuem: getValue(serverItem, [
-                        'Pago Para', 'Pago_Para', 'PagoPara', 'Paid To', 'pago_para'
-                    ], 'Não informado'),
-                    status: getValue(serverItem, ['Status', 'Estado', 'State', 'status'], 'Solicitado'),
-                    observacoes: getValue(serverItem, [
-                        'Observações', 'Observacoes', 'Obs', 'Notes', 'Comentarios', 'observacoes'
-                    ], ''),
-                    created: getValue(serverItem, [
-                        'Data Criação', 'Data_Criacao', 'DataCriacao', 'Created', 'Timestamp'
-                    ], new Date().toISOString())
-                };
-                
-                if (!convertedData.nomeCliente || convertedData.nomeCliente === 'Cliente não informado') {
-                    console.warn(`Item ${index}: Cliente não informado ou vazio`);
-                }
-                
-                if (!convertedData.data) {
-                    console.warn(`Item ${index}: Data inválida ou vazia`);
-                }
-                
-                if (convertedData.valorTotal > 0) {
-                    if (convertedData.valorHotel === 0) {
-                        convertedData.valorHotel = convertedData.valorTotal * 0.30;
-                    }
-                    
-                    if (convertedData.comissaoRecepcao === 0) {
-                        convertedData.comissaoRecepcao = convertedData.tipoServico.includes('Tour') ? 5.00 : 2.00;
-                    }
-                    
-                    if (convertedData.valorHUB === 0) {
-                        convertedData.valorHUB = convertedData.valorTotal - convertedData.valorHotel - convertedData.comissaoRecepcao;
-                    }
-                }
-                
-                return convertedData;
-                
-            } catch (error) {
-                console.error('Erro ao converter dados do servidor:', error);
-                console.error('Item problemático:', serverItem);
-                console.error('Index:', index);
-                return null;
-            }
-        }
-
-        function formatDateFromServer(dateStr) {
-            if (!dateStr) return '';
+            // Adicionar ao novo array
+            novosTransfers.push(transferNormalizado);
             
-            try {
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                    return dateStr;
-                }
-                
-                if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                    const [day, month, year] = dateStr.split('/');
-                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                }
-                
-                const date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                
-                return dateStr;
-                
-            } catch (error) {
-                console.error('Erro ao formatar data do servidor:', dateStr, error);
-                return dateStr;
-            }
+            console.log(`✅ Transfer ${index + 1}/${transfersArray.length}: ID ${transferNormalizado.id} - ${transferNormalizado.nomeCliente} - ${transferNormalizado.horaPickup}`);
+        });
+
+        // 🔥 SUBSTITUIR COMPLETAMENTE O ARRAY GLOBAL
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🔄 SUBSTITUINDO DADOS:');
+        console.log(`   Antes: ${services.length} transfers`);
+        
+        services = novosTransfers;
+        
+        console.log(`   Depois: ${services.length} transfers`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+        // Atualizar variáveis globais
+        serverData = [...transfersArray];
+        lastSyncTime = new Date();
+
+        // Salvar no localStorage
+        saveData();
+        
+        // Atualizar interface
+        renderTable();
+        updateSummary();
+
+        console.log('✅ Sincronização COMPLETA', {
+            total: services.length,
+            tempo: `${loadTime}ms`,
+            modo: 'SUBSTITUIÇÃO TOTAL'
+        });
+
+        showStatus(`✅ ${services.length} transfers sincronizados (substituição total)!`, 'success');
+
+        // Atualizar status de conexão
+        isConnected = true;
+        updateConnectionStatus(true);
+
+        return true;
+
+    } catch (error) {
+        console.error('❌ Erro na sincronização:', error);
+        console.error('Stack:', error.stack);
+        
+        showStatus(`Erro ao sincronizar: ${error.message}`, 'error');
+        
+        isConnected = false;
+        updateConnectionStatus(false);
+
+        return false;
+
+    } finally {
+        syncInProgress = false;
+        
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
         }
+    }
+}
+
+function updateConnectionStatus(connected) {
+    const syncIndicator = document.getElementById('syncIndicator');
+    if (syncIndicator) {
+        if (connected) {
+            syncIndicator.textContent = '🟢 Conectado';
+            syncIndicator.style.background = '#28a745';
+            syncIndicator.style.display = 'block';
+            setTimeout(() => {
+                syncIndicator.style.display = 'none';
+            }, 3000);
+        } else {
+            syncIndicator.textContent = '🔴 Desconectado';
+            syncIndicator.style.background = '#dc3545';
+            syncIndicator.style.display = 'block';
+        }
+    }
+}
 
         // =====================================================
         // SINCRONIZAÇÃO COM SERVIDOR
@@ -2636,25 +2471,12 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
         }
 
         function showSyncLoading(show) {
-            const button = document.getElementById('syncBtn');
-            if (button) {
-                if (show) {
-                    button.textContent = 'Sincronizando...';
-                    button.disabled = true;
-                    button.classList.add('loading');
-                } else {
-                    button.textContent = 'Atualizar Dados';
-                    button.disabled = false;
-                    button.classList.remove('loading');
-                }
-            }
-            
-            const indicator = document.getElementById('syncIndicator');
-            if (indicator) {
-                indicator.style.display = show ? 'block' : 'none';
-            }
-        }
-
+    // Botão syncBtn foi removido - apenas controla o indicador
+    const indicator = document.getElementById('syncIndicator');
+    if (indicator) {
+        indicator.style.display = show ? 'block' : 'none';
+    }
+}
         function showSyncSuccess(count) {
             showStatus(`${count} transfers sincronizados com sucesso!`, 'success');
             updateLastSyncDisplay();
@@ -2735,17 +2557,16 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
                     services = [];
                 }
             }
-            
             if (savedUrl) {
-                document.getElementById('webappUrl').value = savedUrl;
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            } else {
-                document.getElementById('webappUrl').value = WEBAPP_URL;
-                localStorage.setItem('webappUrl', WEBAPP_URL);
-                document.getElementById('syncBtn').style.display = 'inline-block';
-                isConnected = true;
-            }
+    document.getElementById('webappUrl').value = savedUrl;
+    // Botão syncBtn removido
+    isConnected = true;
+} else {
+    document.getElementById('webappUrl').value = WEBAPP_URL;
+    localStorage.setItem('webappUrl', WEBAPP_URL);
+    // Botão syncBtn removido
+    isConnected = true;
+}
             
             const lastSync = localStorage.getItem('lastSyncTime');
             if (lastSync) {
@@ -3205,7 +3026,7 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
                 if (service.tipoServico && (service.tipoServico.includes('Tour') || service.tipoServico === 'tour')) {
                     rowBackgroundClass = 'tour-row';
                 } else if (service.origem && service.origem.toLowerCase().includes('aeroporto') && 
-                           service.destino && service.destino.toLowerCase().includes('empire')) {
+           service.destino && service.destino.toLowerCase().includes('hotel')) {
                     rowBackgroundClass = 'airport-to-hotel-row';
                 }
                 
@@ -3239,10 +3060,9 @@ const SPREADSHEET_ID = '12uW6XqVZJBIieHFl02zfatcWjPhHnYpZjydBK-JgV_A';
                                    service.status === 'Confirmado' ? '✅' :
                                    service.status === 'Finalizado' ? '🏁' : '❌';
                 
-                const referenciaDisplay = (service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '') ? 
+                const referenciaDisplay = service.referencia && typeof service.referencia === 'string' && service.referencia.trim() !== '' ? 
     `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${service.referencia.trim()}</span>` : 
     '<span style="color: #adb5bd; font-size: 0.75rem;">N/A</span>';
-
 row.innerHTML = `
     <td><strong>#${service.id}</strong></td>
     <td>
@@ -3344,15 +3164,37 @@ row.innerHTML = `
         }
 
         function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-PT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
+    if (!dateString) return '';
+    
+    try {
+        let date;
+        
+        // Se já está em formato DD/MM/YYYY, retorna direto
+        if (dateString.includes('/')) {
+            return dateString;
         }
-
+        
+        // Se está em formato YYYY-MM-DD (do input date)
+        if (dateString.includes('-')) {
+            const [year, month, day] = dateString.split('-');
+            date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        } else {
+            // Fallback: tenta criar Date normalmente
+            date = new Date(dateString);
+        }
+        
+        // Formata para DD/MM/YYYY
+        const dia = String(date.getDate()).padStart(2, '0');
+        const mes = String(date.getMonth() + 1).padStart(2, '0');
+        const ano = date.getFullYear();
+        
+        return `${dia}/${mes}/${ano}`;
+        
+    } catch (error) {
+        console.error('Erro ao formatar data:', dateString, error);
+        return dateString;
+    }
+}
         function updateScrollIndicator() {
             const tableContainer = document.getElementById('tableContainer');
             const scrollIndicator = document.getElementById('scrollIndicator');
@@ -3762,32 +3604,62 @@ row.innerHTML = `
         }
 
 function parseServiceDate(dateStr) {
-            if (!dateStr) return null;
-            
-            try {
-                if (dateStr.includes('/')) {
-                    const [day, month, year] = dateStr.split('/');
-                    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                } else if (dateStr.includes('-')) {
-                    return new Date(dateStr);
-                } else {
-                    return new Date(dateStr);
-                }
-            } catch (error) {
-                console.error('Erro ao processar data:', dateStr, error);
-                return null;
-            }
+    if (!dateStr) return null;
+    
+    try {
+        let date;
+        
+        // Formato DD/MM/YYYY
+        if (dateStr.includes('/')) {
+            const [day, month, year] = dateStr.split('/').map(n => parseInt(n));
+            date = new Date(year, month - 1, day);
+        } 
+        // Formato YYYY-MM-DD (do input HTML)
+        else if (dateStr.includes('-')) {
+            const [year, month, day] = dateStr.split('-').map(n => parseInt(n));
+            date = new Date(year, month - 1, day);
+        } 
+        // Fallback
+        else {
+            date = new Date(dateStr);
         }
+        
+        // Validar se a data é válida
+        if (isNaN(date.getTime())) {
+            console.warn('Data inválida:', dateStr);
+            return null;
+        }
+        
+        return date;
+        
+    } catch (error) {
+        console.error('Erro ao processar data:', dateStr, error);
+        return null;
+    }
+}
 
         function formatDateForInput(date) {
-            if (!(date instanceof Date)) return '';
-            
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}`;
+    if (!(date instanceof Date)) {
+        if (typeof date === 'string') {
+            // Se é string DD/MM/YYYY
+            if (date.includes('/')) {
+                const [day, month, year] = date.split('/');
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            // Se já é YYYY-MM-DD
+            if (date.includes('-')) {
+                return date;
+            }
         }
+        return '';
+    }
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
 
         function saveFilters() {
             try {
@@ -3860,13 +3732,13 @@ function parseServiceDate(dateStr) {
             valorHUB = valorTotal - valorHotel - comissaoRecepcao;
 
             const formData = {
-            nomeCliente: document.getElementById('nomeCliente').value.trim(),
-            referencia: document.getElementById('referencia').value.trim(),
-            tipoServico: currentServiceType,
+    nomeCliente: document.getElementById('nomeCliente').value.trim(),
+    referencia: document.getElementById('referencia').value.trim(),
+    tipoServico: currentServiceType,
                 tourSelecionado: document.getElementById('tourSelecionado').value,
                 numeroPessoas: pessoas,
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
-                data: document.getElementById('data').value,
+                data: formatDate(document.getElementById('data').value),
                 contacto: getFormattedPhoneNumber(),
                 numeroVoo: document.getElementById('numeroVoo').value.trim(),
                 origem: document.getElementById('origem').value.trim(),
@@ -3882,6 +3754,32 @@ function parseServiceDate(dateStr) {
                 status: 'Solicitado'
             };
 
+            // 🔥 COLE AQUI O CÓDIGO DE NORMALIZAÇÃO DO HORÁRIO
+            // (código do arquivo frontend_correcao_submitForm_horario.js - PARTE 1)
+            if (formData.horaPickup) {
+                const horarioInput = formData.horaPickup;
+                
+                if (horarioInput instanceof Date) {
+                    const h = horarioInput.getHours().toString().padStart(2, '0');
+                    const m = horarioInput.getMinutes().toString().padStart(2, '0');
+                    formData.horaPickup = `${h}:${m}`;
+                }
+                else if (typeof horarioInput === 'string') {
+                    let horarioLimpo = horarioInput.trim();
+                    const match = horarioLimpo.match(/(\d{1,2}):(\d{2})/);
+                    if (match) {
+                        formData.horaPickup = `${match[1].padStart(2, '0')}:${match[2]}`;
+                    }
+                }
+                
+                if (!/^\d{2}:\d{2}$/.test(formData.horaPickup)) {
+                    console.warn('⚠️ Horário em formato inválido:', formData.horaPickup);
+                    showStatus('Atenção: Formato de horário pode estar incorreto. Use HH:MM', 'warning');
+                } else {
+                    console.log('✅ Horário validado:', formData.horaPickup);
+                }
+            }
+            
             try {
                 if (editingId) {
                     const index = services.findIndex(s => s.id === editingId);
@@ -4051,7 +3949,7 @@ function parseServiceDate(dateStr) {
                 document.getElementById('referencia').value = service.referencia || '';
                 document.getElementById('numeroPessoas').value = service.numeroPessoas;
                 document.getElementById('numeroBagagens').value = service.numeroBagagens;
-                document.getElementById('data').value = service.data;
+                document.getElementById('data').value = formatDateForInput(service.data);
                 document.getElementById('numeroVoo').value = service.numeroVoo || '';
                 document.getElementById('origem').value = service.origem;
                 document.getElementById('destino').value = service.destino;
@@ -4199,7 +4097,7 @@ function parseServiceDate(dateStr) {
 
             try {
                 const headers = [
-                    'ID', 'Cliente', 'Referência', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
+    'ID', 'Cliente', 'Referência', 'Tipo Serviço', 'Tour Selecionado', 'Pessoas', 'Bagagens', 
                     'Data', 'Contacto', 'Voo', 'Origem', 'Destino', 'Hora Pick-up', 'Valor Total', 
                     'Valor Hotel', 'Valor HUB', 'Comissão Recepção', 'Pagamento', 'Pago Para', 
                     'Status', 'Observações', 'Data Criação'
@@ -4209,10 +4107,10 @@ function parseServiceDate(dateStr) {
                 
                 services.forEach(service => {
                     const row = [
-                    service.id,
-                        `"${service.nomeCliente}"`,
-                        `"${service.referencia || ''}"`,
-                        `"${service.tipoServico || 'Transfer'}"`,
+    service.id,
+    `"${service.nomeCliente}"`,
+    `"${service.referencia || ''}"`,
+    `"${service.tipoServico || 'Transfer'}"`,
                         `"${service.tourSelecionado || ''}"`,
                         service.numeroPessoas,
                         service.numeroBagagens,
@@ -4239,7 +4137,7 @@ function parseServiceDate(dateStr) {
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', `transfers_Empire_lisbon_hub_${new Date().toISOString().split('T')[0]}.csv`);
+                link.setAttribute('download', `transfers_TESTE_sistema_${new Date().toISOString().split('T')[0]}.csv`);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
@@ -4317,7 +4215,7 @@ function parseServiceDate(dateStr) {
         // =====================================================
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                console.log('Inicializando Sistema de Transfers Empire Marques Hotel v9.0...');
+                console.log('Inicializando Sistema de Transfers Empire Lisbon Hotel v9.0...');
                 
                 loadData();
                 loadSavedFilters();
@@ -4330,6 +4228,31 @@ function parseServiceDate(dateStr) {
                 const searchClient = document.getElementById('searchClient');
                 if (searchClient) {
                     searchClient.addEventListener('input', debouncedClientFilter);
+                }
+
+                 // 🔥 COLE AQUI O CÓDIGO DOS LISTENERS DE HORÁRIO
+                // (código do arquivo frontend_correcao_submitForm_horario.js - PARTE 2)
+                const horaPickupInput = document.getElementById('horaPickup');
+                if (horaPickupInput) {
+                    horaPickupInput.addEventListener('change', function() {
+                        if (this.value) {
+                            const match = this.value.match(/(\d{1,2}):(\d{2})/);
+                            if (match) {
+                                this.value = `${match[1].padStart(2, '0')}:${match[2]}`;
+                            }
+                        }
+                    });
+                    
+                    horaPickupInput.addEventListener('blur', function() {
+                        if (this.value) {
+                            const match = this.value.match(/(\d{1,2}):(\d{2})/);
+                            if (match) {
+                                this.value = `${match[1].padStart(2, '0')}:${match[2]}`;
+                            }
+                        }
+                    });
+                    
+                    console.log('✅ Listeners de normalização de horário adicionados');
                 }
                 
                 document.addEventListener('keydown', function(e) {
@@ -4440,7 +4363,7 @@ function parseServiceDate(dateStr) {
         window.toggleClearData = toggleClearData;
 
         // Log final de inicialização
-        console.log('Sistema de Transfers Empire Marques Hotel & HUB Transfer v9.0');
+        console.log('Sistema de Transfers Empire Lisbon Hotel & HUB Transfer v9.0');
         console.log('Email configurado para testes:', TEST_EMAIL);
         console.log('URL do WebApp:', WEBAPP_URL);
         console.log('Senha admin: admin2025');
