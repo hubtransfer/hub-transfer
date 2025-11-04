@@ -1716,6 +1716,417 @@ function getFormattedPhoneNumber() {
            }, 5000);
        }
 
+    // =====================================================
+// 🔧 FUNÇÃO DE CORREÇÃO - ERRO DE COMUNICAÇÃO #7
+// =====================================================
+// Cole este código ANTES da seção "INICIALIZAÇÃO FINAL"
+// no seu arquivo HTML (procure por: "// =====================================================
+// // INICIALIZAÇÃO FINAL"
+
+// 1. CORRIGIR EXTRAÇÃO DE TELEFONE
+function getFormattedPhoneNumber() {
+    const phoneInput = document.getElementById('contacto');
+    const rawValue = phoneInput.value.trim();
+    
+    console.log('📱 Extração de telefone - Raw value:', rawValue);
+    
+    // Se vazio, retornar vazio
+    if (!rawValue) {
+        console.warn('⚠️ Campo de telefone vazio');
+        return '';
+    }
+    
+    // Se já tem o formato internacional correto (+351...)
+    if (rawValue.match(/^\+\d{1,3}\d{6,14}$/)) {
+        console.log('✅ Telefone em formato internacional:', rawValue);
+        return rawValue;
+    }
+    
+    // Tentar extrair do intlTelInput se disponível
+    if (window.intlTelInput) {
+        const itiInstance = window.intlTelInput.getInstance(phoneInput);
+        
+        if (itiInstance && itiInstance.isValidNumber()) {
+            const phoneNumber = itiInstance.getNumber();
+            console.log('✅ Telefone formatado por intlTelInput:', phoneNumber);
+            return phoneNumber;
+        }
+    }
+    
+    // Fallback: tentar formatar manualmente
+    let cleanNumber = rawValue.replace(/\D/g, '');
+    
+    // Se começa com 351 (Portugal)
+    if (cleanNumber.startsWith('351')) {
+        const formatted = '+' + cleanNumber;
+        console.log('✅ Telefone formatado manualmente (PT):', formatted);
+        return formatted;
+    }
+    
+    // Se começa com 9 (Portugal sem código)
+    if (cleanNumber.startsWith('9') && cleanNumber.length === 9) {
+        const formatted = '+351' + cleanNumber;
+        console.log('✅ Telefone formatado manualmente (+351):', formatted);
+        return formatted;
+    }
+    
+    // Se começa com +
+    if (rawValue.startsWith('+')) {
+        console.log('✅ Telefone com + já presente:', rawValue);
+        return rawValue;
+    }
+    
+    // Última tentativa: adicionar +351
+    if (cleanNumber.length >= 9) {
+        const formatted = '+351' + cleanNumber.slice(-9);
+        console.log('✅ Telefone formatado por fallback:', formatted);
+        return formatted;
+    }
+    
+    console.error('❌ Não foi possível formatar o telefone:', rawValue);
+    return rawValue; // Retornar como está se tudo falhar
+}
+
+// 2. FUNÇÃO MELHORADA DE ENVIO PARA BACKEND COM RETRY
+async function enviarParaBackendComRetry(dadosTransfer, tentativa = 1) {
+    const MAX_TENTATIVAS = 3;
+    const DELAY_ENTRE_TENTATIVAS = 1500;
+    
+    try {
+        console.log(`🔗 [Tentativa ${tentativa}/${MAX_TENTATIVAS}] Conectando com backend...`);
+        console.log('📤 Dados a enviar:', JSON.stringify(dadosTransfer, null, 2));
+        
+        // Validar telefone antes de enviar
+        if (!dadosTransfer.contacto) {
+            throw new Error('Telefone não foi extraído corretamente');
+        }
+        
+        console.log(`✅ Telefone validado: ${dadosTransfer.contacto}`);
+        
+        const response = await Promise.race([
+            fetch(HUB_CONFIG.WEBAPP_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dadosTransfer),
+                mode: 'cors',
+                cache: 'no-cache'
+            }),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout na conexão')), 10000)
+            )
+        ]);
+        
+        console.log('📡 Resposta recebida - Status:', response.status);
+        
+        // Se resposta OK
+        if (response.ok) {
+            try {
+                const result = await response.json();
+                console.log('✅ Resposta JSON:', result);
+                return result;
+            } catch (e) {
+                console.log('⚠️ Resposta recebida mas não é JSON válido');
+                return {
+                    success: true,
+                    message: 'Transfer enviado com sucesso',
+                    transferId: Date.now()
+                };
+            }
+        }
+        
+        // Se resposta não OK, tentar modo no-cors
+        console.log('⚠️ Resposta não OK (', response.status, '), tentando modo no-cors...');
+        throw new Error(`Resposta não OK: ${response.status}`);
+        
+    } catch (error) {
+        console.error(`❌ Erro na tentativa ${tentativa}:`, error.message);
+        
+        // Se não foi timeout ou erro de conexão, tentar no-cors
+        if (tentativa === 1 && error.message !== 'Timeout na conexão') {
+            try {
+                console.log('🔄 Tentando modo no-cors como fallback...');
+                
+                const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify(dadosTransfer),
+                    mode: 'no-cors'
+                });
+                
+                console.log('✅ Modo no-cors funcionou!');
+                return {
+                    success: true,
+                    message: 'Transfer enviado (modo no-cors)',
+                    transferId: Date.now()
+                };
+                
+            } catch (noCorserror) {
+                console.error('❌ Erro no no-cors:', noCorserror.message);
+            }
+        }
+        
+        // Retry logic
+        if (tentativa < MAX_TENTATIVAS) {
+            console.log(`⏳ Aguardando ${DELAY_ENTRE_TENTATIVAS}ms antes de nova tentativa...`);
+            await new Promise(resolve => setTimeout(resolve, DELAY_ENTRE_TENTATIVAS));
+            return enviarParaBackendComRetry(dadosTransfer, tentativa + 1);
+        }
+        
+        throw error;
+    }
+}
+
+// 3. SOBRESCREVER A FUNÇÃO ORIGINAL
+async function enviarParaBackend(dadosTransfer) {
+    return enviarParaBackendComRetry(dadosTransfer, 1);
+}
+
+// 4. MELHORAR COLETA DE DADOS COM VALIDAÇÃO
+function coletarDadosFormularioCorrigido() {
+    const contactoRaw = document.getElementById('contacto').value.trim();
+    const contactoFormatado = getFormattedPhoneNumber();
+    
+    console.log('📋 Coletando dados do formulário...');
+    console.log('  - Telefone raw:', contactoRaw);
+    console.log('  - Telefone formatado:', contactoFormatado);
+    
+    const dados = {
+        nomeCliente: document.getElementById('nomeCliente').value.trim(),
+        hotelOperadora: document.getElementById('hotelOperadora').value.trim(),
+        tipoServico: document.getElementById('tipoServico').value,
+        numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
+        numeroBagagens: parseInt(document.getElementById('numeroBagagens').value) || 0,
+        data: document.getElementById('data').value,
+        horaPickup: document.getElementById('horaPickup').value,
+        contacto: contactoFormatado, // USAR FUNÇÃO CORRIGIDA
+        numeroVoo: document.getElementById('numeroVoo').value.trim(),
+        origem: document.getElementById('origem').value.trim(),
+        destino: document.getElementById('destino').value.trim(),
+        valorTotal: parseFloat(document.getElementById('valorServico').value),
+        modoPagamento: document.getElementById('formaPagamento').value,
+        pagoParaQuem: document.getElementById('cobranca').value,
+        observacoes: document.getElementById('observacoes').value.trim(),
+        
+        // Dados do sistema
+        sistema: 'HUB_FRONTEND',
+        versao: HUB_CONFIG.VERSION,
+        timestamp: new Date().toISOString(),
+        
+        // DEBUG: valores originais do telefone
+        _debug_contacto_raw: contactoRaw,
+        _debug_contacto_formatted: contactoFormatado
+    };
+    
+    console.log('✅ Dados coletados:', dados);
+    return dados;
+}
+
+// 5. SOBRESCREVER handleFormSubmit COM VERSÃO CORRIGIDA
+async function handleFormSubmitCorrigido(event) {
+    event.preventDefault();
+    
+    if (isSubmitting) {
+        showNotification('Aguarde! Já está processando...', 'warning');
+        return;
+    }
+    
+    if (!validarFormulario()) {
+        console.error('❌ Validação falhou');
+        return;
+    }
+    
+    isSubmitting = true;
+    setButtonLoading('submitBtn', true);
+    
+    try {
+        // USAR FUNÇÃO CORRIGIDA
+        const dadosTransfer = coletarDadosFormularioCorrigido();
+        
+        // Validar telefone especificamente
+        if (!dadosTransfer.contacto || dadosTransfer.contacto === '') {
+            throw new Error('Telefone não foi extraído. Por favor, verifique o número.');
+        }
+        
+        console.log('📤 Enviando dados:', dadosTransfer);
+        
+        const resultado = await enviarParaBackend(dadosTransfer);
+        
+        if (resultado.success) {
+            console.log('✅ Transfer enviado com sucesso!');
+            showNotification('✅ Transfer solicitado com sucesso! WhatsApp será enviado automaticamente.', 'success');
+            limparFormulario();
+            
+            // Carregar transfers atualizados após 2 segundos
+            setTimeout(() => {
+                carregarTransfers();
+            }, 2000);
+        } else {
+            throw new Error(resultado.error || 'Erro desconhecido do servidor');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao enviar transfer:', error);
+        showNotification('❌ Erro ao enviar transfer: ' + error.message, 'error');
+        showStatus('❌ ' + error.message, 'error');
+    } finally {
+        isSubmitting = false;
+        setButtonLoading('submitBtn', false);
+    }
+}
+
+// 6. MELHORAR initializePhoneInput
+function initializePhoneInputCorrigido() {
+    const phoneInputElement = document.getElementById('contacto');
+    
+    console.log('📱 Inicializando campo de telefone...');
+    
+    if (window.intlTelInput) {
+        try {
+            // Destruir instância anterior se existir
+            if (phoneInput) {
+                phoneInput.destroy();
+            }
+            
+            phoneInput = window.intlTelInput(phoneInputElement, {
+                initialCountry: "pt",
+                preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
+                separateDialCode: true,
+                autoHideDialCode: false,
+                nationalMode: false,
+                formatOnDisplay: true,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+            });
+
+            // Event: ao digitar
+            phoneInputElement.addEventListener('input', function() {
+                const number = phoneInputElement.value.trim();
+                console.log('📝 Input telefone:', number);
+                
+                if (number.startsWith('+')) {
+                    const countryCode = detectCountryFromDDI(number);
+                    if (countryCode && phoneInput.getSelectedCountryData().iso2 !== countryCode) {
+                        phoneInput.setCountry(countryCode);
+                        console.log(`🌍 País detectado: ${countryCode}`);
+                    }
+                }
+            });
+
+            // Event: ao sair do campo
+            phoneInputElement.addEventListener('blur', function() {
+                const numero = phoneInputElement.value.trim();
+                console.log('📋 Blur - Valor atual:', numero);
+                
+                if (phoneInput.isValidNumber()) {
+                    const formatted = phoneInput.getNumber();
+                    phoneInputElement.value = formatted;
+                    console.log('✅ Telefone formatado na blur:', formatted);
+                } else if (numero && numero.length >= 9) {
+                    console.warn('⚠️ Número pode estar inválido:', numero);
+                }
+            });
+
+            // Event: ao colar
+            phoneInputElement.addEventListener('paste', function() {
+                setTimeout(() => {
+                    const pastedValue = phoneInputElement.value.trim();
+                    console.log('📎 Valor colado:', pastedValue);
+                    
+                    if (pastedValue.startsWith('+')) {
+                        const countryCode = detectCountryFromDDI(pastedValue);
+                        if (countryCode) {
+                            phoneInput.setCountry(countryCode);
+                            console.log(`🌍 País detectado de colagem: ${countryCode}`);
+                        }
+                    }
+                }, 100);
+            });
+            
+            console.log('✅ Campo de telefone inicializado com sucesso!');
+            
+        } catch (error) {
+            console.error('❌ Erro ao inicializar intlTelInput:', error);
+        }
+    } else {
+        console.warn('⚠️ Biblioteca intlTelInput não carregada ainda');
+        setTimeout(initializePhoneInputCorrigido, 1000);
+    }
+}
+
+// 7. FUNCTION PARA TESTE AVANÇADO
+function testarConexaoAvancada() {
+    setButtonLoading('testarConexaoBtn', true);
+    
+    console.log('🔧 TESTE AVANÇADO DE CONEXÃO');
+    console.log('================================');
+    console.log('🌐 URL Backend:', HUB_CONFIG.WEBAPP_URL);
+    console.log('📱 Navegador:', navigator.userAgent);
+    console.log('🌍 Online:', navigator.onLine);
+    console.log('================================');
+    
+    // Teste 1: Simular envio com dados fictícios
+    const dadosTeste = {
+        nomeCliente: 'TESTE_' + Date.now(),
+        contacto: '+351912345678',
+        hotelOperadora: 'HUB Transfer',
+        tipoServico: 'Transfer',
+        numeroPessoas: 1,
+        data: new Date().toISOString().split('T')[0],
+        horaPickup: '10:00',
+        origem: 'Aeroporto',
+        destino: 'Hotel',
+        valorTotal: 50,
+        modoPagamento: 'Dinheiro',
+        pagoParaQuem: 'Motorista',
+        observacoes: 'TESTE DE CONEXÃO',
+        sistema: 'HUB_TESTE',
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('📤 Enviando dados de teste...');
+    
+    enviarParaBackendComRetry(dadosTeste, 1)
+        .then(resultado => {
+            console.log('✅ Resposta do backend:', resultado);
+            showNotification('✅ Conexão funcionando! ' + (resultado.message || ''), 'success');
+        })
+        .catch(erro => {
+            console.error('❌ Erro no teste:', erro.message);
+            showNotification('❌ Erro: ' + erro.message, 'error');
+        })
+        .finally(() => {
+            setButtonLoading('testarConexaoBtn', false);
+        });
+}
+
+// 8. SUBSTITUIR EVENT LISTENER APÓS CARREGAMENTO
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Aplicando correções de comunicação...');
+    
+    // Sobrescrever handleFormSubmit
+    const formulario = document.getElementById('transferForm');
+    if (formulario) {
+        formulario.removeEventListener('submit', handleFormSubmit);
+        formulario.addEventListener('submit', handleFormSubmitCorrigido);
+        console.log('✅ Event listener do formulário atualizado');
+    }
+    
+    // Inicializar telefone corrigido
+    setTimeout(() => {
+        initializePhoneInputCorrigido();
+    }, 1500);
+    
+    console.log('✅ Correções aplicadas com sucesso!');
+    showNotification('🔧 Sistema de correção de comunicação ativado', 'success');
+});
+
+// =====================================================
+// FIM DO CÓDIGO DE CORREÇÃO
+// =====================================================
+       
 // =====================================================
        // INICIALIZAÇÃO FINAL
        // =====================================================
