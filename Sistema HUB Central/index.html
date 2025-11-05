@@ -910,7 +910,7 @@
        // =====================================================
        
        const HUB_CONFIG = {
-           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbxlHk632SzxMPo6PO4huGEw16FS7Bcm3hhZ7e8Un8mD7MViGavm2LoYbEhnwUGdFi-k/exec',
+           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbxhr2bbeDYPaDp7jjujKGFsZU_nocquV3d8WGllGYZOtjGB_vEavKj2b-wPM9eHQJ-L/exec',
            SPREADSHEET_URL: 'https://docs.google.com/spreadsheets/d/1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
            SYSTEM_NAME: 'Sistema HUB Central',
            VERSION: '1.0-HUB-FRONTEND',
@@ -935,7 +935,7 @@
        // VARIÁVEIS GLOBAIS
        // =====================================================
        
-       let phoneInput = null;
+       window.phoneInput = null;  // Expor globalmente para todos os scripts
        let isSubmitting = false;
        let transfers = [];
 
@@ -951,7 +951,19 @@
            document.getElementById('data').value = hoje.toISOString().split('T')[0];
            
            // Inicializar campo de telefone
-           setTimeout(initializePhoneInput, 1000);
+           if (document.readyState === 'loading') {
+   document.addEventListener('DOMContentLoaded', initializePhoneInput);
+} else {
+   initializePhoneInput();
+}
+
+// Retry após 1 segundo se ainda não inicializou
+setTimeout(() => {
+   if (!window.phoneInput) {
+       console.warn('⚠️ phoneInput ainda não inicializado, tentando novamente...');
+       initializePhoneInput();
+   }
+}, 1000);
            
            // Inicializar Google Maps Autocomplete
            setTimeout(initializeAutocomplete, 2000);
@@ -1103,7 +1115,7 @@ function initializePhoneInput() {
    const phoneInputElement = document.getElementById('contacto');
    
    if (window.intlTelInput) {
-       phoneInput = window.intlTelInput(phoneInputElement, {
+       window.phoneInput = window.intlTelInput(phoneInputElement, {
            initialCountry: "pt",
            preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
            separateDialCode: true,
@@ -1178,13 +1190,36 @@ function detectCountryFromDDI(number) {
    return null;
 }
 
+/ ✅ NOVO (SUBSTITUA POR):
 function getFormattedPhoneNumber() {
-   if (phoneInput && phoneInput.isValidNumber()) {
-       return phoneInput.getNumber();
+   try {
+       const inputElement = document.getElementById('contacto');
+       const valor = inputElement.value.trim();
+       
+       // Se está vazio, retorna vazio (será validado depois)
+       if (!valor) {
+           console.warn('⚠️ Campo contacto está vazio');
+           return '';
+       }
+       
+       // Se tem intlTelInput disponível e inicializado, usar
+       if (window.phoneInput && typeof window.phoneInput.isValidNumber === 'function') {
+           if (window.phoneInput.isValidNumber()) {
+               const numero = window.phoneInput.getNumber();
+               console.log('✅ Telefone formatado via intlTelInput:', numero);
+               return numero;
+           }
+       }
+       
+       // Fallback: Retornar valor bruto (será normalizado no backend)
+       console.log('⚠️ Usando telefone bruto:', valor);
+       return valor;
+       
+   } catch (error) {
+       console.error('❌ Erro ao formatar telefone:', error.message);
+       return document.getElementById('contacto').value || '';
    }
-   return document.getElementById('contacto').value;
 }
-
        // =====================================================
        // FUNÇÕES DO GOOGLE MAPS
        // =====================================================
@@ -1215,92 +1250,109 @@ function getFormattedPhoneNumber() {
        }
 
        // =====================================================
-       // FUNÇÕES DE SUBMISSÃO E VALIDAÇÃO
-       // =====================================================
-       
-       async function handleFormSubmit(event) {
-           event.preventDefault();
-           
-           if (isSubmitting) {
-               showNotification('Aguarde! Já está processando...', 'warning');
-               return;
-           }
-           
-           if (!validarFormulario()) {
-               return;
-           }
-           
-           isSubmitting = true;
-           setButtonLoading('submitBtn', true);
-           
-           try {
-               const dadosTransfer = coletarDadosFormulario();
-               console.log('📤 Enviando dados:', dadosTransfer);
-               
-               const resultado = await enviarParaBackend(dadosTransfer);
-               
-               if (resultado.success) {
-                   showNotification('✅ Transfer solicitado com sucesso! WhatsApp será enviado automaticamente.', 'success');
-                   limparFormulario();
-                   
-                   // Carregar transfers atualizados após 2 segundos
-                   setTimeout(() => {
-                       carregarTransfers();
-                   }, 2000);
-               } else {
-                   throw new Error(resultado.error || 'Erro desconhecido');
-               }
-               
-           } catch (error) {
-               console.error('❌ Erro ao enviar transfer:', error);
-               showNotification('❌ Erro ao enviar transfer: ' + error.message, 'error');
-           } finally {
-               isSubmitting = false;
-               setButtonLoading('submitBtn', false);
-           }
-       }
+// FUNÇÕES DE SUBMISSÃO E VALIDAÇÃO
+// =====================================================
 
-       function validarFormulario() {
-           const camposObrigatorios = [
-               { id: 'nomeCliente', nome: 'Nome do Cliente' },
-               { id: 'hotelOperadora', nome: 'Hotel/Operadora' },
-               { id: 'numeroPessoas', nome: 'Número de Pessoas' },
-               { id: 'data', nome: 'Data do Transfer' },
-               { id: 'horaPickup', nome: 'Hora de Pick-up' },
-               { id: 'contacto', nome: 'Contacto' },
-               { id: 'origem', nome: 'Local de Origem' },
-               { id: 'destino', nome: 'Local de Destino' },
-               { id: 'valorServico', nome: 'Valor do Serviço' },
-               { id: 'formaPagamento', nome: 'Forma de Pagamento' },
-               { id: 'cobranca', nome: 'Pago Para' }
-           ];
-           
-           for (let campo of camposObrigatorios) {
-               const elemento = document.getElementById(campo.id);
-               if (!elemento.value || elemento.value.trim() === '') {
-                   elemento.focus();
-                   showNotification(`❌ Campo obrigatório: ${campo.nome}`, 'error');
-                   return false;
-               }
-           }
-           
-           // Validar valor
-           const valor = parseFloat(document.getElementById('valorServico').value);
-           if (isNaN(valor) || valor <= 0) {
-               document.getElementById('valorServico').focus();
-               showNotification('❌ Valor deve ser um número positivo', 'error');
-               return false;
-           }
-           
-           // Validar número de pessoas
-           const pessoas = parseInt(document.getElementById('numeroPessoas').value);
-           if (isNaN(pessoas) || pessoas < 1) {
-               showNotification('❌ Número de pessoas deve ser pelo menos 1', 'error');
-               return false;
-           }
-           
-           return true;
-       }
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    if (isSubmitting) {
+        showNotification('Aguarde! Já está processando...', 'warning');
+        return;
+    }
+    
+    if (!validarFormulario()) {
+        return;
+    }
+    
+    isSubmitting = true;
+    setButtonLoading('submitBtn', true);
+    
+    try {
+        const dadosTransfer = coletarDadosFormulario();
+        console.log('📤 Enviando dados:', dadosTransfer);
+        
+        const resultado = await enviarParaBackend(dadosTransfer);
+        
+        if (resultado.success) {
+            showNotification('✅ Transfer solicitado com sucesso! WhatsApp será enviado automaticamente.', 'success');
+            limparFormulario();
+            
+            // Carregar transfers atualizados após 2 segundos
+            setTimeout(() => {
+                carregarTransfers();
+            }, 2000);
+        } else {
+            throw new Error(resultado.error || 'Erro desconhecido');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao enviar transfer:', error);
+        showNotification('❌ Erro ao enviar transfer: ' + error.message, 'error');
+    } finally {
+        isSubmitting = false;
+        setButtonLoading('submitBtn', false);
+    }
+}
+
+function validarFormulario() {
+    const camposObrigatorios = [
+        { id: 'nomeCliente', nome: 'Nome do Cliente' },
+        { id: 'hotelOperadora', nome: 'Hotel/Operadora' },
+        { id: 'numeroPessoas', nome: 'Número de Pessoas' },
+        { id: 'data', nome: 'Data do Transfer' },
+        { id: 'horaPickup', nome: 'Hora de Pick-up' },
+        { id: 'contacto', nome: 'Contacto' },
+        { id: 'origem', nome: 'Local de Origem' },
+        { id: 'destino', nome: 'Local de Destino' },
+        { id: 'valorServico', nome: 'Valor do Serviço' },
+        { id: 'formaPagamento', nome: 'Forma de Pagamento' },
+        { id: 'cobranca', nome: 'Pago Para' }
+    ];
+    
+    // Validar campos obrigatórios
+    for (let campo of camposObrigatorios) {
+        const elemento = document.getElementById(campo.id);
+        if (!elemento.value || elemento.value.trim() === '') {
+            elemento.focus();
+            showNotification(`❌ Campo obrigatório: ${campo.nome}`, 'error');
+            return false;
+        }
+    }
+    
+    // ✅ Validar formato do telefone
+    const telefone = getFormattedPhoneNumber();
+    if (!telefone || telefone.trim().length < 9) {
+        document.getElementById('contacto').focus();
+        showNotification(`❌ Telefone inválido. Mínimo 9 dígitos requeridos.`, 'error');
+        return false;
+    }
+    
+    // ✅ Validar se tem DDI (+ ou começa com país)
+    if (!telefone.startsWith('+') && !/^\d{11,}$/.test(telefone)) {
+        document.getElementById('contacto').focus();
+        showNotification(`❌ Telefone deve incluir código do país (ex: +351)`, 'error');
+        return false;
+    }
+    
+    // Validar valor do serviço
+    const valor = parseFloat(document.getElementById('valorServico').value);
+    if (isNaN(valor) || valor <= 0) {
+        document.getElementById('valorServico').focus();
+        showNotification('❌ Valor deve ser um número positivo', 'error');
+        return false;
+    }
+    
+    // Validar número de pessoas
+    const pessoas = parseInt(document.getElementById('numeroPessoas').value);
+    if (isNaN(pessoas) || pessoas < 1) {
+        document.getElementById('numeroPessoas').focus();
+        showNotification('❌ Número de pessoas deve ser pelo menos 1', 'error');
+        return false;
+    }
+    
+    return true;
+}
 
        function coletarDadosFormulario() {
            return {
@@ -1332,47 +1384,57 @@ function getFormattedPhoneNumber() {
        // =====================================================
        
        async function enviarParaBackend(dadosTransfer) {
-           try {
-               console.log('🔗 Conectando com:', HUB_CONFIG.WEBAPP_URL);
-               
-               const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'text/plain',
-                   },
-                   body: JSON.stringify(dadosTransfer),
-                   mode: 'cors'
-               });
-               
-               if (!response.ok) {
-                   // Tentar modo no-cors como fallback
-                   await fetch(HUB_CONFIG.WEBAPP_URL, {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'text/plain',
-                       },
-                       body: JSON.stringify(dadosTransfer),
-                       mode: 'no-cors'
-                   });
-                   
-                   // Em modo no-cors, assumir sucesso
-                   return {
-                       success: true,
-                       message: 'Transfer enviado (modo no-cors)',
-                       transferId: Date.now()
-                   };
-               }
-               
-               const result = await response.json();
-               console.log('📨 Resposta do backend:', result);
-               
-               return result;
-               
-           } catch (error) {
-               console.error('❌ Erro na comunicação:', error);
-               throw new Error('Erro de conexão com o servidor: ' + error.message);
-           }
-       }
+    try {
+        // ✅ NOVO: Log detalhado
+        console.log('🔗 Backend URL configurada:', HUB_CONFIG.WEBAPP_URL);
+        console.log('📤 Dados sendo enviados:', JSON.stringify(dadosTransfer, null, 2));
+        
+        const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(dadosTransfer),
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            // ✅ NOVO: Log de erro melhorado
+            console.error('❌ Resposta HTTP não OK:', response.status, response.statusText);
+            console.error('   URL:', HUB_CONFIG.WEBAPP_URL);
+            console.error('   Status:', response.status);
+            
+            // Tentar modo no-cors como fallback
+            console.log('🔄 Tentando fallback com modo no-cors...');
+            await fetch(HUB_CONFIG.WEBAPP_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: JSON.stringify(dadosTransfer),
+                mode: 'no-cors'
+            });
+            
+            // Em modo no-cors, assumir sucesso
+            return {
+                success: true,
+                message: 'Transfer enviado (modo no-cors)',
+                transferId: Date.now()
+            };
+        }
+        
+        const result = await response.json();
+        console.log('📨 Resposta do backend:', result);
+        
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Erro na comunicação:', error);
+        console.error('   URL tentada:', HUB_CONFIG.WEBAPP_URL);
+        console.error('   Erro completo:', error.message);
+        throw new Error('Erro de conexão com o servidor: ' + error.message);
+    }
+}
 
        async function testarConexao() {
            setButtonLoading('testarConexaoBtn', true);
