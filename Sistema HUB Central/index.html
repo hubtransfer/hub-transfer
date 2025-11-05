@@ -106,14 +106,13 @@
             border-radius: 50%;
             border: 3px solid var(--hub-accent);
             margin: 0 auto 15px;
-            display: block;
-            background: var(--hub-accent);
-            color: var(--hub-black);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
             font-weight: bold;
+            background: var(--hub-accent);
+            color: var(--hub-black);
         }
 
         .main-content {
@@ -176,7 +175,7 @@
             box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
         }
 
-        /* Botões de Hotel/Operadora - NOVA FUNCIONALIDADE */
+        /* Botões de Hotel/Operadora */
         .hotel-buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -235,316 +234,144 @@
         }
 
         .btn-quick:hover {
-            border-color: var(--hub-accent);
-            background: rgba(255, 215, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-quick.active {
             background: var(--hub-accent);
             color: var(--hub-black);
             border-color: var(--hub-accent);
         }
 
-        /* Botões de ação */
+        .btn-quick.selected {
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            border-color: var(--hub-accent);
+        }
+
+        /* Botões de ação principais */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
         .btn {
-            padding: 15px 30px;
+            padding: 18px 25px;
             border: none;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--hub-accent);
+            color: var(--hub-black);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #5d8aa8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a6a8a;
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: var(--hub-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-3px);
+        }
+
+        .btn-danger {
+            background: var(--hub-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+        }
+
+        .btn-warning {
+            background: var(--hub-warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+            transform: translateY(-3px);
         }
 
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none !important;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--hub-accent) 0%, #FFA500 100%);
-            color: var(--hub-black);
-            font-weight: 900;
+        .btn:disabled:hover {
+            transform: none;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(255, 215, 0, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--hub-success) 0%, #2ecc71 100%);
-            color: white;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--hub-warning) 0%, #e67e22 100%);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--hub-danger) 0%, #c0392b 100%);
-            color: white;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-
-        /* Status e mensagens */
-        .status-message {
-            padding: 15px 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-        }
-
-        .status-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 2px solid #ffeaa7;
-        }
-
-        /* Seção de visualização dos dados */
-        .data-section {
-            padding: 40px;
-            background: #f8f9fa;
-        }
-
-        .data-title {
-            color: var(--hub-primary);
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .transfers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-
-        .transfer-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--hub-accent);
-            transition: transform 0.3s ease;
-        }
-
-        .transfer-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .transfer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .transfer-id {
-            background: var(--hub-primary);
-            color: var(--hub-accent);
-            padding: 8px 15px;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .transfer-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-solicitado {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-confirmado {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-finalizado {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .transfer-client {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--hub-primary);
-            margin-bottom: 10px;
-        }
-
-        .transfer-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95rem;
-        }
-
-        .transfer-detail:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #666;
-        }
-
-        .detail-value {
-            font-weight: 700;
-            color: var(--hub-primary);
-        }
-
-        .hotel-badge {
-            background: var(--hub-accent);
-            color: var(--hub-black);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        /* Loading animation */
-        .btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            margin: auto;
-            border: 2px solid transparent;
-            border-top-color: currentColor;
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border-top-color: var(--hub-black);
+            animation: spin 1s ease-in-out infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Telefone com flag */
-        .phone-container {
-            position: relative;
-        }
-
-        .iti {
-            width: 100%;
-        }
-
-        .iti__country-list {
-            z-index: 9999;
-        }
-
-        .iti__selected-flag {
-            padding: 15px 12px;
-        }
-
-        #contacto {
-            padding-left: 70px;
-        }
-
-        /* Roberta HUB Info Box */
-        .roberta-info {
-            background: linear-gradient(135deg, var(--hub-accent) 0%, #FFA500 100%);
-            color: var(--hub-black);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .roberta-info h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .hotel-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .company-logos {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .form-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        /* Sistema de notificações */
-        .notification {
+        /* Toast notifications */
+        .toast-container {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-weight: 600;
-            z-index: 10000;
-            display: none;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
             animation: slideIn 0.3s ease-out;
         }
 
         @keyframes slideIn {
             from {
-                transform: translateX(100%);
+                transform: translateX(400px);
                 opacity: 0;
             }
             to {
@@ -553,130 +380,270 @@
             }
         }
 
-        .notification.success {
+        .toast.success {
+            border-left: 4px solid var(--hub-success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--hub-danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--hub-secondary);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--hub-warning);
+        }
+
+        /* Transfers container */
+        .transfers-section {
+            padding: 40px;
+            background: white;
+        }
+
+        .transfers-title {
+            color: var(--hub-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .transfers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .transfer-card {
+            background: white;
+            border-left: 5px solid var(--hub-accent);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .transfer-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .transfer-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .transfer-card-title {
+            font-weight: 700;
+            color: var(--hub-primary);
+            font-size: 1.1rem;
+        }
+
+        .transfer-status {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-confirmado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-novo {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .transfer-info {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        /* Config section */
+        .config-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            max-width: 800px;
+            display: none;
+        }
+
+        .config-section.show {
+            display: block;
+        }
+
+        .config-title {
+            color: var(--hub-primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .config-button {
+            padding: 12px 20px;
+            background: var(--hub-secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .config-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hotel-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .transfers-container {
+                grid-template-columns: 1fr;
+            }
+
+            .toast-container {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+
+            .toast {
+                min-width: auto;
+            }
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 999;
+        }
+
+        .connection-status.online {
             background: var(--hub-success);
             color: white;
         }
 
-        .notification.error {
+        .connection-status.offline {
             background: var(--hub-danger);
             color: white;
         }
-
-        .notification.warning {
-            background: var(--hub-warning);
-            color: white;
-        }
-
-        /* Footer HUB */
-        .footer {
-            background: var(--hub-black);
-            color: var(--hub-accent);
-            padding: 30px;
-            text-align: center;
-            margin-top: 40px;
-            border-radius: 20px;
-        }
-
-        .footer h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        .footer p {
-            opacity: 0.8;
-            font-size: 1.1rem;
-        }
     </style>
 </head>
-
 <body>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status online">
+        🟢 Conectado
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
     <div class="container">
-        <!-- Header Principal -->
+        <!-- Header -->
         <div class="header">
             <div class="roberta-avatar">🤖</div>
-            <h1>🎯 Sistema HUB Central</h1>
-            <p>Gestão Centralizada de Transfers - HUB Transfer</p>
+            <h1>🎯 HUB Transfer</h1>
+            <p>Sistema Centralizado de Gerenciamento de Transfers</p>
             <div class="company-logos">
-                <div class="company-logo">🏢 HUB Transfer - Central</div>
-                <div class="company-logo">🔗 Multi-Hotéis</div>
+                <span class="company-logo">🏨 Empire Hotels</span>
+                <span class="company-logo">🚗 World Driver</span>
+                <span class="company-logo">✈️ Hub Transfer</span>
             </div>
         </div>
 
-        <!-- Roberta HUB Info -->
-        <div class="roberta-info">
-            <h3>🤖 Roberta HUB - Assistente Virtual</h3>
-            <p>WhatsApp automático será enviado após confirmação do transfer (+351928283652)</p>
-        </div>
-
-<!-- Configuração de URL -->
-<!-- Seção de Configuração Discreta -->
-<div class="config-section" id="configSection">
-    <div class="config-title">🔗 Configuração do Backend</div>
-    <div class="config-form">
-        <div class="config-input">
-            <label for="backendUrl">URL do Google Apps Script:</label>
-            <input type="url" id="backendUrl" placeholder="https://script.google.com/macros/s/...">
-        </div>
-        <button type="button" class="btn btn-success" onclick="atualizarBackendUrl()" id="updateBtn">
-            🔗 Atualizar URL
-        </button>
-        <button type="button" class="btn btn-warning" onclick="toggleConfig()">
-            🔒 Fechar
-        </button>
-    </div>
-    <div id="configStatus" class="status-message"></div>
-</div>
-
-        <!-- Conteúdo Principal -->
+        <!-- Main Content -->
         <div class="main-content">
-            <!-- Seção do Formulário -->
+            <!-- Form Section -->
             <div class="form-section">
-                <h2 class="form-title">➕ Solicitar Novo Transfer</h2>
-                
+                <h2 class="form-title">📋 Solicitar Transfer</h2>
                 <form id="transferForm">
+                    <!-- Hotel/Operadora Selection -->
+                    <div class="form-group">
+                        <label>🏨 Hotel/Operadora *</label>
+                        <div class="hotel-buttons">
+                            <button type="button" class="btn-hotel active" data-hotel="Empire Marques Hotel" onclick="selecionarHotel(this)">
+                                ✈️ Empire Marques
+                            </button>
+                            <button type="button" class="btn-hotel" data-hotel="Hotel Lioz" onclick="selecionarHotel(this)">
+                                🏖️ Hotel Lioz
+                            </button>
+                            <button type="button" class="btn-hotel" data-hotel="Empire Lisbon Hotel" onclick="selecionarHotel(this)">
+                                🏰 Empire Lisbon
+                            </button>
+                            <button type="button" class="btn-hotel" data-hotel="Gota d´água" onclick="selecionarHotel(this)">
+                                💧 Gota d´água
+                            </button>
+                            <button type="button" class="btn-hotel" data-hotel="Teste Sistema Validado" onclick="selecionarHotel(this)">
+                                🧪 Teste
+                            </button>
+                            <button type="button" class="btn-hotel" onclick="limparHotelOperadora()">
+                                ➕ Outro
+                            </button>
+                        </div>
+                        <input type="text" id="hotelOperadora" placeholder="Ou digite o nome da operadora" value="Empire Marques Hotel">
+                    </div>
+
+                    <!-- Form Grid -->
                     <div class="form-grid">
-                        <!-- Nome do Cliente -->
+                        <!-- Cliente Name -->
                         <div class="form-group">
-                            <label for="nomeCliente">Nome do Cliente *</label>
-                            <input type="text" id="nomeCliente" required placeholder="Ex: João Silva">
+                            <label>👤 Nome do Cliente *</label>
+                            <input type="text" id="nomeCliente" placeholder="Ex: João Silva" required>
                         </div>
 
-                        <!-- Hotel/Operadora de Origem - NOVO CAMPO -->
+                        <!-- Contact Phone -->
                         <div class="form-group">
-                            <label for="hotelOperadora">Hotel/Operadora de Origem *</label>
-                            <div class="hotel-buttons">
-    <button type="button" class="btn-hotel" onclick="setHotel('WT Driver')">
-        🚐 WT Driver
-    </button>
-    <button type="button" class="btn-hotel" onclick="setHotel('Connecto')">
-        🔗 Connecto
-    </button>
-    <button type="button" class="btn-hotel" onclick="setHotel('HUB Transfer')">
-        🎯 HUB Transfer
-    </button>
-    <button type="button" class="btn-hotel" onclick="limparHotelOperadora()">
-        ✏️ Outro
-    </button>
-</div>
-<input type="text" id="hotelOperadora" required 
-       placeholder="Digite: World Driver, Nova Operadora..." style="margin-top: 10px;">
-                       </div>
+                            <label>📱 Contacto *</label>
+                            <input type="tel" id="contacto" placeholder="+351XXXXXXXXX" required>
+                        </div>
 
-                        <!-- Tipo de Serviço -->
+                        <!-- Service Type -->
                         <div class="form-group">
-                            <label for="tipoServico">Tipo de Serviço</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setTipoServico('Transfer')">
-                                    🚕 Transfer
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setTipoServico('Tour Regular')">
-                                    🚐 Tour Regular
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setTipoServico('Private Tour')">
-                                    🚗 Private Tour
-                                </button>
-                            </div>
+                            <label>🚗 Tipo de Serviço *</label>
                             <select id="tipoServico" required>
                                 <option value="Transfer">Transfer</option>
                                 <option value="Tour Regular">Tour Regular</option>
@@ -684,1390 +651,647 @@
                             </select>
                         </div>
 
-                        <!-- Número de Pessoas -->
+                        <!-- Date -->
                         <div class="form-group">
-                            <label for="numeroPessoas">Número de Pessoas *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setPessoas(1)">1</button>
-                                <button type="button" class="btn-quick" onclick="setPessoas(2)">2</button>
-                                <button type="button" class="btn-quick" onclick="setPessoas(3)">3</button>
-                                <button type="button" class="btn-quick" onclick="setPessoas(4)">4</button>
-                                <button type="button" class="btn-quick" onclick="setPessoas(5)">5</button>
-                                <button type="button" class="btn-quick" onclick="setPessoas(6)">6+</button>
-                            </div>
-                            <input type="number" id="numeroPessoas" min="1" max="20" required>
-                        </div>
-
-                        <!-- Número de Bagagens -->
-                        <div class="form-group">
-                            <label for="numeroBagagens">Número de Bagagens</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setBagagens(0)">0</button>
-                                <button type="button" class="btn-quick" onclick="setBagagens(1)">1</button>
-                                <button type="button" class="btn-quick" onclick="setBagagens(2)">2</button>
-                                <button type="button" class="btn-quick" onclick="setBagagens(3)">3</button>
-                                <button type="button" class="btn-quick" onclick="setBagagens(4)">4</button>
-                                <button type="button" class="btn-quick" onclick="setBagagens(5)">5+</button>
-                            </div>
-                            <input type="number" id="numeroBagagens" min="0" max="20" value="0">
-                        </div>
-
-                        <!-- Data do Transfer -->
-                        <div class="form-group">
-                            <label for="data">Data do Transfer *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setData('hoje')">Hoje</button>
-                                <button type="button" class="btn-quick" onclick="setData('amanha')">Amanhã</button>
-                            </div>
+                            <label>📅 Data *</label>
                             <input type="date" id="data" required>
                         </div>
 
-                        <!-- Hora de Pick-up -->
+                        <!-- Time -->
                         <div class="form-group">
-                            <label for="horaPickup">Hora de Pick-up *</label>
+                            <label>⏰ Hora Pick-up *</label>
+                            <input type="time" id="horaPikup" required>
+                        </div>
+
+                        <!-- Number of People -->
+                        <div class="form-group">
+                            <label>👥 Número de Pessoas *</label>
+                            <input type="number" id="numeroPessoas" min="1" value="1" required>
+                        </div>
+
+                        <!-- Luggage -->
+                        <div class="form-group">
+                            <label>🧳 Número de Bagagens</label>
+                            <input type="number" id="numeroBagagens" min="0" value="0">
+                        </div>
+
+                        <!-- Flight Number -->
+                        <div class="form-group">
+                            <label>✈️ Número do Voo</label>
+                            <input type="text" id="numeroVoo" placeholder="Ex: TP123">
+                        </div>
+
+                        <!-- Origin -->
+                        <div class="form-group">
+                            <label>📍 Origem *</label>
+                            <input type="text" id="origem" placeholder="Ex: Aeroporto de Lisboa" required>
+                        </div>
+
+                        <!-- Destination -->
+                        <div class="form-group">
+                            <label>📍 Destino *</label>
+                            <input type="text" id="destino" placeholder="Ex: Centro de Lisboa" required>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label>💰 Valor do Serviço (€) *</label>
                             <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setHora('06:00')">06:00</button>
-                                <button type="button" class="btn-quick" onclick="setHora('08:00')">08:00</button>
-                                <button type="button" class="btn-quick" onclick="setHora('10:00')">10:00</button>
-                                <button type="button" class="btn-quick" onclick="setHora('12:00')">12:00</button>
-                                <button type="button" class="btn-quick" onclick="setHora('14:00')">14:00</button>
-                                <button type="button" class="btn-quick" onclick="setHora('16:00')">16:00</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(25)">€25</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(35)">€35</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(45)">€45</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(60)">€60</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(75)">€75</button>
+                                <button type="button" class="btn-quick" onclick="setarValor(100)">€100</button>
                             </div>
-                            <input type="time" id="horaPickup" required>
+                            <input type="number" id="valorServico" min="0" step="0.01" placeholder="Valor em euros" required>
                         </div>
 
-                        <!-- Contacto do Cliente -->
+                        <!-- Payment Method -->
                         <div class="form-group">
-                            <label for="contacto">Contacto do Cliente *</label>
-                            <div class="phone-container">
-                                <input type="tel" id="contacto" required placeholder="Digite o número...">
-                            </div>
-                        </div>
-
-                        <!-- Número do Voo -->
-                        <div class="form-group">
-                            <label for="numeroVoo">Número do Voo</label>
-                            <input type="text" id="numeroVoo" placeholder="Ex: TP1234">
-                        </div>
-
-                        <!-- Local de Origem -->
-                        <div class="form-group">
-                            <label for="origem">Local de Origem *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setOrigem('Aeroporto de Lisboa')">
-                                    ✈️ Aeroporto
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setOrigem('Centro de Lisboa')">
-                                    🏛️ Centro
-                                </button>
-                            </div>
-                            <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
-                        </div>
-
-                        <!-- Local de Destino -->
-                        <div class="form-group">
-                            <label for="destino">Local de Destino *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setDestino('Aeroporto de Lisboa')">
-                                    ✈️ Aeroporto
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setDestino('Centro de Lisboa')">
-                                    🏛️ Centro
-                                </button>
-                            </div>
-                            <input type="text" id="destino" required placeholder="Digite ou escolha o endereço...">
-                        </div>
-
-                        <!-- Valor do Serviço -->
-                        <div class="form-group">
-                            <label for="valorServico">Valor do Serviço (€) *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setValor(25)">€25</button>
-                                <button type="button" class="btn-quick" onclick="setValor(35)">€35</button>
-                                <button type="button" class="btn-quick" onclick="setValor(45)">€45</button>
-                                <button type="button" class="btn-quick" onclick="setValor(60)">€60</button>
-                                <button type="button" class="btn-quick" onclick="setValor(75)">€75</button>
-                                <button type="button" class="btn-quick" onclick="setValor(100)">€100</button>
-                            </div>
-                            <input type="number" id="valorServico" step="0.01" required placeholder="Ou digite valor...">
-                        </div>
-
-                        <!-- Forma de Pagamento -->
-                        <div class="form-group">
-                            <label for="formaPagamento">Forma de Pagamento *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Dinheiro')">
-                                    💵 Dinheiro
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Multibanco')">
-                                    💳 Multibanco
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setFormaPagamento('Transferência')">
-                                    🏦 Transferência
-                                </button>
-                            </div>
-                            <select id="formaPagamento" required>
-                                <option value="">Selecionar...</option>
+                            <label>💳 Forma de Pagamento</label>
+                            <select id="formaPagamento">
                                 <option value="Dinheiro">Dinheiro</option>
-                                <option value="Multibanco">Multibanco</option>
-                                <option value="Transferência">Transferência Bancária</option>
-                                <option value="PayPal">PayPal</option>
+                                <option value="Cartão">Cartão</option>
+                                <option value="Transferência">Transferência</option>
+                                <option value="WhatsApp Pay">WhatsApp Pay</option>
                             </select>
                         </div>
+                    </div>
 
-                        <!-- Pago Para -->
-                        <div class="form-group">
-                            <label for="cobranca">Pago Para *</label>
-                            <div class="quick-buttons">
-                                <button type="button" class="btn-quick" onclick="setCobranca('Motorista')">
-                                    🚐 Motorista
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setCobranca('Operador')">
-                                    👤 Operador
-                                </button>
-                                <button type="button" class="btn-quick" onclick="setCobranca('Parceiro')">
-                                    🤝 Parceiro
-                                </button>
-                            </div>
-                            <select id="cobranca" required>
-                                <option value="">Selecionar...</option>
-                                <option value="Motorista">Motorista</option>
-                                <option value="Operador">Operador</option>
-                                <option value="Parceiro">Parceiro</option>
-                                <option value="Banco">Banco</option>
-                                <option value="Empresa">Empresa</option>
-                            </select>
+                    <!-- Observations -->
+                    <div class="form-group">
+                        <label>📝 Observações</label>
+                        <div class="quick-buttons">
+                            <button type="button" class="btn-quick" onclick="adicionarObservacao('Bagagem Extra')">Bagagem Extra</button>
+                            <button type="button" class="btn-quick" onclick="adicionarObservacao('VIP')">VIP</button>
+                            <button type="button" class="btn-quick" onclick="adicionarObservacao('Urgente')">Urgente</button>
+                            <button type="button" class="btn-quick" onclick="adicionarObservacao('Com Criança')">Com Criança</button>
                         </div>
+                        <textarea id="observacoes" placeholder="Informações extras sobre o transfer" rows="3"></textarea>
+                    </div>
 
-<!-- Observações -->
-                       <div class="form-group">
-                           <label for="observacoes">Observações</label>
-                           <div class="quick-buttons">
-                               <button type="button" class="btn-quick" onclick="addObservacao('Bagagem extra')">Bagagem Extra</button>
-                               <button type="button" class="btn-quick" onclick="addObservacao('Cliente VIP')">VIP</button>
-                               <button type="button" class="btn-quick" onclick="addObservacao('Transfer urgente')">Urgente</button>
-                               <button type="button" class="btn-quick" onclick="addObservacao('Com criança')">Com Criança</button>
-                           </div>
-                           <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
-                       </div>
-                   </div>
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary" id="btnSolicitar">
+                            ✅ Solicitar Transfer
+                        </button>
+                        <button type="reset" class="btn btn-secondary" onclick="limparFormulario(); return false;">
+                            🗑️ Limpar Formulário
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="testarConexao()">
+                            🔗 Testar Conexão
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="toggleConfig()">
+                            ⚙️ Configurar
+                        </button>
+                    </div>
+                </form>
 
-                   <!-- Botões de Ação -->
-                   <div class="form-actions">
-    <button type="submit" class="btn btn-primary" id="submitBtn">
-        ✅ Solicitar Transfer
-    </button>
-    <button type="button" class="btn btn-success" onclick="limparFormulario()">
-        🔄 Limpar Formulário
-    </button>
-    <button type="button" class="btn btn-warning" onclick="carregarTransfers()">
-        📋 Carregar Transfers
-    </button>
-    <button type="button" class="btn btn-danger" onclick="testarConexao()">
-        🔧 Testar Conexão
-    </button>
-    <button type="button" class="btn btn-warning" onclick="toggleConfig()">
-        ⚙️ Configurar
-    </button>
-    <!-- ADICIONAR ESTA LINHA -->
-    <button type="button" class="btn btn-danger" onclick="limparTodosOsDados()">
-        🗑️ Limpar Dados
-    </button>
-</div>
-</form>
-
-<!-- Mensagem de Status -->
-<div id="statusMessage" class="status-message"></div>
-</div>
-
-<!-- Seção de Visualização de Dados -->
-<div class="data-section">
-   <h2 class="data-title">📋 Transfers Registrados</h2>
-   <div id="transfersContainer" class="transfers-grid">
-       <div class="transfer-card">
-           <div style="text-align: center; padding: 40px; color: #999;">
-               <h3>Nenhum transfer carregado</h3>
-               <p>Clique em "Carregar Transfers" para visualizar os dados</p>
-           </div>
-       </div>
-   </div>
-</div>
-</div>
-
-       <!-- Footer -->
-       <div class="footer">
-           <h3>🚐 HUB Transfer - Sistema Central</h3>
-           <p>Gestão inteligente de transfers com Roberta HUB</p>
-       </div>
-   </div>
-
-   <!-- Notificação -->
-   <div id="notification" class="notification"></div>
-
-   <script>
-       // =====================================================
-       // CONFIGURAÇÕES DO SISTEMA HUB CENTRAL
-       // =====================================================
-       
-       const HUB_CONFIG = {
-           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbwVWOkBDMBBGrskhyhIXE5g_DE3_BLvMtO1qSMq-vORx7ZaXU4PEL_Ci46hz7Xla0Rq/exec',
-           SPREADSHEET_URL: 'https://docs.google.com/spreadsheets/d/1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
-           SYSTEM_NAME: 'Sistema HUB Central',
-           VERSION: '1.0-HUB-FRONTEND',
-           
-           // Operadoras disponíveis
-           OPERADORAS: [
-               { id: 'wt', nome: 'WT', cor: '#e74c3c' },
-               { id: 'connecto', nome: 'Connecto', cor: '#3498db' },
-               { id: 'hub_transfer', nome: 'HUB Transfer', cor: '#2ecc71' }
-           ],
-           
-           // Validações
-           VALIDACOES: {
-               nomeCliente: { min: 2, max: 100 },
-               numeroPessoas: { min: 1, max: 8 },
-               valorServico: { min: 5.00, max: 500.00 },
-               contacto: /^\+351\d{9}$/
-           }
-       };
-
-       // =====================================================
-       // VARIÁVEIS GLOBAIS
-       // =====================================================
-       
-       let phoneInput = null;
-       let isSubmitting = false;
-       let transfers = [];
-
-       // =====================================================
-       // FUNÇÕES DE INICIALIZAÇÃO
-       // =====================================================
-       
-       document.addEventListener('DOMContentLoaded', function() {
-           console.log('🚀 Inicializando Sistema HUB Central...');
-           
-           // Definir data de hoje como padrão
-           const hoje = new Date();
-           document.getElementById('data').value = hoje.toISOString().split('T')[0];
-           
-           // Inicializar campo de telefone
-           setTimeout(initializePhoneInput, 1000);
-           
-           // Inicializar Google Maps Autocomplete
-           setTimeout(initializeAutocomplete, 2000);
-           
-           // Configurar event listeners
-           setupEventListeners();
-           
-           console.log('✅ Sistema HUB Central inicializado');
-           console.log('📧 Roberta HUB: WhatsApp automático para transfers confirmados');
-           console.log('🔗 Backend URL:', HUB_CONFIG.WEBAPP_URL);
-       });
-
-       function setupEventListeners() {
-           // Submissão do formulário
-           document.getElementById('transferForm').addEventListener('submit', handleFormSubmit);
-           
-           // Atalhos de teclado
-           document.addEventListener('keydown', function(e) {
-               if (e.ctrlKey && e.key === 'Enter') {
-                   const submitBtn = document.getElementById('submitBtn');
-                   if (!submitBtn.disabled) {
-                       submitBtn.click();
-                   }
-               }
-               
-               if (e.key === 'Escape') {
-                   limparFormulario();
-               }
-           });
-       }
-
-       // =====================================================
-       // FUNÇÕES DE INTERFACE - BOTÕES RÁPIDOS
-       // =====================================================
-       
-       function setHotel(nomeHotel) {
-           document.getElementById('hotelOperadora').value = nomeHotel;
-           
-           // Atualizar botões
-           document.querySelectorAll('.btn-hotel').forEach(btn => {
-               btn.classList.remove('active');
-           });
-           event.target.classList.add('active');
-           
-           showNotification(`Hotel selecionado: ${nomeHotel}`, 'success');
-       }
-
-       function setTipoServico(tipo) {
-           document.getElementById('tipoServico').value = tipo;
-           
-           // Atualizar botões
-           document.querySelectorAll('.btn-quick').forEach(btn => {
-               if (btn.onclick && btn.onclick.toString().includes('setTipoServico')) {
-                   btn.classList.remove('active');
-               }
-           });
-           event.target.classList.add('active');
-       }
-
-       function setPessoas(numero) {
-           document.getElementById('numeroPessoas').value = numero;
-           updateActiveButton(event.target, 'setPessoas');
-       }
-
-       function setBagagens(numero) {
-           document.getElementById('numeroBagagens').value = numero;
-           updateActiveButton(event.target, 'setBagagens');
-       }
-
-       function setData(opcao) {
-           const hoje = new Date();
-           const dataInput = document.getElementById('data');
-           
-           if (opcao === 'hoje') {
-               dataInput.value = hoje.toISOString().split('T')[0];
-           } else if (opcao === 'amanha') {
-               const amanha = new Date(hoje);
-               amanha.setDate(amanha.getDate() + 1);
-               dataInput.value = amanha.toISOString().split('T')[0];
-           }
-           
-           updateActiveButton(event.target, 'setData');
-       }
-
-       function setHora(hora) {
-           document.getElementById('horaPickup').value = hora;
-           updateActiveButton(event.target, 'setHora');
-       }
-
-       function setOrigem(local) {
-           document.getElementById('origem').value = local;
-           updateActiveButton(event.target, 'setOrigem');
-       }
-
-       function setDestino(local) {
-           document.getElementById('destino').value = local;
-           updateActiveButton(event.target, 'setDestino');
-       }
-
-       function setValor(valor) {
-           document.getElementById('valorServico').value = valor;
-           updateActiveButton(event.target, 'setValor');
-       }
-
-       function setFormaPagamento(forma) {
-           document.getElementById('formaPagamento').value = forma;
-           updateActiveButton(event.target, 'setFormaPagamento');
-       }
-
-       function setCobranca(cobranca) {
-           document.getElementById('cobranca').value = cobranca;
-           updateActiveButton(event.target, 'setCobranca');
-       }
-
-       function addObservacao(texto) {
-           const obsInput = document.getElementById('observacoes');
-           const textoAtual = obsInput.value;
-           
-           if (textoAtual === '') {
-               obsInput.value = texto;
-           } else {
-               obsInput.value = textoAtual + '; ' + texto;
-           }
-           
-           // Efeito visual temporário
-           event.target.classList.add('active');
-           setTimeout(() => {
-               event.target.classList.remove('active');
-           }, 1000);
-       }
-
-       function updateActiveButton(clickedButton, functionName) {
-           // Remover classe active de todos os botões da mesma função
-           document.querySelectorAll('.btn-quick').forEach(btn => {
-               if (btn.onclick && btn.onclick.toString().includes(functionName)) {
-                   btn.classList.remove('active');
-               }
-           });
-           
-           // Adicionar classe active ao botão clicado
-           clickedButton.classList.add('active');
-       }
-
-// =====================================================
-// FUNÇÕES DE TELEFONE
-// =====================================================
-
-function initializePhoneInput() {
-   const phoneInputElement = document.getElementById('contacto');
-   
-   if (window.intlTelInput) {
-       phoneInput = window.intlTelInput(phoneInputElement, {
-           initialCountry: "pt",
-           preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
-           separateDialCode: true,
-           autoHideDialCode: false,
-           nationalMode: false,
-           formatOnDisplay: true,
-           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-       });
-
-       // NOVO: Detectar país automaticamente pelo DDI
-       phoneInputElement.addEventListener('input', function() {
-           const number = phoneInputElement.value.trim();
-           
-           // Se começar com +, detectar país
-           if (number.startsWith('+')) {
-               const countryCode = detectCountryFromDDI(number);
-               if (countryCode && countryCode !== phoneInput.getSelectedCountryData().iso2) {
-                   phoneInput.setCountry(countryCode);
-                   console.log(`🌍 País detectado: ${countryCode} para ${number.substring(0, 4)}`);
-               }
-           }
-       });
-
-       phoneInputElement.addEventListener('blur', function() {
-           if (phoneInput.isValidNumber()) {
-               phoneInputElement.value = phoneInput.getNumber();
-           }
-       });
-       
-       console.log('📱 Campo de telefone inicializado com DDI automático');
-   } else {
-       console.warn('⚠️ Biblioteca intlTelInput não carregada');
-   }
-}
-
-// NOVA FUNÇÃO: Detectar país pelo DDI
-function detectCountryFromDDI(number) {
-   const ddiMap = {
-       '+351': 'pt', // Portugal
-       '+55': 'br',  // Brasil
-       '+34': 'es',  // Espanha
-       '+33': 'fr',  // França
-       '+49': 'de',  // Alemanha
-       '+1': 'us',   // EUA/Canadá
-       '+44': 'gb',  // Reino Unido
-       '+39': 'it',  // Itália
-       '+31': 'nl',  // Holanda
-       '+32': 'be',  // Bélgica
-       '+41': 'ch',  // Suíça
-       '+43': 'at',  // Áustria
-       '+45': 'dk',  // Dinamarca
-       '+46': 'se',  // Suécia
-       '+47': 'no',  // Noruega
-       '+54': 'ar',  // Argentina
-       '+56': 'cl',  // Chile
-       '+57': 'co',  // Colômbia
-       '+58': 've',  // Venezuela
-       '+52': 'mx',  // México
-       '+213': 'dz', // Argélia
-       '+212': 'ma', // Marrocos
-       '+27': 'za'   // África do Sul
-   };
-
-   // Testar DDIs de 4 dígitos primeiro, depois 3, depois 2
-   for (let i = 4; i >= 2; i--) {
-       const ddi = number.substring(0, i);
-       if (ddiMap[ddi]) {
-           return ddiMap[ddi];
-       }
-   }
-   
-   return null;
-}
-
-function getFormattedPhoneNumber() {
-   if (phoneInput && phoneInput.isValidNumber()) {
-       return phoneInput.getNumber();
-   }
-   return document.getElementById('contacto').value;
-}
-
-       // =====================================================
-       // FUNÇÕES DO GOOGLE MAPS
-       // =====================================================
-       
-       function initializeAutocomplete() {
-           if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-               try {
-                   const origemInput = document.getElementById('origem');
-                   const origemAutocomplete = new google.maps.places.Autocomplete(origemInput, {
-                       types: ['establishment', 'geocode'],
-                       componentRestrictions: { country: 'pt' }
-                   });
-
-                   const destinoInput = document.getElementById('destino');
-                   const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-                       types: ['establishment', 'geocode'],
-                       componentRestrictions: { country: 'pt' }
-                   });
-
-                   console.log('📍 Google Maps Autocomplete inicializado');
-                   
-               } catch (error) {
-                   console.error('Erro ao inicializar Google Maps:', error);
-               }
-           } else {
-               setTimeout(initializeAutocomplete, 2000);
-           }
-       }
-
-       // =====================================================
-       // FUNÇÕES DE SUBMISSÃO E VALIDAÇÃO
-       // =====================================================
-       
-       async function handleFormSubmit(event) {
-           event.preventDefault();
-           
-           if (isSubmitting) {
-               showNotification('Aguarde! Já está processando...', 'warning');
-               return;
-           }
-           
-           if (!validarFormulario()) {
-               return;
-           }
-           
-           isSubmitting = true;
-           setButtonLoading('submitBtn', true);
-           
-           try {
-               const dadosTransfer = coletarDadosFormulario();
-               console.log('📤 Enviando dados:', dadosTransfer);
-               
-               const resultado = await enviarParaBackend(dadosTransfer);
-               
-               if (resultado.success) {
-                   showNotification('✅ Transfer solicitado com sucesso! WhatsApp será enviado automaticamente.', 'success');
-                   limparFormulario();
-                   
-                   // Carregar transfers atualizados após 2 segundos
-                   setTimeout(() => {
-                       carregarTransfers();
-                   }, 2000);
-               } else {
-                   throw new Error(resultado.error || 'Erro desconhecido');
-               }
-               
-           } catch (error) {
-               console.error('❌ Erro ao enviar transfer:', error);
-               showNotification('❌ Erro ao enviar transfer: ' + error.message, 'error');
-           } finally {
-               isSubmitting = false;
-               setButtonLoading('submitBtn', false);
-           }
-       }
-
-       function validarFormulario() {
-           const camposObrigatorios = [
-               { id: 'nomeCliente', nome: 'Nome do Cliente' },
-               { id: 'hotelOperadora', nome: 'Hotel/Operadora' },
-               { id: 'numeroPessoas', nome: 'Número de Pessoas' },
-               { id: 'data', nome: 'Data do Transfer' },
-               { id: 'horaPickup', nome: 'Hora de Pick-up' },
-               { id: 'contacto', nome: 'Contacto' },
-               { id: 'origem', nome: 'Local de Origem' },
-               { id: 'destino', nome: 'Local de Destino' },
-               { id: 'valorServico', nome: 'Valor do Serviço' },
-               { id: 'formaPagamento', nome: 'Forma de Pagamento' },
-               { id: 'cobranca', nome: 'Pago Para' }
-           ];
-           
-           for (let campo of camposObrigatorios) {
-               const elemento = document.getElementById(campo.id);
-               if (!elemento.value || elemento.value.trim() === '') {
-                   elemento.focus();
-                   showNotification(`❌ Campo obrigatório: ${campo.nome}`, 'error');
-                   return false;
-               }
-           }
-           
-           // Validar valor
-           const valor = parseFloat(document.getElementById('valorServico').value);
-           if (isNaN(valor) || valor <= 0) {
-               document.getElementById('valorServico').focus();
-               showNotification('❌ Valor deve ser um número positivo', 'error');
-               return false;
-           }
-           
-           // Validar número de pessoas
-           const pessoas = parseInt(document.getElementById('numeroPessoas').value);
-           if (isNaN(pessoas) || pessoas < 1) {
-               showNotification('❌ Número de pessoas deve ser pelo menos 1', 'error');
-               return false;
-           }
-           
-           return true;
-       }
-
-       function coletarDadosFormulario() {
-           return {
-               nomeCliente: document.getElementById('nomeCliente').value.trim(),
-               hotelOperadora: document.getElementById('hotelOperadora').value.trim(),
-               tipoServico: document.getElementById('tipoServico').value,
-               numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
-               numeroBagagens: parseInt(document.getElementById('numeroBagagens').value) || 0,
-               data: document.getElementById('data').value,
-               horaPickup: document.getElementById('horaPickup').value,
-               contacto: getFormattedPhoneNumber(),
-               numeroVoo: document.getElementById('numeroVoo').value.trim(),
-               origem: document.getElementById('origem').value.trim(),
-               destino: document.getElementById('destino').value.trim(),
-               valorTotal: parseFloat(document.getElementById('valorServico').value),
-               modoPagamento: document.getElementById('formaPagamento').value,
-               pagoParaQuem: document.getElementById('cobranca').value,
-               observacoes: document.getElementById('observacoes').value.trim(),
-               
-               // Dados do sistema
-               sistema: 'HUB_FRONTEND',
-               versao: HUB_CONFIG.VERSION,
-               timestamp: new Date().toISOString()
-           };
-       }
-
-       // =====================================================
-       // COMUNICAÇÃO COM BACKEND
-       // =====================================================
-       
-       async function enviarParaBackend(dadosTransfer) {
-           try {
-               console.log('🔗 Conectando com:', HUB_CONFIG.WEBAPP_URL);
-               
-               const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'text/plain',
-                   },
-                   body: JSON.stringify(dadosTransfer),
-                   mode: 'cors'
-               });
-               
-               if (!response.ok) {
-                   // Tentar modo no-cors como fallback
-                   await fetch(HUB_CONFIG.WEBAPP_URL, {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'text/plain',
-                       },
-                       body: JSON.stringify(dadosTransfer),
-                       mode: 'no-cors'
-                   });
-                   
-                   // Em modo no-cors, assumir sucesso
-                   return {
-                       success: true,
-                       message: 'Transfer enviado (modo no-cors)',
-                       transferId: Date.now()
-                   };
-               }
-               
-               const result = await response.json();
-               console.log('📨 Resposta do backend:', result);
-               
-               return result;
-               
-           } catch (error) {
-               console.error('❌ Erro na comunicação:', error);
-               throw new Error('Erro de conexão com o servidor: ' + error.message);
-           }
-       }
-
-       async function testarConexao() {
-           setButtonLoading('testarConexaoBtn', true);
-           
-           try {
-               console.log('🔧 Testando conexão com backend...');
-               
-               const response = await fetch(HUB_CONFIG.WEBAPP_URL + '?action=test', {
-                   method: 'GET',
-                   mode: 'cors'
-               });
-               
-               if (response.ok) {
-                   const result = await response.json();
-                   showNotification('✅ Conexão funcionando! ' + result.message, 'success');
-               } else {
-                   throw new Error('Resposta não OK: ' + response.status);
-               }
-               
-           } catch (error) {
-               console.error('❌ Erro no teste:', error);
-               
-               // Tentar fallback
-               try {
-                   await fetch(HUB_CONFIG.WEBAPP_URL, {
-                       method: 'POST',
-                       headers: { 'Content-Type': 'text/plain' },
-                       body: JSON.stringify({ action: 'test' }),
-                       mode: 'no-cors'
-                   });
-                   
-                   showNotification('⚠️ Conexão estabelecida (modo limitado)', 'warning');
-               } catch (fallbackError) {
-                   showNotification('❌ Erro de conexão: Verifique a URL do backend', 'error');
-               }
-           } finally {
-               setButtonLoading('testarConexaoBtn', false);
-           }
-       }
-
-       async function carregarTransfers() {
-           try {
-               console.log('📋 Carregando transfers...');
-               showNotification('📋 Carregando transfers...', 'success');
-               
-               const response = await fetch(HUB_CONFIG.WEBAPP_URL + '?action=transfers&limit=10', {
-                   method: 'GET',
-                   mode: 'cors'
-               });
-               
-               if (response.ok) {
-                   const result = await response.json();
-                   
-                   if (result.success && result.data && result.data.transfers) {
-                       transfers = result.data.transfers;
-                       renderizarTransfers();
-                       showNotification(`✅ ${transfers.length} transfers carregados`, 'success');
-                   } else {
-                       showNotification('⚠️ Nenhum transfer encontrado', 'warning');
-                       transfers = [];
-                       renderizarTransfers();
-                   }
-               } else {
-                   throw new Error('Erro ao carregar: ' + response.status);
-               }
-               
-           } catch (error) {
-               console.error('❌ Erro ao carregar transfers:', error);
-               showNotification('❌ Erro ao carregar transfers', 'error');
-               
-               // Mostrar dados de exemplo em caso de erro
-               mostrarDadosExemplo();
-           }
-       }
-
-       // =====================================================
-       // RENDERIZAÇÃO DE DADOS
-       // =====================================================
-       
-       function renderizarTransfers() {
-           const container = document.getElementById('transfersContainer');
-           container.innerHTML = '';
-           
-           if (transfers.length === 0) {
-               container.innerHTML = `
-                   <div class="transfer-card">
-                       <div style="text-align: center; padding: 40px; color: #999;">
-                           <h3>Nenhum transfer encontrado</h3>
-                           <p>Os transfers aparecerão aqui quando forem carregados</p>
-                       </div>
-                   </div>
-               `;
-               return;
-           }
-           
-           transfers.forEach(transfer => {
-               const card = criarCardTransfer(transfer);
-               container.appendChild(card);
-           });
-       }
-
-       function criarCardTransfer(transfer) {
-           const card = document.createElement('div');
-           card.className = 'transfer-card';
-           
-           const statusClass = `status-${(transfer.Status || transfer.status || 'solicitado').toLowerCase()}`;
-           const hotelOperadora = transfer['Hotel/Operadora'] || transfer.hotelOperadora || 'Não especificado';
-           
-           card.innerHTML = `
-               <div class="transfer-header">
-                   <div class="transfer-id">#${transfer.ID || transfer.id || 'N/A'}</div>
-                   <div class="transfer-status ${statusClass}">${transfer.Status || transfer.status || 'Solicitado'}</div>
-               </div>
-               
-               <div class="transfer-client">${transfer.Cliente || transfer.nomeCliente || 'Cliente não informado'}</div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Hotel/Operadora:</span>
-                   <span class="detail-value">
-                       <span class="hotel-badge">${hotelOperadora}</span>
-                   </span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Tipo:</span>
-                   <span class="detail-value">${transfer['Tipo Serviço'] || transfer.tipoServico || 'Transfer'}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Pessoas:</span>
-                   <span class="detail-value">${transfer.Pessoas || transfer.numeroPessoas || 'N/A'}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Data:</span>
-                   <span class="detail-value">${formatarData(transfer.Data || transfer.data)}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Hora:</span>
-                   <span class="detail-value">${transfer['Hora Pick-up'] || transfer.horaPickup || 'N/A'}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Origem:</span>
-                   <span class="detail-value">${transfer.Origem || transfer.origem || 'N/A'}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Destino:</span>
-                   <span class="detail-value">${transfer.Destino || transfer.destino || 'N/A'}</span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Valor:</span>
-                   <span class="detail-value" style="color: var(--hub-success); font-weight: 900;">
-                       €${formatarMoeda(transfer['Preço Cliente (€)'] || transfer.valorServico || 0)}
-                   </span>
-               </div>
-               
-               <div class="transfer-detail">
-                   <span class="detail-label">Contacto:</span>
-                   <span class="detail-value">${transfer.Contacto || transfer.contacto || 'N/A'}</span>
-               </div>
-               
-               ${(transfer.Observações || transfer.observacoes) ? `
-               <div class="transfer-detail">
-                   <span class="detail-label">Observações:</span>
-                   <span class="detail-value" style="font-style: italic;">${transfer.Observações || transfer.observacoes}</span>
-               </div>
-               ` : ''}
-           `;
-           
-           return card;
-       }
-
-       function mostrarDadosExemplo() {
-           const exemplos = [
-               {
-                   ID: 'DEMO1',
-                   Cliente: 'João Silva (Exemplo)',
-                   'Hotel/Operadora': 'Empire Marques Hotel',
-                   'Tipo Serviço': 'Transfer',
-                   Pessoas: 2,
-                   Data: new Date().toISOString().split('T')[0],
-                   'Hora Pick-up': '10:00',
-                   Origem: 'Aeroporto de Lisboa',
-                   Destino: 'Empire Marques Hotel',
-                   'Preço Cliente (€)': 35.00,
-                   Contacto: '+351912345678',
-                   Status: 'Confirmado',
-                   Observações: 'Dados de exemplo - Carregue os transfers reais'
-               },
-               {
-                   ID: 'DEMO2',
-                   Cliente: 'Maria Santos (Exemplo)',
-                   'Hotel/Operadora': 'HUB Transfer',
-                   'Tipo Serviço': 'Tour Regular',
-                   Pessoas: 4,
-                   Data: new Date().toISOString().split('T')[0],
-                   'Hora Pick-up': '14:00',
-                   Origem: 'Hotel Lioz',
-                   Destino: 'Sintra',
-                   'Preço Cliente (€)': 125.00,
-                   Contacto: '+351987654321',
-                   Status: 'Solicitado',
-                   Observações: 'Tour de Sintra - Dados de exemplo'
-               }
-           ];
-           
-           transfers = exemplos;
-           renderizarTransfers();
-           showNotification('📋 Dados de exemplo carregados (erro na conexão)', 'warning');
-       }
-
-       // =====================================================
-       // FUNÇÕES UTILITÁRIAS
-       // =====================================================
-       
-       function formatarData(data) {
-           if (!data) return 'N/A';
-           
-           try {
-               const date = new Date(data);
-               return date.toLocaleDateString('pt-PT');
-           } catch (error) {
-               return data;
-           }
-       }
-
-       function formatarMoeda(valor) {
-           if (typeof valor === 'number') {
-               return valor.toFixed(2);
-           }
-           return parseFloat(valor || 0).toFixed(2);
-       }
-
-       function limparFormulario() {
-    try {
-        // Resetar o formulário HTML
-        document.getElementById('transferForm').reset();
-        
-        // Limpar campos específicos que podem não resetar
-        document.getElementById('nomeCliente').value = '';
-        document.getElementById('hotelOperadora').value = '';
-        document.getElementById('tipoServico').value = 'Transfer';
-        document.getElementById('numeroPessoas').value = '';
-        document.getElementById('numeroBagagens').value = '0';
-        document.getElementById('contacto').value = '';
-        document.getElementById('numeroVoo').value = '';
-        document.getElementById('origem').value = '';
-        document.getElementById('destino').value = '';
-        document.getElementById('valorServico').value = '';
-        document.getElementById('formaPagamento').value = '';
-        document.getElementById('cobranca').value = '';
-        document.getElementById('observacoes').value = '';
-        
-        // Resetar data para hoje
-        const hoje = new Date();
-        document.getElementById('data').value = hoje.toISOString().split('T')[0];
-        
-        // Limpar hora
-        document.getElementById('horaPickup').value = '';
-        
-        // Limpar todas as seleções ativas
-        document.querySelectorAll('.btn-hotel, .btn-quick').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Limpar telefone se inicializado
-        if (phoneInput) {
-            phoneInput.setNumber('');
-        }
-        
-        // Resetar variáveis
-        isSubmitting = false;
-        
-        // Focar no primeiro campo
-        document.getElementById('nomeCliente').focus();
-        
-        showNotification('🔄 Formulário limpo com sucesso', 'success');
-        console.log('✅ Formulário limpo');
-        
-    } catch (error) {
-        console.error('❌ Erro ao limpar formulário:', error);
-        
-        // Fallback: tentar resetar pelo menos o formulário base
-        try {
-            document.getElementById('transferForm').reset();
-            document.getElementById('data').value = new Date().toISOString().split('T')[0];
-            document.getElementById('numeroBagagens').value = '0';
-            showNotification('⚠️ Formulário parcialmente limpo', 'warning');
-        } catch (fallbackError) {
-            showNotification('❌ Erro ao limpar formulário', 'error');
-        }
-    }
-}
-       function setButtonLoading(buttonId, loading = true) {
-           const button = document.getElementById(buttonId);
-           if (!button) return;
-           
-           if (loading) {
-               button.disabled = true;
-               button.classList.add('loading');
-               const originalText = button.textContent;
-               button.setAttribute('data-original-text', originalText);
-               button.textContent = 'Processando...';
-           } else {
-               button.disabled = false;
-               button.classList.remove('loading');
-               const originalText = button.getAttribute('data-original-text');
-               if (originalText) {
-                   button.textContent = originalText;
-               }
-           }
-       }
-
-       function showNotification(message, type = 'success') {
-           const notification = document.getElementById('notification');
-           
-           notification.textContent = message;
-           notification.className = `notification ${type}`;
-           notification.style.display = 'block';
-           
-           // Auto-hide após 5 segundos
-           setTimeout(() => {
-               notification.style.display = 'none';
-           }, 5000);
-           
-           console.log(`[${type.toUpperCase()}] ${message}`);
-       }
-
-       function showStatus(message, type = 'success') {
-           const statusDiv = document.getElementById('statusMessage');
-           statusDiv.className = `status-message status-${type}`;
-           statusDiv.textContent = message;
-           statusDiv.style.display = 'block';
-           
-           setTimeout(() => {
-               statusDiv.style.display = 'none';
-           }, 5000);
-       }
-
-// =====================================================
-       // INICIALIZAÇÃO FINAL
-       // =====================================================
-       
-       // Log de inicialização
-       console.log('🚐 Sistema HUB Central v1.0');
-       console.log('📧 Roberta HUB: WhatsApp automático (+351928283652)');
-       console.log('🔗 Backend:', HUB_CONFIG.WEBAPP_URL);
-       console.log('📊 Planilha:', HUB_CONFIG.SPREADSHEET_URL);
-       console.log('🎯 Sistema pronto para solicitação de transfers');
-       
-       // Função de debug para desenvolvimento
-       window.debugHUB = function() {
-           console.log('=== DEBUG SISTEMA HUB CENTRAL ===');
-           console.log('Configurações:', HUB_CONFIG);
-           console.log('Transfers carregados:', transfers.length);
-           console.log('Phone Input:', phoneInput);
-           console.log('Is Submitting:', isSubmitting);
-           console.log('================================');
-       };
-       
-       // Função para exportar dados (para desenvolvimento)
-       window.exportarTransfers = function() {
-           if (transfers.length === 0) {
-               console.log('Nenhum transfer para exportar');
-               return;
-           }
-           
-           const dataStr = JSON.stringify(transfers, null, 2);
-           const dataBlob = new Blob([dataStr], {type: 'application/json'});
-           const url = URL.createObjectURL(dataBlob);
-           
-           const link = document.createElement('a');
-           link.href = url;
-           link.download = `transfers_hub_${new Date().toISOString().split('T')[0]}.json`;
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
-           
-           console.log('Transfers exportados para download');
-       };
-       
-       // Auto-teste da conexão após 3 segundos
-       setTimeout(() => {
-           console.log('🔧 Executando teste automático de conexão...');
-           testarConexao();
-       }, 3000);
-       
-       // Função para detectar se é um dispositivo móvel
-       function isMobileDevice() {
-           return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-       }
-       
-       // Ajustes específicos para mobile
-       if (isMobileDevice()) {
-           console.log('📱 Dispositivo móvel detectado - Aplicando ajustes');
-           
-           // Adicionar classe CSS para mobile
-           document.body.classList.add('mobile-device');
-           
-           // Ajustar viewport para evitar zoom em inputs
-           const viewport = document.querySelector('meta[name=viewport]');
-           if (viewport) {
-               viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-           }
-       }
-       
-       // Salvar dados no localStorage antes de sair da página
-       window.addEventListener('beforeunload', function(e) {
-           if (transfers.length > 0) {
-               localStorage.setItem('hub_transfers_cache', JSON.stringify(transfers));
-               console.log('💾 Cache de transfers salvo');
-           }
-       });
-       
-       // Carregar cache na inicialização
-       window.addEventListener('load', function() {
-           const cache = localStorage.getItem('hub_transfers_cache');
-           if (cache) {
-               try {
-                   const cachedTransfers = JSON.parse(cache);
-                   if (cachedTransfers.length > 0) {
-                       transfers = cachedTransfers;
-                       renderizarTransfers();
-                       console.log(`📂 ${transfers.length} transfers carregados do cache`);
-                       showNotification(`📂 ${transfers.length} transfers carregados do cache`, 'success');
-                   }
-               } catch (error) {
-                   console.error('Erro ao carregar cache:', error);
-                   localStorage.removeItem('hub_transfers_cache');
-               }
-           }
-       });
-       
-       // Função para limpar cache
-       window.limparCache = function() {
-           localStorage.removeItem('hub_transfers_cache');
-           console.log('🗑️ Cache limpo');
-           showNotification('🗑️ Cache de transfers limpo', 'success');
-       };
-       
-       // Monitorar conexão com a internet
-       function monitorarConexao() {
-           if (!navigator.onLine) {
-               showNotification('🔴 Sem conexão com a internet', 'warning');
-           }
-           
-           window.addEventListener('online', function() {
-               showNotification('🟢 Conexão restaurada', 'success');
-               console.log('🌐 Conexão com internet restaurada');
-           });
-           
-           window.addEventListener('offline', function() {
-               showNotification('🔴 Conexão perdida - Trabalhando offline', 'warning');
-               console.log('🌐 Conexão com internet perdida');
-           });
-       }
-       
-       // Inicializar monitoramento de conexão
-       monitorarConexao();
-       
-       // Função para recarregar página com confirmação
-       window.recarregarPagina = function() {
-           if (confirm('Deseja recarregar a página? Dados não salvos serão perdidos.')) {
-               location.reload();
-           }
-       };
-       
-       // Adicionar atalhos de teclado adicionais
-       document.addEventListener('keydown', function(e) {
-           // F5 personalizado
-           if (e.key === 'F5') {
-               e.preventDefault();
-               carregarTransfers();
-               return false;
-           }
-           
-           // Ctrl+L para limpar formulário
-           if (e.ctrlKey && e.key === 'l') {
-               e.preventDefault();
-               limparFormulario();
-               return false;
-           }
-           
-           // Ctrl+T para testar conexão
-           if (e.ctrlKey && e.key === 't') {
-               e.preventDefault();
-               testarConexao();
-               return false;
-           }
-       });
-       
-       // Configurar tooltips informativos
-       function adicionarTooltips() {
-           const tooltips = {
-               'hotelOperadora': 'Selecione o hotel ou digite uma nova operadora',
-               'contacto': 'Formato: +351XXXXXXXXX',
-               'valorServico': 'Valor em euros (€)',
-               'observacoes': 'Informações extras sobre o transfer'
-           };
-           
-           Object.entries(tooltips).forEach(([id, texto]) => {
-               const elemento = document.getElementById(id);
-               if (elemento) {
-                   elemento.title = texto;
-               }
-           });
-       }
-       
-       // Adicionar tooltips
-       setTimeout(adicionarTooltips, 1000);
-       
-       // Estatísticas de uso (para desenvolvimento)
-       let estatisticasUso = {
-           transfersEnviados: 0,
-           errosConexao: 0,
-           inicioSessao: new Date().toISOString()
-       };
-       
-       // Função para mostrar estatísticas
-       window.mostrarEstatisticas = function() {
-           console.log('=== ESTATÍSTICAS DE USO ===');
-           console.log('Início da sessão:', estatisticasUso.inicioSessao);
-           console.log('Transfers enviados:', estatisticasUso.transfersEnviados);
-           console.log('Erros de conexão:', estatisticasUso.errosConexao);
-           console.log('Transfers em cache:', transfers.length);
-           console.log('==========================');
-           
-           return estatisticasUso;
-       };
-       
-       // Interceptar erros globais
-       window.addEventListener('error', function(e) {
-           console.error('❌ Erro global capturado:', e.error);
-           showNotification('❌ Erro inesperado - Verifique o console', 'error');
-       });
-       
-       // Interceptar promessas rejeitadas
-       window.addEventListener('unhandledrejection', function(e) {
-           console.error('❌ Promise rejeitada:', e.reason);
-           showNotification('❌ Erro de comunicação', 'error');
-       });
-       
-       // Função para resetar completamente o sistema
-       window.resetarSistema = function() {
-           if (confirm('⚠️ ATENÇÃO: Isso vai limpar todos os dados e cache. Continuar?')) {
-               // Limpar cache
-               localStorage.clear();
-               
-               // Limpar variáveis
-               transfers = [];
-               isSubmitting = false;
-               
-               // Limpar formulário
-               limparFormulario();
-               
-               // Recarregar componentes
-               renderizarTransfers();
-               
-               // Reinicializar telefone
-               if (phoneInput) {
-                   phoneInput.destroy();
-                   phoneInput = null;
-                   setTimeout(initializePhoneInput, 1000);
-               }
-               
-               showNotification('🔄 Sistema resetado completamente', 'success');
-               console.log('🔄 Sistema HUB Central resetado');
-           }
-       };
-       
-       // Mensagem final de inicialização
-       console.log('✅ Sistema HUB Central totalmente carregado e pronto!');
-       console.log('💡 Funções disponíveis:');
-       console.log('   - debugHUB(): Informações de debug');
-       console.log('   - exportarTransfers(): Exportar dados');
-       console.log('   - mostrarEstatisticas(): Ver estatísticas');
-       console.log('   - limparCache(): Limpar cache local');
-       console.log('   - resetarSistema(): Reset completo');
-       console.log('⌨️  Atalhos: Ctrl+Enter (enviar), Esc (limpar), F5 (carregar), Ctrl+L (limpar), Ctrl+T (testar)');
-       
-       // Mostrar mensagem de boas-vindas após 5 segundos
-       setTimeout(() => {
-           if (!localStorage.getItem('hub_welcome_shown')) {
-               showNotification('🎯 Bem-vindo ao Sistema HUB Central! Sistema pronto para uso.', 'success');
-               localStorage.setItem('hub_welcome_shown', 'true');
-           }
-       }, 5000);
-// Função para atualizar URL do backend
-function atualizarBackendUrl() {
-    const novaUrl = document.getElementById('backendUrl').value.trim();
-    
-    if (!novaUrl) {
-        showNotification('❌ Digite uma URL válida', 'error');
-        return;
-    }
-    
-    if (!novaUrl.startsWith('https://script.google.com/macros/')) {
-        showNotification('❌ URL deve ser do Google Apps Script', 'error');
-        return;
-    }
-    
-    // Atualizar a configuração
-    HUB_CONFIG.WEBAPP_URL = novaUrl;
-    
-    // Salvar no localStorage
-    localStorage.setItem('hub_backend_url', novaUrl);
-    
-    showNotification('✅ URL do backend atualizada!', 'success');
-    console.log('🔗 Nova URL:', novaUrl);
-}
-
-// Carregar URL salva na inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    const urlSalva = localStorage.getItem('hub_backend_url');
-    if (urlSalva) {
-        HUB_CONFIG.WEBAPP_URL = urlSalva;
-        if (document.getElementById('backendUrl')) {
-            document.getElementById('backendUrl').value = urlSalva;
-        }
-        console.log('🔗 URL carregada do localStorage:', urlSalva);
-    } else {
-        // Mostrar URL atual no campo
-        if (document.getElementById('backendUrl')) {
-            document.getElementById('backendUrl').value = HUB_CONFIG.WEBAPP_URL;
-        }
-    }
-});
-
-// Função para mostrar/ocultar configuração
-function toggleConfig() {
-    const configSection = document.getElementById('configSection');
-    configSection.classList.toggle('show');
-    
-    if (configSection.classList.contains('show')) {
-        showNotification('⚙️ Painel de configuração aberto', 'success');
-    } else {
-        showNotification('🔒 Painel de configuração fechado', 'success');
-    }
-}
-
-// Função para limpar dados de demonstração
-function limparTodosOsDados() {
-    if (confirm('⚠️ Isso vai limpar todos os transfers carregados. Continuar?')) {
-        transfers = [];
-        const container = document.getElementById('transfersContainer');
-        container.innerHTML = '<div class="transfer-card"><div style="text-align: center; padding: 40px; color: #999;"><h3>Nenhum transfer carregado</h3><p>Clique em "Carregar Transfers" para visualizar os dados</p></div></div>';
-        localStorage.clear();
-        showNotification('🗑️ Todos os dados foram limpos!', 'success');
-    }
-}
-
-// Função para limpar todos os dados (para uso da equipe)
-function limparTodosOsDados() {
-    if (confirm('⚠️ Isso vai limpar todos os transfers carregados. Continuar?')) {
-        // Limpar array
-        transfers = [];
-        
-        // Limpar visualização
-        const container = document.getElementById('transfersContainer');
-        container.innerHTML = `
-            <div class="transfer-card">
-                <div style="text-align: center; padding: 40px; color: #999;">
-                    <h3>Nenhum transfer carregado</h3>
-                    <p>Clique em "Carregar Transfers" para visualizar os dados</p>
+                <!-- Configuration Section -->
+                <div id="configSection" class="config-section">
+                    <h3 class="config-title">⚙️ Configuração do Sistema</h3>
+                    <label>URL do Backend (Google Apps Script):</label>
+                    <input type="text" id="backendUrl" class="config-input" placeholder="https://script.google.com/macros/s/.../exec">
+                    <button class="config-button" onclick="atualizarBackendUrl()">Atualizar URL</button>
+                    <button class="config-button" onclick="limparTodosOsDados()" style="background: var(--hub-danger);">Limpar Dados</button>
                 </div>
             </div>
-        `;
-        
-        // Limpar cache local
-        localStorage.clear();
-        
-        showNotification('🗑️ Todos os dados foram limpos!', 'success');
-        console.log('🗑️ Sistema limpo pela equipe');
-    }
-}
 
-// Função para limpar seleção de hotel
-function limparHotelOperadora() {
-    document.getElementById('hotelOperadora').value = '';
-    document.getElementById('hotelOperadora').focus();
-    
-    // Remover classe active de todos os botões hotel
-    document.querySelectorAll('.btn-hotel').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Ativar apenas o botão "Outro"
-    event.target.classList.add('active');
-    
-    showNotification('✏️ Digite o nome da operadora', 'success');
-}       
-   </script>
+            <!-- Transfers Display Section -->
+            <div class="transfers-section">
+                <h3 class="transfers-title">📦 Transfers Registrados</h3>
+                <div class="action-buttons" style="margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="carregarTransfers()">
+                        📥 Carregar Transfers
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarTransfers()">
+                        📤 Exportar Dados
+                    </button>
+                </div>
+                <div id="transfersContainer" class="transfers-container">
+                    <div class="transfer-card">
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <h3>Nenhum transfer carregado</h3>
+                            <p>Clique em "Carregar Transfers" para visualizar os dados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CONFIGURAÇÃO PRINCIPAL
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        const HUB_CONFIG = {
+            WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbwi3D0Kaa41t7dzh4SHS7qcMs-2-N4nmrZa5RABcxzcbKthshOmPaz2XoUGUfW_uZOFsw/exec',
+            SPREADSHEET_ID: '1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
+            SHEET_NAME: 'HUB_Central',
+            VERSION: '1.0',
+            TIMEOUT: 30000
+        };
+
+        // State
+        let transfers = [];
+        let isSubmitting = false;
+        let phoneInput = null;
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // UTILITY FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateConnectionStatus(online) {
+            const status = document.getElementById('connectionStatus');
+            if (online) {
+                status.textContent = '🟢 Conectado';
+                status.classList.add('online');
+                status.classList.remove('offline');
+            } else {
+                status.textContent = '🔴 Desconectado';
+                status.classList.add('offline');
+                status.classList.remove('online');
+            }
+        }
+
+        function validarFormulario() {
+            const campos = ['nomeCliente', 'contacto', 'tipoServico', 'data', 'horaPikup', 
+                           'numeroPessoas', 'origem', 'destino', 'valorServico'];
+            
+            for (let campo of campos) {
+                const elemento = document.getElementById(campo);
+                if (!elemento.value || elemento.value.trim() === '') {
+                    showNotification(`❌ Campo obrigatório: ${elemento.previousElementSibling?.textContent || campo}`, 'error');
+                    return false;
+                }
+            }
+
+            // Validar telefone
+            const telefone = document.getElementById('contacto').value;
+            if (!telefone.startsWith('+') || telefone.length < 10) {
+                showNotification('❌ Telefone deve estar no formato internacional (+XXX...)', 'error');
+                return false;
+            }
+
+            // Validar valor
+            const valor = parseFloat(document.getElementById('valorServico').value);
+            if (valor <= 0) {
+                showNotification('❌ Valor deve ser maior que zero', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function coletarDadosFormulario() {
+            return {
+                nomeCliente: document.getElementById('nomeCliente').value.trim(),
+                tipoServico: document.getElementById('tipoServico').value,
+                contacto: document.getElementById('contacto').value.trim(),
+                numeroVoo: document.getElementById('numeroVoo').value.trim(),
+                origem: document.getElementById('origem').value.trim(),
+                destino: document.getElementById('destino').value.trim(),
+                data: document.getElementById('data').value,
+                horaPikup: document.getElementById('horaPikup').value,
+                numeroPessoas: parseInt(document.getElementById('numeroPessoas').value),
+                numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
+                valorServico: parseFloat(document.getElementById('valorServico').value),
+                formaPagamento: document.getElementById('formaPagamento').value,
+                observacoes: document.getElementById('observacoes').value.trim(),
+                hotelOperadora: document.getElementById('hotelOperadora').value.trim(),
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // FORM HANDLERS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function selecionarHotel(btn) {
+            document.querySelectorAll('.btn-hotel').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const hotel = btn.getAttribute('data-hotel');
+            if (hotel) {
+                document.getElementById('hotelOperadora').value = hotel;
+            }
+        }
+
+        function setarValor(valor) {
+            document.getElementById('valorServico').value = valor;
+            
+            // Highlight button
+            document.querySelectorAll('.quick-buttons .btn-quick').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent.includes(valor)) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function adicionarObservacao(texto) {
+            const obs = document.getElementById('observacoes');
+            if (obs.value) {
+                obs.value += ', ' + texto;
+            } else {
+                obs.value = texto;
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('transferForm').reset();
+            document.getElementById('hotelOperadora').value = 'Empire Marques Hotel';
+            document.getElementById('numeroPessoas').value = 1;
+            document.querySelectorAll('.btn-quick').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.btn-hotel').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.btn-hotel').classList.add('active');
+            showNotification('✨ Formulário limpo', 'success');
+        }
+
+        function limparHotelOperadora() {
+            document.getElementById('hotelOperadora').value = '';
+            document.getElementById('hotelOperadora').focus();
+            document.querySelectorAll('.btn-hotel').forEach(btn => btn.classList.remove('active'));
+            showNotification('✏️ Digite o nome da operadora', 'success');
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // BACKEND COMMUNICATION
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        async function enviarTransferBackend(dados) {
+            if (isSubmitting) {
+                showNotification('⏳ Aguarde - Requisição anterior em andamento', 'warning');
+                return false;
+            }
+
+            isSubmitting = true;
+            const btnSubmit = document.getElementById('btnSolicitar');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<div class="spinner"></div> Enviando...';
+
+            try {
+                console.log('📤 Enviando para backend:', HUB_CONFIG.WEBAPP_URL);
+                
+                const resposta = await fetch(HUB_CONFIG.WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                if (!resposta.ok) {
+                    throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
+                }
+
+                const resultado = await resposta.json();
+                console.log('📥 Resposta do backend:', resultado);
+                
+                if (resultado.success || resultado.sucesso) {
+                    showNotification('✅ Transfer registrado com sucesso!', 'success');
+                    salvarTransferLocal(dados);
+                    setTimeout(limparFormulario, 500);
+                    setTimeout(carregarTransfers, 1000);
+                    updateConnectionStatus(true);
+                    return true;
+                } else {
+                    throw new Error(resultado.error || resultado.erro || 'Erro desconhecido');
+                }
+            } catch (erro) {
+                console.error('❌ Erro ao enviar transfer:', erro);
+                showNotification(`❌ Erro: ${erro.message}`, 'error');
+                updateConnectionStatus(false);
+                salvarTransferLocal(dados);
+                return false;
+            } finally {
+                isSubmitting = false;
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '✅ Solicitar Transfer';
+            }
+        }
+
+        async function testarConexao() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Testando...';
+
+            try {
+                console.log('🔗 Testando conexão com:', HUB_CONFIG.WEBAPP_URL);
+                
+                const resposta = await fetch(HUB_CONFIG.WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ teste: true })
+                });
+
+                if (resposta.ok) {
+                    showNotification('✅ Conexão com backend está funcionando!', 'success');
+                    updateConnectionStatus(true);
+                } else {
+                    throw new Error(`HTTP ${resposta.status}`);
+                }
+            } catch (erro) {
+                console.error('❌ Erro de conexão:', erro);
+                showNotification(`❌ Erro na conexão: ${erro.message}`, 'error');
+                updateConnectionStatus(false);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔗 Testar Conexão';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // LOCAL STORAGE & DATA MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function salvarTransferLocal(transfer) {
+            try {
+                let transfersLocal = JSON.parse(localStorage.getItem('hub_transfers') || '[]');
+                transfer.id = Date.now();
+                transfer.salvoLocal = new Date().toISOString();
+                transfersLocal.unshift(transfer);
+                transfersLocal = transfersLocal.slice(0, 100);
+                
+                localStorage.setItem('hub_transfers', JSON.stringify(transfersLocal));
+                console.log('✅ Transfer salvo localmente:', transfer.id);
+            } catch (erro) {
+                console.error('❌ Erro ao salvar localmente:', erro);
+            }
+        }
+
+        function carregarTransfers() {
+            const container = document.getElementById('transfersContainer');
+            
+            try {
+                const transfersLocal = JSON.parse(localStorage.getItem('hub_transfers') || '[]');
+                
+                if (transfersLocal.length === 0) {
+                    container.innerHTML = `
+                        <div class="transfer-card">
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                <h3>Nenhum transfer carregado</h3>
+                                <p>Clique em "Solicitar Transfer" para criar um novo</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = transfersLocal.map(transfer => `
+                    <div class="transfer-card">
+                        <div class="transfer-card-header">
+                            <div class="transfer-card-title">${transfer.nomeCliente}</div>
+                            <div class="transfer-status ${transfer.salvoLocal ? 'status-novo' : 'status-confirmado'}">
+                                ${transfer.salvoLocal ? 'Local' : 'Confirmado'}
+                            </div>
+                        </div>
+                        <div class="transfer-info">
+                            <strong>📱 Contato:</strong> ${transfer.contacto}
+                        </div>
+                        <div class="transfer-info">
+                            <strong>📍 Rota:</strong> ${transfer.origem} → ${transfer.destino}
+                        </div>
+                        <div class="transfer-info">
+                            <strong>📅 Data:</strong> ${new Date(transfer.data).toLocaleDateString('pt-PT')} às ${transfer.horaPikup}
+                        </div>
+                        <div class="transfer-info">
+                            <strong>👥 Pessoas:</strong> ${transfer.numeroPessoas} | <strong>💰 Valor:</strong> €${transfer.valorServico.toFixed(2)}
+                        </div>
+                        <div class="transfer-info">
+                            <strong>🏨 Operadora:</strong> ${transfer.hotelOperadora}
+                        </div>
+                        <div class="transfer-info" style="font-size: 0.85rem; color: #999;">
+                            <strong>⏱️ Registrado:</strong> ${new Date(transfer.timestamp).toLocaleString('pt-PT')}
+                        </div>
+                    </div>
+                `).join('');
+
+                showNotification(`✅ ${transfersLocal.length} transfers carregados`, 'success');
+            } catch (erro) {
+                console.error('❌ Erro ao carregar transfers:', erro);
+                showNotification('❌ Erro ao carregar transfers', 'error');
+            }
+        }
+
+        function exportarTransfers() {
+            try {
+                const transfersLocal = JSON.parse(localStorage.getItem('hub_transfers') || '[]');
+                
+                if (transfersLocal.length === 0) {
+                    showNotification('❌ Nenhum transfer para exportar', 'warning');
+                    return;
+                }
+
+                let csv = 'Cliente,Contato,Tipo,Data,Hora,Origem,Destino,Pessoas,Valor €,Operadora,Status\n';
+                
+                transfersLocal.forEach(t => {
+                    csv += `"${t.nomeCliente}","${t.contacto}","${t.tipoServico}","${t.data}","${t.horaPikup}","${t.origem}","${t.destino}",${t.numeroPessoas},${t.valorServico},"${t.hotelOperadora}","${t.salvoLocal ? 'Local' : 'Confirmado'}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `transfers_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+
+                showNotification('📥 Transfers exportados com sucesso!', 'success');
+            } catch (erro) {
+                console.error('❌ Erro ao exportar:', erro);
+                showNotification('❌ Erro ao exportar', 'error');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // PHONE INPUT INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function initializePhoneInput() {
+            const inputElement = document.getElementById('contacto');
+            try {
+                phoneInput = intlTelInput(inputElement, {
+                    initialCountry: 'pt',
+                    preferredCountries: ['pt', 'es', 'fr', 'it', 'gb'],
+                    separateDialCode: true,
+                    utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js'
+                });
+
+                inputElement.addEventListener('change', function() {
+                    if (phoneInput && phoneInput.isValidNumber()) {
+                        this.value = phoneInput.getNumber();
+                    }
+                });
+            } catch (erro) {
+                console.warn('⚠️ Erro ao inicializar phone input:', erro);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function atualizarBackendUrl() {
+            const novaUrl = document.getElementById('backendUrl').value.trim();
+            
+            if (!novaUrl) {
+                showNotification('❌ Digite uma URL válida', 'error');
+                return;
+            }
+            
+            if (!novaUrl.startsWith('https://script.google.com/macros/')) {
+                showNotification('❌ URL deve ser do Google Apps Script', 'error');
+                return;
+            }
+            
+            HUB_CONFIG.WEBAPP_URL = novaUrl;
+            localStorage.setItem('hub_backend_url', novaUrl);
+            
+            showNotification('✅ URL do backend atualizada!', 'success');
+            console.log('🔗 Nova URL:', novaUrl);
+        }
+
+        function toggleConfig() {
+            const configSection = document.getElementById('configSection');
+            configSection.classList.toggle('show');
+            
+            if (configSection.classList.contains('show')) {
+                showNotification('⚙️ Painel de configuração aberto', 'success');
+            }
+        }
+
+        function limparTodosOsDados() {
+            if (confirm('⚠️ ATENÇÃO: Isso vai limpar todos os transfers carregados. Continuar?')) {
+                localStorage.clear();
+                transfers = [];
+                document.getElementById('transfersContainer').innerHTML = `
+                    <div class="transfer-card">
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <h3>Nenhum transfer carregado</h3>
+                            <p>Clique em "Solicitar Transfer" para criar um novo</p>
+                        </div>
+                    </div>
+                `;
+                showNotification('🗑️ Todos os dados foram limpos!', 'success');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // FORM SUBMISSION
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        document.getElementById('transferForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validarFormulario()) {
+                return;
+            }
+
+            const dados = coletarDadosFormulario();
+            console.log('📤 Dados do formulário:', dados);
+
+            const sucesso = await enviarTransferBackend(dados);
+            
+            if (sucesso) {
+                console.log('✅ Transfer enviado com sucesso');
+            } else {
+                console.log('⚠️ Transfer salvo localmente (sem conexão)');
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // KEYBOARD SHORTCUTS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('transferForm').dispatchEvent(new Event('submit'));
+            }
+            
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                limparFormulario();
+            }
+            
+            if (e.key === 'F5') {
+                e.preventDefault();
+                carregarTransfers();
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Iniciando Sistema HUB Central...');
+
+            const urlSalva = localStorage.getItem('hub_backend_url');
+            if (urlSalva) {
+                HUB_CONFIG.WEBAPP_URL = urlSalva;
+            }
+            if (document.getElementById('backendUrl')) {
+                document.getElementById('backendUrl').value = HUB_CONFIG.WEBAPP_URL;
+            }
+
+            initializePhoneInput();
+            setTimeout(carregarTransfers, 500);
+            setTimeout(monitorarConexao, 2000);
+
+            console.log('✅ Sistema HUB Central carregado e pronto!');
+            console.log('📍 URL Backend:', HUB_CONFIG.WEBAPP_URL);
+            showNotification('🎯 Bem-vindo ao Sistema HUB Central!', 'success');
+        });
+
+        function monitorarConexao() {
+            setInterval(() => {
+                fetch(HUB_CONFIG.WEBAPP_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ teste: true }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(() => updateConnectionStatus(true))
+                    .catch(() => updateConnectionStatus(false));
+            }, 10000);
+        }
+
+        // Debug functions
+        window.debugHUB = function() {
+            console.log('=== HUB DEBUG ===');
+            console.log('Config:', HUB_CONFIG);
+            console.log('Transfers:', JSON.parse(localStorage.getItem('hub_transfers') || '[]'));
+            console.log('=================');
+        };
+
+        window.mostrarEstatisticas = function() {
+            const transfers = JSON.parse(localStorage.getItem('hub_transfers') || '[]');
+            console.log('=== ESTATÍSTICAS ===');
+            console.log('Total de transfers:', transfers.length);
+            console.log('Últimos 5:', transfers.slice(0, 5));
+            console.log('====================');
+        };
+
+    </script>
 </body>
 </html>
