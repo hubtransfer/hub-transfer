@@ -910,7 +910,7 @@
        // =====================================================
        
        const HUB_CONFIG = {
-           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbxV6MkCzXDXqMflq7ffxwh20TSL4yhrPYcC6sa3avMLyqfozkimtp6AgO6LLfPweOQR/exec',
+           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbxwLohbULhBOHdvrZhyg9q4CgMSLlEnNzyXE8S2qTatI_xiHigeJz0H695xsExbKD65/exec',
            SPREADSHEET_URL: 'https://docs.google.com/spreadsheets/d/1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
            SYSTEM_NAME: 'Sistema HUB Central',
            VERSION: '1.0-HUB-FRONTEND',
@@ -1332,57 +1332,47 @@ function getFormattedPhoneNumber() {
        // =====================================================
        
        async function enviarParaBackend(dadosTransfer) {
-    try {
-        console.log('🔗 Conectando com:', HUB_CONFIG.WEBAPP_URL);
-        
-        const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dadosTransfer),
-            mode: 'cors'
-        });
-        
-        console.log('📊 Status resposta:', response.status, response.ok);
-        
-        if (response.ok) {
-            try {
-                const result = await response.json();
-                console.log('📨 Resposta JSON:', result);
-                return result;
-            } catch (jsonError) {
-                console.warn('⚠️ Resposta não é JSON, assumindo sucesso');
-                return {
-                    success: true,
-                    message: 'Transfer enviado',
-                    transferId: Date.now()
-                };
-            }
-        } else {
-            console.warn('⚠️ Resposta não OK:', response.status);
-            // Tentar fallback com no-cors
-            const fallbackResponse = await fetch(HUB_CONFIG.WEBAPP_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dadosTransfer),
-                mode: 'no-cors'
-            });
-            
-            return {
-                success: true,
-                message: 'Transfer enviado (fallback no-cors)',
-                transferId: Date.now()
-            };
-        }
-        
-    } catch (error) {
-        console.error('❌ Erro na comunicação:', error);
-        throw new Error('Erro de conexão: ' + error.message);
-    }
-}
+           try {
+               console.log('🔗 Conectando com:', HUB_CONFIG.WEBAPP_URL);
+               
+               const response = await fetch(HUB_CONFIG.WEBAPP_URL, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'text/plain',
+                   },
+                   body: JSON.stringify(dadosTransfer),
+                   mode: 'cors'
+               });
+               
+               if (!response.ok) {
+                   // Tentar modo no-cors como fallback
+                   await fetch(HUB_CONFIG.WEBAPP_URL, {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'text/plain',
+                       },
+                       body: JSON.stringify(dadosTransfer),
+                       mode: 'no-cors'
+                   });
+                   
+                   // Em modo no-cors, assumir sucesso
+                   return {
+                       success: true,
+                       message: 'Transfer enviado (modo no-cors)',
+                       transferId: Date.now()
+                   };
+               }
+               
+               const result = await response.json();
+               console.log('📨 Resposta do backend:', result);
+               
+               return result;
+               
+           } catch (error) {
+               console.error('❌ Erro na comunicação:', error);
+               throw new Error('Erro de conexão com o servidor: ' + error.message);
+           }
+       }
 
        async function testarConexao() {
            setButtonLoading('testarConexaoBtn', true);
