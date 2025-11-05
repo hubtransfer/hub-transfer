@@ -20,12 +20,50 @@
         };
     </script>
     
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap">
+    <!-- Google Maps com loading otimizado -->
+    <script>
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBe4UwnVYRP5KAUOtHg3diD6kPTif3VN30&libraries=places&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            script.onload = function() {
+                console.log('✅ Google Maps carregado!');
+            };
+            script.onerror = function() {
+                console.error('❌ Erro ao carregar Google Maps');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Carregar após DOM estar pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+        } else {
+            loadGoogleMaps();
+        }
     </script>
     
+    <!-- intlTelInput com retry logic -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    
+    <script>
+        // Verificar disponibilidade da biblioteca
+        function waitForIntlTelInput(callback, maxAttempts = 10, attempt = 0) {
+            if (window.intlTelInput) {
+                console.log('✅ intlTelInput disponível');
+                callback();
+            } else if (attempt < maxAttempts) {
+                setTimeout(() => {
+                    waitForIntlTelInput(callback, maxAttempts, attempt + 1);
+                }, 100);
+            } else {
+                console.warn('⚠️ intlTelInput não carregou após 1 segundo');
+                callback(); // Prosseguir mesmo sem a lib
+            }
+        }
+    </script>
     
     <style>
         * {
@@ -926,8 +964,8 @@
            VALIDACOES: {
                nomeCliente: { min: 2, max: 100 },
                numeroPessoas: { min: 1, max: 8 },
-               valorServico: { min: 5.00, max: 500.00 },
-               contacto: /^\+351\d{9}$/
+               valorServico: { min: 5.00, max: 500.00 }
+               // contacto será validado em validarFormulario()
            }
        };
 
@@ -1114,43 +1152,56 @@ setTimeout(() => {
 function initializePhoneInput() {
    const phoneInputElement = document.getElementById('contacto');
    
-   if (window.intlTelInput) {
-       window.phoneInput = window.intlTelInput(phoneInputElement, {
-           initialCountry: "pt",
-           preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
-           separateDialCode: true,
-           autoHideDialCode: false,
-           nationalMode: false,
-           formatOnDisplay: true,
-           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-       });
-
-       // NOVO: Detectar país automaticamente pelo DDI
-       phoneInputElement.addEventListener('input', function() {
-           const number = phoneInputElement.value.trim();
-           
-           // Se começar com +, detectar país
-           if (number.startsWith('+')) {
-               const countryCode = detectCountryFromDDI(number);
-               if (countryCode && countryCode !== phoneInput.getSelectedCountryData().iso2) {
-                   phoneInput.setCountry(countryCode);
-                   console.log(`🌍 País detectado: ${countryCode} para ${number.substring(0, 4)}`);
-               }
-           }
-       });
-
-       phoneInputElement.addEventListener('blur', function() {
-           if (phoneInput.isValidNumber()) {
-               phoneInputElement.value = phoneInput.getNumber();
-           }
-       });
+   try {
+       if (!phoneInputElement) {
+           console.error('❌ Campo contacto não encontrado no DOM');
+           return false;
+       }
        
-       console.log('📱 Campo de telefone inicializado com DDI automático');
-   } else {
-       console.warn('⚠️ Biblioteca intlTelInput não carregada');
+       if (window.intlTelInput && typeof window.intlTelInput === 'function') {
+           window.phoneInput = window.intlTelInput(phoneInputElement, {
+               initialCountry: "pt",
+               preferredCountries: ["pt", "br", "es", "fr", "de", "us", "gb"],
+               separateDialCode: true,
+               autoHideDialCode: false,
+               nationalMode: false,
+               formatOnDisplay: true,
+               utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+           });
+
+           // NOVO: Detectar país automaticamente pelo DDI
+           phoneInputElement.addEventListener('input', function() {
+               const number = phoneInputElement.value.trim();
+               if (number.startsWith('+') && window.phoneInput) {
+                   const countryCode = detectCountryFromDDI(number);
+                   if (countryCode && window.phoneInput.getSelectedCountryData) {
+                       const current = window.phoneInput.getSelectedCountryData();
+                       if (current && countryCode !== current.iso2) {
+                           window.phoneInput.setCountry(countryCode);
+                           console.log(`🌍 País detectado: ${countryCode}`);
+                       }
+                   }
+               }
+           });
+
+           phoneInputElement.addEventListener('blur', function() {
+               if (window.phoneInput && window.phoneInput.isValidNumber && window.phoneInput.isValidNumber()) {
+                   phoneInputElement.value = window.phoneInput.getNumber();
+                   console.log('✅ Telefone formatado:', phoneInputElement.value);
+               }
+           });
+           
+           console.log('✅ intlTelInput inicializado com sucesso');
+           return true;
+       } else {
+           console.warn('⚠️ Biblioteca intlTelInput não disponível, usando validação manual');
+           return false;
+       }
+   } catch (error) {
+       console.error('❌ Erro ao inicializar intlTelInput:', error.message);
+       return false;
    }
 }
-
 // NOVA FUNÇÃO: Detectar país pelo DDI
 function detectCountryFromDDI(number) {
    const ddiMap = {
@@ -2001,7 +2052,10 @@ function validarFormulario() {
                if (phoneInput) {
                    phoneInput.destroy();
                    phoneInput = null;
-                   setTimeout(initializePhoneInput, 1000);
+                   waitForIntlTelInput(() => {
+               initializePhoneInput();
+               console.log('✅ Phone input inicializado');
+           });
                }
                
                showNotification('🔄 Sistema resetado completamente', 'success');
