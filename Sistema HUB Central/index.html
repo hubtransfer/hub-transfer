@@ -1402,13 +1402,6 @@ function validarFormulario() {
         showNotification('❌ Número de pessoas deve ser pelo menos 1', 'error');
         return false;
     }
-
-    const telefone = getFormattedPhoneNumber();
-           if (!telefone || telefone.trim().length < 9) {
-               document.getElementById('contacto').focus();
-               showNotification('❌ Telefone inválido. Mínimo 9 dígitos requeridos.', 'error');
-               return false;
-           }
            
            if (!telefone.startsWith('+') && !/^\d{11,}$/.test(telefone)) {
                document.getElementById('contacto').focus();
