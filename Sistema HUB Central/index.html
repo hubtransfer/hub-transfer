@@ -910,7 +910,7 @@
        // =====================================================
        
        const HUB_CONFIG = {
-           WEBAPP_URL: 'https://https://script.google.com/macros/s/AKfycbwVWOkBDMBBGrskhyhIXE5g_DE3_BLvMtO1qSMq-vORx7ZaXU4PEL_Ci46hz7Xla0Rq/exec',
+           WEBAPP_URL: 'https://script.google.com/macros/s/AKfycbwVWOkBDMBBGrskhyhIXE5g_DE3_BLvMtO1qSMq-vORx7ZaXU4PEL_Ci46hz7Xla0Rq/exec',
            SPREADSHEET_URL: 'https://docs.google.com/spreadsheets/d/1pXAYotTOvev50-NPQMks905DELshIA4yWjcBa8Pz9WU',
            SYSTEM_NAME: 'Sistema HUB Central',
            VERSION: '1.0-HUB-FRONTEND',
@@ -1302,63 +1302,6 @@ function getFormattedPhoneNumber() {
            return true;
        }
 
-        function enviarTransfer() {
-  const hotel = document.getElementById('hotel-select').value;
-  const telefone = document.getElementById('telefone').value;
-  const origem = document.getElementById('origem').value;
-  const destino = document.getElementById('destino').value;
-  const data = document.getElementById('data').value;
-  const hora = document.getElementById('hora').value;
-  const pessoas = parseInt(document.getElementById('pessoas').value) || 1;
-  const bagagens = parseInt(document.getElementById('bagagens').value) || 0;
-  const valor = document.getElementById('valor').value;
-  const formaPagamento = document.getElementById('forma-pagamento').value;
-  const pagoPara = document.getElementById('pago-para').value;
-  const observacoes = document.getElementById('observacoes').value;
-
-  if (!hotel || !telefone || !origem || !destino || !data || !hora || !valor) {
-    mostrarNotificacao('Por favor preencha todos os campos obrigatórios', 'erro');
-    return;
-  }
-
-  const dados = {
-    hotel: hotel,
-    telefone: telefone,
-    cliente: document.getElementById('nome-cliente')?.value || 'Cliente',
-    origem: origem,
-    destino: destino,
-    data: data,
-    hora: hora,
-    pessoas: pessoas,
-    bagagens: bagagens,
-    valor: valor,
-    formaPagamento: formaPagamento,
-    pagoPara: pagoPara,
-    observacoes: observacoes,
-    timestamp: new Date().toISOString()
-  };
-
-  const urlBackend = 'https://https://script.google.com/macros/s/AKfycbwVWOkBDMBBGrskhyhIXE5g_DE3_BLvMtO1qSMq-vORx7ZaXU4PEL_Ci46hz7Xla0Rq/exec';
-
-  fetch(urlBackend, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dados)
-  })
-  .then(response => {
-    mostrarNotificacao('Transfer enviado com sucesso!', 'sucesso');
-    limparFormulario();
-    carregarTransfers();
-  })
-  .catch(error => {
-    console.error('Erro ao enviar transfer:', error);
-    mostrarNotificacao('Erro ao enviar transfer. Tente novamente.', 'erro');
-  });
-}
-       
        function coletarDadosFormulario() {
            return {
                nomeCliente: document.getElementById('nomeCliente').value.trim(),
