@@ -1366,6 +1366,57 @@
         .btn-danger.pulse {
             animation: pulse 1s infinite;
         }
+
+        .operator-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.btn-operator {
+    padding: 10px 14px;
+    border: 2px solid #FFA500;
+    background: linear-gradient(135deg, #FFF8E7 0%, #FFECB3 100%);
+    color: #333333;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: fit-content;
+}
+
+.btn-operator:hover {
+    border-color: #FF8C00;
+    background: linear-gradient(135deg, #FFE082 0%, #FFD54F 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 165, 0, 0.3);
+}
+
+.btn-operator.active {
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+    color: #FFFFFF;
+    border-color: #FF6F00;
+    box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
+    animation: emoji-bounce 0.6s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .operator-buttons {
+        gap: 6px;
+    }
+    
+    .btn-operator {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}
+        
     </style>
 </head>
 
@@ -1440,22 +1491,24 @@
 
 <div class="form-group">
     <label>🏢 Operador Parceiro *</label>
-    <div class="service-buttons">
-        <button type="button" class="btn-service active" onclick="setOperador('HUB Transfer', this)">
-    HUB Transfer
-</button>
-<button type="button" class="btn-service" onclick="setOperador('WT-Driver', this)">
-    WT-Driver
-</button>
-<button type="button" class="btn-service" onclick="setOperador('Connecto', this)">
-    Connecto
-</button>
-<button type="button" class="btn-service" onclick="setOperador('Talixo', this)">
-    Talixo
-</button>
-<button type="button" class="btn-service" onclick="setOperador('Outro', this)">
-    Outro
-</button>                  
+    <div class="operator-buttons">
+        <button type="button" class="btn-operator active" onclick="setOperador('HUB Transfer', this)">
+            HUB Transfer
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('WT-Driver', this)">
+            WT-Driver
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('Connecto', this)">
+            Connecto
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('Talixo', this)">
+            Talixo
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('Outro', this)">
+            Outro
+        </button>
+    </div>
+</div>                  
                     
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
