@@ -1437,6 +1437,25 @@
     <label for="referencia">📋 Referência da Reserva</label>
     <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
 </div>
+
+<div class="form-group">
+    <label>🏢 Operador Parceiro *</label>
+    <div class="service-buttons">
+        <button type="button" class="btn-service active" onclick="setOperador('HUB Transfer', this)">
+    HUB Transfer
+</button>
+<button type="button" class="btn-service" onclick="setOperador('WT-Driver', this)">
+    WT-Driver
+</button>
+<button type="button" class="btn-service" onclick="setOperador('Connecto', this)">
+    Connecto
+</button>
+<button type="button" class="btn-service" onclick="setOperador('Talixo', this)">
+    Talixo
+</button>
+<button type="button" class="btn-service" onclick="setOperador('Outro', this)">
+    Outro
+</button>                  
                     
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
@@ -1868,6 +1887,7 @@
         let isConnected = false;
         let isAdminMode = false;
         let currentServiceType = 'transfer';
+        let operadorSelecionado = 'HUB Transfer'; // Valor padrão
         let precoUnitarioAtual = 0;
         let syncInProgress = false;
         let lastSyncTime = null;
@@ -2731,6 +2751,16 @@ function updateConnectionStatus(connected) {
             updateCalculation();
         }
 
+function setOperador(operador, btn) {
+    operadorSelecionado = operador;
+    // Remove 'active' de todos os botões de operador
+    const container = btn.parentElement;
+    container.querySelectorAll('.btn-service').forEach(b => b.classList.remove('active'));
+    // Adiciona 'active' ao botão clicado
+    btn.classList.add('active');
+    console.log('Operador selecionado:', operador);
+}
+        
         function updateTourPrice() {
             const tourSelect = document.getElementById('tourSelecionado');
             const selectedOption = tourSelect.options[tourSelect.selectedIndex];
