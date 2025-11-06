@@ -1367,11 +1367,14 @@
             animation: pulse 1s infinite;
         }
 
-        .operator-buttons {
+        /* ===== OPERADOR PARCEIRO - RESPONSIVO COMPLETO ===== */
+.operator-buttons {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
     margin-bottom: 15px;
+    padding: 0;
+    width: 100%;
 }
 
 .btn-operator {
@@ -1384,11 +1387,12 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    display: inline-block;
+    white-space: nowrap;
+    flex: 0 0 auto;
     min-width: fit-content;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(255, 165, 0, 0.15);
 }
 
 .btn-operator:hover {
@@ -1396,6 +1400,10 @@
     background: linear-gradient(135deg, #FFE082 0%, #FFD54F 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 165, 0, 0.3);
+}
+
+.btn-operator:active {
+    transform: translateY(0);
 }
 
 .btn-operator.active {
@@ -1406,17 +1414,86 @@
     animation: emoji-bounce 0.6s ease-in-out;
 }
 
-@media (max-width: 768px) {
+.btn-operator:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (min-width: 1201px) {
     .operator-buttons {
-        gap: 6px;
+        gap: 8px;
     }
     
     .btn-operator {
-        padding: 8px 12px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .operator-buttons {
+        gap: 7px;
+    }
+    
+    .btn-operator {
+        padding: 9px 12px;
         font-size: 0.85rem;
     }
 }
-        
+
+@media (max-width: 768px) {
+    .operator-buttons {
+        gap: 6px;
+        margin-bottom: 12px;
+        padding: 0;
+    }
+    
+    .btn-operator {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 6px rgba(255, 165, 0, 0.12);
+    }
+    
+    .btn-operator:hover {
+        box-shadow: 0 5px 15px rgba(255, 165, 0, 0.25);
+    }
+}
+
+@media (max-width: 480px) {
+    .operator-buttons {
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+    
+    .btn-operator {
+        padding: 7px 9px;
+        font-size: 0.75rem;
+        box-shadow: 0 1px 4px rgba(255, 165, 0, 0.1);
+    }
+    
+    .btn-operator:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 165, 0, 0.2);
+    }
+}
+
+@media (max-width: 360px) {
+    .operator-buttons {
+        gap: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .btn-operator {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+        border-width: 1px;
+    }
+    
+    .btn-operator:hover {
+        transform: translateY(-1px);
+    }
+}       
     </style>
 </head>
 
