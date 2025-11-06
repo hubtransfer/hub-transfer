@@ -1566,30 +1566,31 @@
     <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
 </div>
 
-<div class="form-group">
-    <label>🏢 Operador Parceiro *</label>
-    <div class="operator-buttons">
-        <button type="button" class="btn-operator active" onclick="setOperador('HUB Transfer', this)">
-            HUB Transfer
-        </button>
-        <button type="button" class="btn-operator" onclick="setOperador('WT-Driver', this)">
-            WT-Driver
-        </button>
-        <button type="button" class="btn-operator" onclick="setOperador('Connecto', this)">
-            Connecto
-        </button>
-        <button type="button" class="btn-operator" onclick="setOperador('Talixo', this)">
-            Talixo
-        </button>
-        <button type="button" class="btn-operator" onclick="setOperador('Outro', this)">
-            Outro
-        </button>
+<div class="form-group" style="display: flex; gap: 10px; align-items: flex-end;">
+    <div style="flex: 1;">
+        <label>🏢 Operador Parceiro *</label>
+        <div class="operator-buttons">
+            <button type="button" class="btn-operator active" onclick="setOperador('HUB Transfer', this)">
+                HUB Transfer
+            </button>
+            <button type="button" class="btn-operator" onclick="setOperador('WT-Driver', this)">
+                WT-Driver
+            </button>
+            <button type="button" class="btn-operator" onclick="setOperador('Connecto', this)">
+                Connecto
+            </button>
+            <button type="button" class="btn-operator" onclick="setOperador('Talixo', this)">
+                Talixo
+            </button>
+            <button type="button" class="btn-operator" onclick="setOperador('Outro', this)">
+                Outro
+            </button>
+        </div>
     </div>
-</div>                  
-
-                    <div class="form-group">
-    <label>✅ Operador Selecionado</label>
-    <input type="text" id="operadorSelecionadoDisplay" readonly placeholder="Nenhum operador selecionado" style="background-color: #f0f0f0; color: #333;">
+    <div style="flex: 1; min-width: 200px;">
+        <label>✅ Operador</label>
+        <input type="text" id="operadorSelecionadoDisplay" placeholder="Digite ou selecione..." style="background-color: #E8F5E9; width: 100%;">
+    </div>
 </div>
                     
                     <div class="form-group">
