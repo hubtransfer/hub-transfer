@@ -523,13 +523,22 @@
         }
 
         .date-buttons, .time-buttons, .location-buttons, 
-        .price-buttons, .payment-buttons, .payment-to-buttons, .obs-buttons,
-        .people-buttons, .baggage-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
+.price-buttons, .payment-buttons, .payment-to-buttons,
+.people-buttons, .baggage-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.obs-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+}
 
         .btn-people, .btn-baggage {
             min-width: 60px;
