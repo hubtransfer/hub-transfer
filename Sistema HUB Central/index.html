@@ -1759,23 +1759,21 @@
                     
                     <div class="form-group">
     <label>📝 Observações</label>
-    <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: nowrap;">
-        <div class="obs-buttons" style="display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto;">
-            <button type="button" class="btn-obs" onclick="toggleObs('Bagagem Extra', this)" style="white-space: nowrap; flex-shrink: 0;">
-                💼 Bagagem Extra
-            </button>
-            <button type="button" class="btn-obs" onclick="toggleObs('Urgente', this)" style="white-space: nowrap; flex-shrink: 0;">
-                ⚡ Urgente
-            </button>
-            <button type="button" class="btn-obs" onclick="toggleObs('VIP', this)" style="white-space: nowrap; flex-shrink: 0;">
-                ⭐ VIP
-            </button>
-            <button type="button" class="btn-obs" onclick="toggleObs('Com Criança', this)" style="white-space: nowrap; flex-shrink: 0;">
-                😊 Com Criança
-            </button>
-        </div>
-        <textarea id="observacoes" placeholder="Informações adicionais..." style="flex: 1; min-width: 200px; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 0.95rem; resize: none; height: auto;"></textarea>
+    <div class="obs-buttons" style="display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 10px;">
+        <button type="button" class="btn-obs" onclick="toggleObs('Bagagem Extra', this)" style="white-space: nowrap; flex-shrink: 0;">
+            💼 Bagagem Extra
+        </button>
+        <button type="button" class="btn-obs" onclick="toggleObs('Urgente', this)" style="white-space: nowrap; flex-shrink: 0;">
+            ⚡ Urgente
+        </button>
+        <button type="button" class="btn-obs" onclick="toggleObs('VIP', this)" style="white-space: nowrap; flex-shrink: 0;">
+            ⭐ VIP
+        </button>
+        <button type="button" class="btn-obs" onclick="toggleObs('Com Criança', this)" style="white-space: nowrap; flex-shrink: 0;">
+            😊 Com Criança
+        </button>
     </div>
+    <textarea id="observacoes" placeholder="Informações adicionais..." style="width: 100%; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 0.95rem; resize: none; min-height: 80px;"></textarea>
 </div>
                 <!-- Box de Cálculo de Preço -->
                 <div class="price-calculation-box" id="priceCalculationBox">
