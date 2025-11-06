@@ -1586,6 +1586,11 @@
         </button>
     </div>
 </div>                  
+
+                    <div class="form-group">
+    <label>✅ Operador Selecionado</label>
+    <input type="text" id="operadorSelecionadoDisplay" readonly placeholder="Nenhum operador selecionado" style="background-color: #f0f0f0; color: #333;">
+</div>
                     
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
@@ -2882,15 +2887,24 @@ function updateConnectionStatus(connected) {
         }
 
 function setOperador(operador, btn) {
-    operadorSelecionado = operador;
-    // Remove 'active' de todos os botões de operador
-    const container = btn.parentElement;
-    container.querySelectorAll('.btn-service').forEach(b => b.classList.remove('active'));
-    // Adiciona 'active' ao botão clicado
-    btn.classList.add('active');
-    console.log('Operador selecionado:', operador);
-}
-        
+    const operadorDisplay = document.getElementById('operadorSelecionadoDisplay');
+    
+    if (btn.classList.contains('active')) {
+        // Clique 2: desseleciona
+        btn.classList.remove('active');
+        operadorSelecionado = null;
+        operadorDisplay.value = '';
+        operadorDisplay.style.backgroundColor = '#f0f0f0';
+    } else {
+        // Clique 1: seleciona
+        const container = btn.parentElement;
+        container.querySelectorAll('.btn-operator').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        operadorSelecionado = operador;
+        operadorDisplay.value = operador;
+        operadorDisplay.style.backgroundColor = '#E8F5E9';
+    }
+}        
         function updateTourPrice() {
             const tourSelect = document.getElementById('tourSelecionado');
             const selectedOption = tourSelect.options[tourSelect.selectedIndex];
