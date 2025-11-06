@@ -1692,6 +1692,9 @@
                             <button type="button" class="btn-location origem-btn" onclick="setOrigin('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
+                            <button type="button" class="btn-location origem-btn" onclick="setOrigin('HUB Central')">
+    🏨 HUB Central
+</button>
                         </div>
                         <input type="text" id="origem" required placeholder="Digite ou escolha o endereço...">
                     </div>
@@ -1699,6 +1702,9 @@
                     <div class="form-group">
                         <label for="destino">🎯 Local de Destino *</label>
                         <div class="location-buttons">
+                            <button type="button" class="btn-location destino-btn" onclick="setDestination('HUB Central')">
+    🏨 HUB Central
+</button>
                             <button type="button" class="btn-location destino-btn" onclick="setDestination('Aeroporto de Lisboa')">
                                 ✈️ Aeroporto de Lisboa
                             </button>
@@ -1758,23 +1764,17 @@
                     </div>
                     
                     <div class="form-group">
-    <label>📝 Observações</label>
-    <div class="obs-buttons" style="display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 10px;">
-        <button type="button" class="btn-obs" onclick="toggleObs('Bagagem Extra', this)" style="white-space: nowrap; flex-shrink: 0;">
-            💼 Bagagem Extra
-        </button>
-        <button type="button" class="btn-obs" onclick="toggleObs('Urgente', this)" style="white-space: nowrap; flex-shrink: 0;">
-            ⚡ Urgente
-        </button>
-        <button type="button" class="btn-obs" onclick="toggleObs('VIP', this)" style="white-space: nowrap; flex-shrink: 0;">
-            ⭐ VIP
-        </button>
-        <button type="button" class="btn-obs" onclick="toggleObs('Com Criança', this)" style="white-space: nowrap; flex-shrink: 0;">
-            😊 Com Criança
-        </button>
-    </div>
-    <textarea id="observacoes" placeholder="Informações adicionais..." style="width: 100%; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 0.95rem; resize: none; min-height: 80px;"></textarea>
-</div>
+                        <label for="observacoes">📝 Observações</label>
+                        <div class="obs-buttons">
+                            <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">🧳 Bagagem Extra</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">⚡ Urgente</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">⭐ VIP</button>
+                            <button type="button" class="btn-obs" onclick="addObservation('Com criança')">👶 Com Criança</button>
+                        </div>
+                        <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
+                    </div>
+                </div>
+
                 <!-- Box de Cálculo de Preço -->
                 <div class="price-calculation-box" id="priceCalculationBox">
                     <div class="calculation-header">💹 Cálculo do Valor Total</div>
