@@ -1566,29 +1566,24 @@
     <input type="text" id="referencia" maxlength="100" placeholder="Ex: Booking.com, Expedia, etc.">
 </div>
 
-<div class="form-group" style="display: flex; gap: 10px; align-items: flex-end;">
-    <div style="flex: 1;">
-        <label>🏢 Operador Parceiro *</label>
-        <div class="operator-buttons">
-            <button type="button" class="btn-operator active" onclick="setOperador('HUB Transfer', this)">
-                HUB Transfer
-            </button>
-            <button type="button" class="btn-operator" onclick="setOperador('WT-Driver', this)">
-                WT-Driver
-            </button>
-            <button type="button" class="btn-operator" onclick="setOperador('Connecto', this)">
-                Connecto
-            </button>
-            <button type="button" class="btn-operator" onclick="setOperador('Talixo', this)">
-                Talixo
-            </button>
-        </div>
+<div class="form-group">
+    <label>🏢 Operador Parceiro *</label>
+    <div style="display: flex; gap: 8px; align-items: flex-end;">
+        <button type="button" class="btn-operator active" onclick="setOperador('HUB Transfer', this)">
+            HUB Transfer
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('WT-Driver', this)">
+            WT-Driver
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('Connecto', this)">
+            Connecto
+        </button>
+        <button type="button" class="btn-operator" onclick="setOperador('Talixo', this)">
+            Talixo
+        </button>
+        <input type="text" id="operadorSelecionadoDisplay" placeholder="Outro..." style="padding: 10px 14px; border: 2px solid #FFA500; border-radius: 8px; font-size: 0.9rem; background-color: #FFF8E7; width: 130px; flex-shrink: 0;">
     </div>
-    <div style="flex: 1; min-width: 200px;">
-        <input type="text" id="operadorSelecionadoDisplay" placeholder="Digite ou selecione..." style="background-color: #E8F5E9; width: 100%;">
-    </div>
-</div>
-                    
+</div>                    
                     <div class="form-group">
                         <label for="tipoServico">🚗 Tipo de Serviço</label>
                         <div class="service-buttons">
