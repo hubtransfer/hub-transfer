@@ -1759,12 +1759,20 @@
                     
                     <div class="form-group">
                         <label for="observacoes">📝 Observações</label>
-                        <div class="obs-buttons">
-                            <button type="button" class="btn-obs" onclick="addObservation('Bagagem extra')">🧳 Bagagem Extra</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Transfer urgente')">⚡ Urgente</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Cliente VIP')">⭐ VIP</button>
-                            <button type="button" class="btn-obs" onclick="addObservation('Com criança')">👶 Com Criança</button>
-                        </div>
+                        <div class="obs-buttons" style="display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto;">
+    <button type="button" class="btn-obs" onclick="toggleObs('Bagagem Extra', this)" style="white-space: nowrap; flex-shrink: 0;">
+        💼 Bagagem Extra
+    </button>
+    <button type="button" class="btn-obs" onclick="toggleObs('Urgente', this)" style="white-space: nowrap; flex-shrink: 0;">
+        ⚡ Urgente
+    </button>
+    <button type="button" class="btn-obs" onclick="toggleObs('VIP', this)" style="white-space: nowrap; flex-shrink: 0;">
+        ⭐ VIP
+    </button>
+    <button type="button" class="btn-obs" onclick="toggleObs('Com Criança', this)" style="white-space: nowrap; flex-shrink: 0;">
+        😊 Com Criança
+    </button>
+</div>
                         <textarea id="observacoes" rows="3" placeholder="Informações adicionais..."></textarea>
                     </div>
                 </div>
