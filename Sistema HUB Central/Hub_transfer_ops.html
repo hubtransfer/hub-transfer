@@ -91,39 +91,54 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 /* ── DIA VIEW ── */
 .dia-wrap{padding:.6rem 1.25rem 2rem;display:flex;flex-direction:column;gap:.5rem}
 .dia-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;flex-shrink:0}
-.dia-stat{padding:.5rem .4rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;text-align:center}
-.dia-stat-n{font-family:var(--mono);font-size:1.3rem;font-weight:700;line-height:1}
+.dia-stat{padding:.6rem .4rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;text-align:center}
+.dia-stat-n{font-family:var(--mono);font-size:1.4rem;font-weight:700;line-height:1}
 .dia-stat-l{font-family:var(--mono);font-size:.46rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
 .dia-stat.s-c .dia-stat-n{color:var(--chegada)}
 .dia-stat.s-r .dia-stat-n{color:var(--recolha)}
 .dia-stat.s-t .dia-stat-n{color:var(--accent)}
 .dia-sync-bar{display:flex;align-items:center;gap:.45rem;padding:.5rem .75rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;flex-shrink:0}
-.dia-sync-info{flex:1;font-family:var(--mono);font-size:.53rem;color:var(--text-dim);line-height:1.6}
+.dia-sync-info{flex:1;font-family:var(--mono);font-size:.53rem;color:var(--text-dim);line-height:1.7}
 .dia-sync-info strong{color:var(--text)}
-.dia-sync-btn{padding:.28rem .6rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:.55rem;letter-spacing:.07em;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.dia-sync-btn{padding:.3rem .65rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:.55rem;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .dia-sync-btn:hover{border-color:var(--chegada);color:var(--chegada);background:var(--chegada-dim)}
 .dia-sync-btn.syncing{opacity:.45;pointer-events:none}
-.dia-timeline{display:flex;flex-direction:column;gap:.42rem}
-.dia-card{display:grid;grid-template-columns:56px 1fr;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface);animation:cardIn .3s ease both;transition:border-color .15s}
-.dia-card:hover{border-color:var(--border2)}
-.dia-card.chegada-c{border-left:3px solid var(--chegada)}
-.dia-card.recolha-c{border-left:3px solid var(--recolha)}
-.dia-time-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem .25rem;border-right:1px solid var(--border);background:var(--surface2)}
-.dia-time{font-family:var(--mono);font-size:.9rem;font-weight:700;line-height:1.1;letter-spacing:.01em}
-.dia-card.chegada-c .dia-time{color:var(--chegada)}
-.dia-card.recolha-c .dia-time{color:var(--recolha)}
-.dia-type-ico{font-size:.65rem;margin-top:2px;opacity:.55}
-.dia-body{padding:.48rem .72rem;display:flex;flex-direction:column;gap:.15rem;min-width:0}
-.dia-client{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dia-route{font-family:var(--mono);font-size:.52rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dia-meta{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin-top:.1rem}
-.dia-tag{font-family:var(--mono);font-size:.48rem;padding:.08rem .32rem;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);white-space:nowrap}
-.dia-driver-tag{font-family:var(--mono);font-size:.48rem;padding:.08rem .32rem;border-radius:3px;background:var(--recolha-dim);border:1px solid var(--recolha-glow);color:var(--recolha);white-space:nowrap}
-.dia-flight-tag{font-family:var(--mono);font-size:.48rem;padding:.08rem .32rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap}
-.dia-no-driver{font-family:var(--mono);font-size:.48rem;padding:.08rem .32rem;border-radius:3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;white-space:nowrap}
+.dia-section-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);letter-spacing:.14em;text-transform:uppercase;padding:.5rem 0 .25rem;border-bottom:1px solid var(--border);margin-bottom:.2rem}
+.dia-timeline{display:flex;flex-direction:column;gap:.5rem}
 .dia-empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-family:var(--mono);font-size:.62rem;line-height:2.2}
-.dia-section-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);letter-spacing:.14em;text-transform:uppercase;padding:.4rem 0 .2rem;border-bottom:1px solid var(--border);margin-bottom:.1rem}
 
+/* Card do Dia */
+.dc{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface);animation:cardIn .25s ease both;transition:border-color .15s}
+.dc:hover{border-color:var(--border2)}
+.dc.dc-chegada{border-left:3px solid var(--chegada)}
+.dc.dc-recolha{border-left:3px solid var(--recolha)}
+.dc-top{display:grid;grid-template-columns:64px 1fr auto;min-height:72px}
+.dc-time{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem .25rem;border-right:1px solid var(--border);background:var(--surface2);gap:2px}
+.dc-h{font-family:var(--mono);font-size:1.05rem;font-weight:700;line-height:1;letter-spacing:.01em}
+.dc-chegada .dc-h{color:var(--chegada)}
+.dc-recolha .dc-h{color:var(--recolha)}
+.dc-type{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
+.dc-main{padding:.55rem .75rem;display:flex;flex-direction:column;gap:.22rem;min-width:0}
+.dc-client{font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.dc-route{font-family:var(--mono);font-size:.54rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:.3rem}
+.dc-flight-badge{display:inline-flex;align-items:center;gap:.2rem;font-family:var(--mono);font-size:.5rem;padding:.08rem .35rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap;flex-shrink:0}
+.dc-tags{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;margin-top:.05rem}
+.dc-tag{font-family:var(--mono);font-size:.48rem;padding:.08rem .3rem;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);white-space:nowrap}
+.dc-drv{font-family:var(--mono);font-size:.48rem;padding:.08rem .3rem;border-radius:3px;background:var(--recolha-dim);border:1px solid var(--recolha-glow);color:var(--recolha);white-space:nowrap}
+.dc-nodrv{font-family:var(--mono);font-size:.48rem;padding:.08rem .3rem;border-radius:3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;white-space:nowrap}
+.dc-actions{display:flex;flex-direction:column;gap:.25rem;padding:.5rem .6rem;justify-content:center;flex-shrink:0;border-left:1px solid var(--border)}
+.dc-act{display:inline-flex;align-items:center;justify-content:center;gap:.22rem;padding:.3rem .52rem;border-radius:4px;font-family:var(--mono);font-size:.52rem;font-weight:700;letter-spacing:.06em;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;text-decoration:none}
+.dc-act.nav{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.3);color:#4285f4}
+.dc-act.nav:hover{background:rgba(66,133,244,.22)}
+.dc-act.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.3);color:#35c5f0}
+.dc-act.wz:hover{background:rgba(53,197,240,.22)}
+.dc-act.wpp{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.28);color:var(--wpp)}
+.dc-act.wpp:hover{background:rgba(37,211,102,.2)}
+.dc-act.dispatch{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--chegada)}
+.dc-act.dispatch:hover{background:rgba(245,158,11,.22)}
+.dc-bottom{border-top:1px solid var(--border);padding:.38rem .75rem;display:flex;align-items:center;gap:.5rem;background:var(--surface2);flex-wrap:wrap}
+.dc-addr{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-nav-links{display:flex;gap:.28rem;flex-shrink:0}
 /* ── MAIN CONTENT ── */
 .content{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
 .content::-webkit-scrollbar{width:4px}
@@ -1080,26 +1095,68 @@ function renderDia(){
   const recolhas = list.filter(v=>v.type==='RECOLHA');
 
   function buildDiaCard(v){
-    const tc = v.type === 'CHEGADA' ? 'chegada-c' : 'recolha-c';
-    const ico = v.type === 'CHEGADA' ? '▼' : '▲';
+    const isC = v.type === 'CHEGADA';
+    const tc  = isC ? 'dc-chegada' : 'dc-recolha';
+    const ico = isC ? '▼' : '▲';
+    const lbl = isC ? 'CHEGADA' : 'RECOLHA';
     const hora = v.pickupTime || '—:—';
-    const route = v.type === 'CHEGADA'
-      ? `${v.flight ? v.flight + ' · ' : ''}${v.origin||'?'} → ${v.destination||'?'}`
-      : `${v.origin||'?'} → ${v.destination||'?'}${v.flight ? ' · ' + v.flight : ''}`;
-    const driverTag = v.driver
-      ? `<span class="dia-driver-tag">🚗 ${v.driver}</span>`
-      : `<span class="dia-no-driver">⚠️ Sem motorista</span>`;
-    const flightTag = v.flight ? `<span class="dia-flight-tag">✈ ${v.flight}</span>` : '';
-    const paxTag = (v.pax||v.bags) ? `<span class="dia-tag">${[v.pax?v.pax+'pax':'',v.bags?v.bags+'bag':''].filter(Boolean).join(' · ')}</span>` : '';
-    return `<div class="dia-card ${tc}">
-      <div class="dia-time-col">
-        <div class="dia-time">${hora}</div>
-        <div class="dia-type-ico">${ico}</div>
+    const origem  = v.origin      || '—';
+    const destino = v.destination || '—';
+
+    const drvTag = v.driver
+      ? `<span class="dc-drv">🚗 ${v.driver}</span>`
+      : `<span class="dc-nodrv">⚠️ Sem motorista</span>`;
+    const paxTag  = v.pax  ? `<span class="dc-tag">👤 ${v.pax}</span>` : '';
+    const bagsTag = v.bags ? `<span class="dc-tag">🧳 ${v.bags}</span>` : '';
+    const flightBadge = v.flight
+      ? `<span class="dc-flight-badge">✈ ${v.flight}</span>`
+      : '';
+
+    const navAddr = isC ? destino : origem;
+    const gmUrl  = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(navAddr)}`;
+    const wzUrl  = `https://waze.com/ul?q=${encodeURIComponent(navAddr)}&navigate=yes`;
+
+    const wppClientUrl = v.phone
+      ? `https://wa.me/${v.phone.replace(/\D/g,'')}`
+      : '#';
+    const wppClientStyle = v.phone ? '' : 'style="opacity:.35;pointer-events:none"';
+
+    const drvObj   = DRIVERS.find(d=>d.name===v.driver);
+    const drvPhone = drvObj?.phone || '';
+    const tmplFn   = v.driver ? (TEMPLATES[v.type]?.EN) : null;
+    const tmplTxt  = tmplFn ? tmplFn(v.driver, v.client) : '';
+    const wppDrvUrl = (drvPhone && tmplTxt)
+      ? `https://wa.me/${drvPhone.replace(/\D/g,'')}?text=${encodeURIComponent(tmplTxt)}`
+      : '#';
+    const wppDrvStyle = (drvPhone && tmplTxt) ? '' : 'style="opacity:.35;pointer-events:none"';
+
+    return `<div class="dc ${tc}">
+      <div class="dc-top">
+        <div class="dc-time">
+          <div class="dc-h">${hora}</div>
+          <div class="dc-type">${ico} ${lbl}</div>
+        </div>
+        <div class="dc-main">
+          <div class="dc-client">${v.client||'—'}</div>
+          <div class="dc-route">
+            <span>${origem}</span>
+            <span style="color:var(--text-muted);margin:0 .2rem">→</span>
+            <span>${destino}</span>
+            ${flightBadge}
+          </div>
+          <div class="dc-tags">${drvTag}${paxTag}${bagsTag}</div>
+        </div>
+        <div class="dc-actions">
+          <a class="dc-act nav" href="${gmUrl}" target="_blank">🗺 Maps</a>
+          <a class="dc-act wz"  href="${wzUrl}"  target="_blank">🔷 Waze</a>
+        </div>
       </div>
-      <div class="dia-body">
-        <div class="dia-client">${v.client||'—'}</div>
-        <div class="dia-route">${route}</div>
-        <div class="dia-meta">${driverTag}${flightTag}${paxTag}</div>
+      <div class="dc-bottom">
+        <span class="dc-addr">${isC ? '✈ ' + origem + ' → 📍 ' + destino : '📍 ' + origem + ' → ✈ ' + destino}</span>
+        <div class="dc-nav-links">
+          <a class="dc-act wpp" href="${wppClientUrl}" target="_blank" ${wppClientStyle}>${WPP_ICO} Cliente</a>
+          <a class="dc-act dispatch" href="${wppDrvUrl}" target="_blank" ${wppDrvStyle}>⚡ Motorista</a>
+        </div>
       </div>
     </div>`;
   }
@@ -1109,7 +1166,7 @@ function renderDia(){
     html += `<div class="dia-timeline">${chegadas.map(buildDiaCard).join('')}</div>`;
   }
   if(recolhas.length){
-    html += `<div class="dia-section-lbl" style="margin-top:.4rem">▲ Recolhas (${recolhas.length})</div>`;
+    html += `<div class="dia-section-lbl" style="margin-top:.5rem">▲ Recolhas (${recolhas.length})</div>`;
     html += `<div class="dia-timeline">${recolhas.map(buildDiaCard).join('')}</div>`;
   }
 
@@ -1138,11 +1195,11 @@ function saveViagensCfg(){
 }
 
 function setViagensStatus(state, msg){
-  const dot = document.getElementById('viagensDot');
-  const txt = document.getElementById('viagensStatusTxt');
-  const btn = document.getElementById('sbViagensSync');
+  const dot    = document.getElementById('viagensDot');
+  const txt    = document.getElementById('viagensStatusTxt');
+  const btn    = document.getElementById('sbViagensSync');
   const diaBtn = document.getElementById('diaSyncBtn');
-  if(dot){ dot.className = 'hub-dot ' + state; dot.textContent = state==='online'?'●':state==='offline'?'●':'○'; }
+  if(dot){ dot.className='hub-dot '+state; dot.textContent=state==='online'?'●':state==='offline'?'●':'○'; }
   if(txt) txt.textContent = msg;
   if(btn) btn.classList.toggle('syncing', state==='loading');
   if(diaBtn) diaBtn.classList.toggle('syncing', state==='loading');
@@ -1153,7 +1210,7 @@ async function syncViagens(manual){
   if(!HUB_VIAGENS_URL){ setViagensStatus('offline','URL não configurado'); if(currentTab==='dia')renderDia(); return; }
   setViagensStatus('loading','A sincronizar...');
   try{
-    const url = HUB_VIAGENS_URL + '?action=viagens&t=' + Date.now();
+    const url  = HUB_VIAGENS_URL + '?action=viagens&t=' + Date.now();
     const resp = await fetch(url, {redirect:'follow'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
@@ -1197,40 +1254,28 @@ function setHubStatus(state, msg, extra){
 async function syncDrivers(manual){
   setHubStatus('loading','A sincronizar...');
   try{
-    // Tenta primeiro endpoint ?action=motoristas
     const url=HUB_CENTRAL_URL+'?action=motoristas&t='+Date.now();
     const resp=await fetch(url,{redirect:'follow'});
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const data=await resp.json();
-
-    // Suporta estrutura {motoristas:[...]} OU array directo
     const list=Array.isArray(data)?data:(data.motoristas||data.drivers||[]);
-
-    if(!list.length && data.error){
-      throw new Error(data.error);
-    }
-
+    if(!list.length && data.error) throw new Error(data.error);
     if(list.length===0){
-      // Endpoint existe mas sem motoristas — usa fallback
       DRIVERS=DRIVERS_FALLBACK;
-      setHubStatus('offline','Sem motoristas na aba',
-        `<span>Aba vazia — a usar lista local</span>`);
+      setHubStatus('offline','Sem motoristas na aba',`<span>Aba vazia — a usar lista local</span>`);
     } else {
       DRIVERS=list.map(d=>({
-        name:  String(d.name||d.nome||d.NOME||d.motorista||'').trim(),
-        phone: String(d.phone||d.telefone||d.tel||d.TELEFONE||'').replace(/[\s\-\+\(\)]/g,''),
+        name:   String(d.name||d.nome||d.NOME||d.motorista||'').trim(),
+        phone:  String(d.phone||d.telefone||d.tel||d.TELEFONE||'').replace(/[\s\-\+\(\)]/g,''),
         viatura:String(d.viatura||d.car||d.vehicle||'').trim(),
       })).filter(d=>d.name);
-
       const ts=new Date().toLocaleString('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'});
       setHubStatus('online','HUB Central · Ligada',
         `<span class="hi-count">✦ ${DRIVERS.length} motoristas</span>`+
         `<span>Sync: ${ts}</span>`+
         DRIVERS.map(d=>`<span style="color:var(--text-dim)">· ${d.name}${d.viatura?' ('+d.viatura+')':''}</span>`).join('')
       );
-
       if(manual){
-        // Flash visual feedback
         const btn=document.getElementById('sbSyncBtn');
         const prev=btn.innerHTML;
         btn.innerHTML='<span>✅</span> Actualizado!';
@@ -1245,17 +1290,15 @@ async function syncDrivers(manual){
       `<span>A usar ${DRIVERS_FALLBACK.length} motoristas locais</span>`
     );
   }
-  // Re-render cards so dropdowns reflect new drivers
   renderAll();
 }
 
 // ─── INIT ───
 renderAll();
-syncDrivers(false);   // carrega motoristas da HUB Central no arranque
-// Inicializa input URL config com valor guardado
+syncDrivers(false);
 const _cfgInp = document.getElementById('sbCfgInp');
 if(_cfgInp) _cfgInp.value = HUB_VIAGENS_URL;
-if(HUB_VIAGENS_URL) syncViagens(false); // carrega viagens do dia no arranque
+if(HUB_VIAGENS_URL) syncViagens(false);
 </script>
 </body>
 </html>
