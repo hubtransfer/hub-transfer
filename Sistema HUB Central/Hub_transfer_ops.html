@@ -1569,7 +1569,7 @@ function buildDiaCard(v){
       ${middleHtml}
       <div class="dc-bottom">
         <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')"><option value="">— Atribuir motorista —</option>${drvOpts}</select>
-        ${v.phone ? `<span class="dc-phone" onclick="navigator.clipboard.writeText('${v.phone.replace(/\D/g,'')}').then(()=>this.textContent='✅ Copiado!');setTimeout(()=>this.textContent='📞 ${v.phone}',2000)" title="Clica para copiar">📞 ${v.phone}</span>` : ''}
+        ${v.phone ? `<span class="dc-phone" onclick="navigator.clipboard.writeText('+${v.phone.replace(/\D/g,'')}').then(()=>this.textContent='✅ Copiado!');setTimeout(()=>this.textContent='📞 +${v.phone.replace(/\D/g,'')}',2000)" title="Clica para copiar">📞 +${v.phone.replace(/\D/g,'')}</span>` : ''}
         <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
         ${v.phone ? `<button class="dc-act sms" onclick="diaSmsMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">💬 SMS</button>` : ''}
         <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}')">⚡ Motorista</button>
