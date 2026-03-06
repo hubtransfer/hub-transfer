@@ -390,6 +390,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-act.tmpl{background:var(--chegada-dim);border:1px solid var(--chegada-glow);color:var(--chegada)}
 .dc-act.tmpl:hover{background:rgba(245,158,11,.2)}
 .dc-act.dis{opacity:.3;pointer-events:none}
+.dc-phone{font-family:var(--mono);font-size:.55rem;padding:.1rem .4rem;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all .15s;white-space:nowrap}
+.dc-phone:hover{border-color:var(--accent);color:var(--text)}
+.dc-act.sms{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.28);color:var(--accent);text-decoration:none;flex:0}
 .dc-navbtn{display:inline-flex;align-items:center;gap:.22rem;padding:.28rem .52rem;border-radius:4px;font-family:var(--mono);font-size:.52rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;text-decoration:none;flex-shrink:0}
 .dc-navbtn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.3);color:#4285f4}
 .dc-navbtn.gm:hover{background:rgba(66,133,244,.2)}
@@ -1388,6 +1391,10 @@ function buildDiaCard(v){
     const drvTag  = v.driver
       ? `<span class="dc-drv-tag">🚗 ${v.driver}</span>`
       : `<span class="dc-nodrv-tag">⚠️ Sem motorista</span>`;
+    /* Idioma resolvido: GAS field → DDI → fallback EN */
+    const _resolvedLang = resolveLanguage(v.language, v.phone);
+    const langFlags = {PT:'🇵🇹',EN:'🇬🇧',FR:'🇫🇷',ES:'🇪🇸',IT:'🇮🇹',DE:'🇩🇪'};
+    const langTag = `<span class="dc-tag">${langFlags[_resolvedLang]||'🌐'} ${_resolvedLang}</span>`;
     const navAddr = isC ? destino : origem;
     const gmUrl   = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(navAddr)}`;
     const wzUrl   = `https://waze.com/ul?q=${encodeURIComponent(navAddr)}&navigate=yes`;
@@ -1485,14 +1492,16 @@ function buildDiaCard(v){
     return `<div class="dc ${tc}" id="dcard-${cardId}">
       <div class="dc-row1">
         <div class="dc-timebox"><div class="dc-hora">${hora}</div><div class="dc-tipo-lbl">${icoLbl}</div></div>
-        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${(v.client||'').replace(/'/g,"\\'")}')" style="cursor:pointer">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${paxTag}${bagsTag}</div></div>
+        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${(v.client||'').replace(/'/g,"\\'")}')" style="cursor:pointer">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${langTag}${paxTag}${bagsTag}</div></div>
         <div class="dc-navbtns"><a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a><a class="dc-navbtn wz" href="${wzUrl}" target="_blank">🔷 Waze</a></div>
       </div>
       ${middleHtml}
       <div class="dc-bottom">
         <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')"><option value="">— Atribuir motorista —</option>${drvOpts}</select>
-        <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
-        <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}')">⚡ Motorista</button>
+        ${v.phone ? `<span class="dc-phone" onclick="navigator.clipboard.writeText('${v.phone.replace(/\D/g,'')}').then(()=>this.textContent='✅ Copiado!');setTimeout(()=>this.textContent='📞 ${v.phone}',2000)" title="Clica para copiar">📞 ${v.phone}</span>` : ''}
+        <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
+        ${v.phone ? `<a class="dc-act sms" href="sms:${v.phone.replace(/\D/g,'')}">💬 SMS</a>` : ''}
+        <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}')">⚡ Motorista</button>
       </div>
     </div>`;
   }
@@ -1526,12 +1535,11 @@ function diaDispatch(cardId, type, client, lang, origin, hora){
   if(!drv){ alert('⚠️ Seleciona um motorista primeiro!'); sel&&sel.focus(); return; }
   const drvObj = DRIVERS.find(d=>d.name===drv);
   if(!drvObj?.phone){ alert('⚠️ ' + drv + ' não tem número na HUB Central.'); return; }
-  const fn = TEMPLATES[type]?.[lang]
-          || TEMPLATES[type]?.EN
-          || TEMPLATES[type]?.PT;
+  const resolvedLang = resolveLanguage(lang);
+  const horaClean = cleanHora(hora);
+  const fn = TEMPLATES[type]?.[resolvedLang] || TEMPLATES[type]?.EN || TEMPLATES[type]?.PT;
   if(!fn){ alert('Template não encontrado para tipo: ' + type); return; }
-  // Passa todos os parâmetros — CHEGADA usa (motorista,cliente), RECOLHA/TOUR usa (motorista,cliente,origem,hora)
-  const txt = fn(drv, client, origin, hora);
+  const txt = fn(drv, client, origin, horaClean);
   window.open(`https://wa.me/${drvObj.phone.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`, '_blank');
 }
 
@@ -1541,12 +1549,68 @@ function diaClientMsg(cardId, type, client, lang, origin, hora, clientPhone){
   const sel = document.getElementById('dcdrv-'+cardId);
   const drv = (sel ? sel.value : '') || _diaDriverMap[cardId] || '';
   if(!drv){ alert('⚠️ Seleciona um motorista primeiro para enviar a mensagem ao cliente.'); sel&&sel.focus(); return; }
-  const fn = TEMPLATES[type]?.[lang]
-          || TEMPLATES[type]?.EN
-          || TEMPLATES[type]?.PT;
+  const resolvedLang = resolveLanguage(lang);
+  const horaClean = cleanHora(hora);
+  const fn = TEMPLATES[type]?.[resolvedLang] || TEMPLATES[type]?.EN || TEMPLATES[type]?.PT;
   if(!fn){ alert('Template não encontrado para tipo: ' + type); return; }
-  const txt = fn(drv, client, origin, hora);
+  const txt = fn(drv, client, origin, horaClean);
   window.open(`https://wa.me/${clientPhone}?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+/* ─── HORA LIMPA — Extrai HH:MM de qualquer formato ─── */
+function cleanHora(h){
+  if(!h) return '—:—';
+  const s = String(h);
+  /* Tentar extrair HH:MM de qualquer formato (Date obj, string, etc) */
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if(m) return m[1].padStart(2,'0') + ':' + m[2];
+  /* Se veio como Date object stringified, tentar parsear */
+  try{
+    const d = new Date(s);
+    if(!isNaN(d.getTime())){
+      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    }
+  }catch(e){}
+  return s.slice(0,5) || '—:—';
+}
+
+/* ─── DETECÇÃO DE IDIOMA RIGOROSA — baseada no DDI do telefone ─── */
+const DDI_LANG = {
+  '351':'PT','55':'PT',  /* Portugal, Brasil */
+  '34':'ES','54':'ES','56':'ES','57':'ES','58':'ES','51':'ES','52':'ES','53':'ES','591':'ES','593':'ES','595':'ES','598':'ES','502':'ES','503':'ES','504':'ES','505':'ES','506':'ES','507':'ES','809':'ES',
+  '33':'FR','32':'FR','41':'FR','352':'FR','221':'FR','212':'FR','213':'FR','216':'FR','225':'FR','237':'FR','228':'FR','229':'FR','223':'FR','224':'FR','227':'FR','235':'FR','242':'FR','243':'FR','245':'FR','261':'FR','269':'FR',
+  '39':'IT','378':'IT','379':'IT',
+  '49':'DE','43':'DE','41':'DE',
+  '31':'NL','32':'NL',
+  '44':'EN','1':'EN','61':'EN','64':'EN','27':'EN','353':'EN','356':'EN','350':'EN','233':'EN','234':'EN','254':'EN','256':'EN','255':'EN','260':'EN','263':'EN','265':'EN',
+  '7':'RU','380':'RU',
+  '81':'JA','86':'ZH','82':'KO',
+  '90':'TR','966':'AR','971':'AR','974':'AR','973':'AR','968':'AR','965':'AR','962':'AR','961':'AR','972':'HE',
+  '91':'HI','92':'UR','94':'SI','977':'NE',
+  '66':'TH','84':'VI','63':'TL','60':'MS','65':'EN','62':'ID',
+  '351':'PT','244':'PT','258':'PT','245':'PT','238':'PT','239':'PT',
+};
+function detectLangFromPhone(phone){
+  if(!phone) return null;
+  const p = String(phone).replace(/\D/g,'');
+  /* Tentar 3 dígitos, depois 2, depois 1 */
+  if(DDI_LANG[p.slice(0,3)]) return DDI_LANG[p.slice(0,3)];
+  if(DDI_LANG[p.slice(0,2)]) return DDI_LANG[p.slice(0,2)];
+  if(DDI_LANG[p.slice(0,1)]) return DDI_LANG[p.slice(0,1)];
+  return null;
+}
+function resolveLanguage(lang, phone){
+  /* 1. Se o GAS enviou idioma válido (PT, EN, FR, ES, IT, DE), usar */
+  const valid = ['PT','EN','ES','FR','IT','DE'];
+  const upper = String(lang||'').toUpperCase().trim();
+  if(upper && valid.includes(upper)) return upper;
+  /* 2. Se só veio as 2 primeiras letras de algo mais longo, normalizar */
+  if(upper.length >= 2 && valid.includes(upper.slice(0,2))) return upper.slice(0,2);
+  /* 3. Tentar detectar pelo DDI do telefone */
+  const fromPhone = detectLangFromPhone(phone);
+  if(fromPhone && valid.includes(fromPhone)) return fromPhone;
+  /* 4. Fallback EN */
+  return 'EN';
 }
 
   /* ─── SYNC VIAGENS — HUB CENTRAL ─── */
