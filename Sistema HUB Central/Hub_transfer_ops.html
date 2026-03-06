@@ -508,23 +508,123 @@ function detectTipo(origin,flight){
 }
 
 /* ═══ IATA: região, país, e hub por prefixo da companhia ═══ */
+/* ═══ BASE DE AEROPORTOS MUNDIAL — classificação operacional para tempo de saída em LIS ═══
+ * sch     = Schengen (sem passaporte) → ~15-25min
+ * uk      = Reino Unido (Brexit, controlo passaportes) → ~40-60min
+ * eur     = Europa não-Schengen (Roménia, Bulgária, Turquia, Irlanda, Balcãs) → ~30-45min
+ * na      = América do Norte (EUA, Canadá) → ~45-60min
+ * africa  = África → ~45-60min
+ * mideast = Médio Oriente / Golfo → ~45-60min
+ * latam   = América Latina (exceto Brasil) → ~50-75min
+ * brazil  = Brasil (voo longo + muitos passageiros) → ~60-90min
+ * asia    = Ásia / Oceania → ~60-90min
+ */
 const IATA_DATA={
-FRA:{r:'eu',c:'🇩🇪 Alemanha'},MUC:{r:'eu',c:'🇩🇪 Munique'},CDG:{r:'eu',c:'🇫🇷 Paris'},ORY:{r:'eu',c:'🇫🇷 Paris'},AMS:{r:'eu',c:'🇳🇱 Amesterdão'},BCN:{r:'eu',c:'🇪🇸 Barcelona'},MAD:{r:'eu',c:'🇪🇸 Madrid'},FCO:{r:'eu',c:'🇮🇹 Roma'},MXP:{r:'eu',c:'🇮🇹 Milão'},BER:{r:'eu',c:'🇩🇪 Berlim'},ZRH:{r:'eu',c:'🇨🇭 Zurique'},VIE:{r:'eu',c:'🇦🇹 Viena'},BRU:{r:'eu',c:'🇧🇪 Bruxelas'},CPH:{r:'eu',c:'🇩🇰 Copenhaga'},OSL:{r:'eu',c:'🇳🇴 Oslo'},ARN:{r:'eu',c:'🇸🇪 Estocolmo'},HEL:{r:'eu',c:'🇫🇮 Helsínquia'},WAW:{r:'eu',c:'🇵🇱 Varsóvia'},PRG:{r:'eu',c:'🇨🇿 Praga'},BUD:{r:'eu',c:'🇭🇺 Budapeste'},ATH:{r:'eu',c:'🇬🇷 Atenas'},DUB:{r:'eu',c:'🇮🇪 Dublin'},EDI:{r:'eu',c:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Edimburgo'},MAN:{r:'eu',c:'🇬🇧 Manchester'},GVA:{r:'eu',c:'🇨🇭 Genebra'},NCE:{r:'eu',c:'🇫🇷 Nice'},HAM:{r:'eu',c:'🇩🇪 Hamburgo'},DUS:{r:'eu',c:'🇩🇪 Düsseldorf'},STR:{r:'eu',c:'🇩🇪 Stuttgart'},BGY:{r:'eu',c:'🇮🇹 Bérgamo'},VCE:{r:'eu',c:'🇮🇹 Veneza'},NAP:{r:'eu',c:'🇮🇹 Nápoles'},PMI:{r:'eu',c:'🇪🇸 Palma de Maiorca'},AGP:{r:'eu',c:'🇪🇸 Málaga'},VLC:{r:'eu',c:'🇪🇸 Valência'},SVQ:{r:'eu',c:'🇪🇸 Sevilha'},OPO:{r:'eu',c:'🇵🇹 Porto'},FAO:{r:'eu',c:'🇵🇹 Faro'},FNC:{r:'eu',c:'🇵🇹 Madeira'},PDL:{r:'eu',c:'🇵🇹 Açores'},LUX:{r:'eu',c:'🇱🇺 Luxemburgo'},BOD:{r:'eu',c:'🇫🇷 Bordeaux'},TLS:{r:'eu',c:'🇫🇷 Toulouse'},MRS:{r:'eu',c:'🇫🇷 Marselha'},BLQ:{r:'eu',c:'🇮🇹 Bolonha'},PSA:{r:'eu',c:'🇮🇹 Pisa'},FLR:{r:'eu',c:'🇮🇹 Florença'},CTA:{r:'eu',c:'🇮🇹 Catânia'},PMO:{r:'eu',c:'🇮🇹 Palermo'},GOT:{r:'eu',c:'🇸🇪 Gotemburgo'},KRK:{r:'eu',c:'🇵🇱 Cracóvia'},GDN:{r:'eu',c:'🇵🇱 Gdansk'},RIX:{r:'eu',c:'🇱🇻 Riga'},TLL:{r:'eu',c:'🇪🇪 Tallin'},VNO:{r:'eu',c:'🇱🇹 Vilnius'},SOF:{r:'eu',c:'🇧🇬 Sófia'},OTP:{r:'eu',c:'🇷🇴 Bucareste'},BEG:{r:'eu',c:'🇷🇸 Belgrado'},ZAG:{r:'eu',c:'🇭🇷 Zagreb'},LJU:{r:'eu',c:'🇸🇮 Liubliana'},DBV:{r:'eu',c:'🇭🇷 Dubrovnik'},SPU:{r:'eu',c:'🇭🇷 Split'},LHR:{r:'eu',c:'🇬🇧 Londres'},LGW:{r:'eu',c:'🇬🇧 Londres'},STN:{r:'eu',c:'🇬🇧 Londres'},LTN:{r:'eu',c:'🇬🇧 Londres'},BHX:{r:'eu',c:'🇬🇧 Birmingham'},GLA:{r:'eu',c:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Glasgow'},BFS:{r:'eu',c:'🇬🇧 Belfast'},LPL:{r:'eu',c:'🇬🇧 Liverpool'},BRS:{r:'eu',c:'🇬🇧 Bristol'},IST:{r:'eu',c:'🇹🇷 Istambul'},SAW:{r:'eu',c:'🇹🇷 Istambul'},AYT:{r:'eu',c:'🇹🇷 Antalya'},TFS:{r:'eu',c:'🇪🇸 Tenerife'},LPA:{r:'eu',c:'🇪🇸 Gran Canária'},ACE:{r:'eu',c:'🇪🇸 Lanzarote'},IBZ:{r:'eu',c:'🇪🇸 Ibiza'},NTE:{r:'eu',c:'🇫🇷 Nantes'},LIL:{r:'eu',c:'🇫🇷 Lille'},TLV:{r:'inter',c:'🇮🇱 Israel'},CMN:{r:'inter',c:'🇲🇦 Casablanca'},RAK:{r:'inter',c:'🇲🇦 Marraquexe'},FEZ:{r:'inter',c:'🇲🇦 Fez'},ALG:{r:'inter',c:'🇩🇿 Argel'},TUN:{r:'inter',c:'🇹🇳 Tunis'},CAI:{r:'inter',c:'🇪🇬 Cairo'},JFK:{r:'inter',c:'🇺🇸 Nova Iorque'},EWR:{r:'inter',c:'🇺🇸 Newark'},BOS:{r:'inter',c:'🇺🇸 Boston'},IAD:{r:'inter',c:'🇺🇸 Washington'},MIA:{r:'inter',c:'🇺🇸 Miami'},ORD:{r:'inter',c:'🇺🇸 Chicago'},LAX:{r:'inter',c:'🇺🇸 Los Angeles'},SFO:{r:'inter',c:'🇺🇸 São Francisco'},ATL:{r:'inter',c:'🇺🇸 Atlanta'},DFW:{r:'inter',c:'🇺🇸 Dallas'},YYZ:{r:'inter',c:'🇨🇦 Toronto'},YUL:{r:'inter',c:'🇨🇦 Montreal'},MEX:{r:'inter',c:'🇲🇽 México'},PTY:{r:'inter',c:'🇵🇦 Panamá'},BOG:{r:'inter',c:'🇨🇴 Bogotá'},DXB:{r:'inter',c:'🇦🇪 Dubai'},DOH:{r:'inter',c:'🇶🇦 Doha'},AUH:{r:'inter',c:'🇦🇪 Abu Dhabi'},RUH:{r:'inter',c:'🇸🇦 Riade'},JED:{r:'inter',c:'🇸🇦 Jeddah'},GRU:{r:'long',c:'🇧🇷 São Paulo'},GIG:{r:'long',c:'🇧🇷 Rio de Janeiro'},CNF:{r:'long',c:'🇧🇷 Belo Horizonte'},BSB:{r:'long',c:'🇧🇷 Brasília'},SSA:{r:'long',c:'🇧🇷 Salvador'},REC:{r:'long',c:'🇧🇷 Recife'},FOR:{r:'long',c:'🇧🇷 Fortaleza'},POA:{r:'long',c:'🇧🇷 Porto Alegre'},CWB:{r:'long',c:'🇧🇷 Curitiba'},BEL:{r:'long',c:'🇧🇷 Belém'},MAO:{r:'long',c:'🇧🇷 Manaus'},VCP:{r:'long',c:'🇧🇷 Campinas'},NAT:{r:'long',c:'🇧🇷 Natal'},MCZ:{r:'long',c:'🇧🇷 Maceió'},EZE:{r:'long',c:'🇦🇷 Buenos Aires'},SCL:{r:'long',c:'🇨🇱 Santiago'},LIM:{r:'long',c:'🇵🇪 Lima'},MVD:{r:'long',c:'🇺🇾 Montevidéu'},PEK:{r:'long',c:'🇨🇳 Pequim'},PVG:{r:'long',c:'🇨🇳 Xangai'},HKG:{r:'long',c:'🇭🇰 Hong Kong'},NRT:{r:'long',c:'🇯🇵 Tóquio'},HND:{r:'long',c:'🇯🇵 Tóquio'},ICN:{r:'long',c:'🇰🇷 Seul'},SIN:{r:'long',c:'🇸🇬 Singapura'},KUL:{r:'long',c:'🇲🇾 Kuala Lumpur'},BKK:{r:'long',c:'🇹🇭 Banguecoque'},DEL:{r:'long',c:'🇮🇳 Delhi'},BOM:{r:'long',c:'🇮🇳 Mumbai'},JNB:{r:'long',c:'🇿🇦 Joanesburgo'},CPT:{r:'long',c:'🇿🇦 Cidade do Cabo'},NBO:{r:'long',c:'🇰🇪 Nairobi'},ADD:{r:'long',c:'🇪🇹 Addis Abeba'},LOS:{r:'long',c:'🇳🇬 Lagos'},LAD:{r:'long',c:'🇦🇴 Luanda'},MPM:{r:'long',c:'🇲🇿 Maputo'},SYD:{r:'long',c:'🇦🇺 Sydney'},MEL:{r:'long',c:'🇦🇺 Melbourne'},AKL:{r:'long',c:'🇳🇿 Auckland'}
+/* ── SCHENGEN (sem passaporte em LIS) ── */
+FRA:{r:'sch',c:'🇩🇪 Frankfurt, Alemanha'},MUC:{r:'sch',c:'🇩🇪 Munique, Alemanha'},BER:{r:'sch',c:'🇩🇪 Berlim, Alemanha'},HAM:{r:'sch',c:'🇩🇪 Hamburgo, Alemanha'},DUS:{r:'sch',c:'🇩🇪 Düsseldorf, Alemanha'},STR:{r:'sch',c:'🇩🇪 Stuttgart, Alemanha'},CGN:{r:'sch',c:'🇩🇪 Colónia, Alemanha'},NUE:{r:'sch',c:'🇩🇪 Nuremberga, Alemanha'},LEJ:{r:'sch',c:'🇩🇪 Leipzig, Alemanha'},HAJ:{r:'sch',c:'🇩🇪 Hanôver, Alemanha'},BRE:{r:'sch',c:'🇩🇪 Bremen, Alemanha'},DTM:{r:'sch',c:'🇩🇪 Dortmund, Alemanha'},FKB:{r:'sch',c:'🇩🇪 Karlsruhe, Alemanha'},HHN:{r:'sch',c:'🇩🇪 Hahn, Alemanha'},PAD:{r:'sch',c:'🇩🇪 Paderborn, Alemanha'},
+CDG:{r:'sch',c:'🇫🇷 Paris CDG, França'},ORY:{r:'sch',c:'🇫🇷 Paris Orly, França'},NCE:{r:'sch',c:'🇫🇷 Nice, França'},LYS:{r:'sch',c:'🇫🇷 Lyon, França'},MRS:{r:'sch',c:'🇫🇷 Marselha, França'},TLS:{r:'sch',c:'🇫🇷 Toulouse, França'},BOD:{r:'sch',c:'🇫🇷 Bordeaux, França'},NTE:{r:'sch',c:'🇫🇷 Nantes, França'},LIL:{r:'sch',c:'🇫🇷 Lille, França'},BVA:{r:'sch',c:'🇫🇷 Beauvais, França'},MPL:{r:'sch',c:'🇫🇷 Montpellier, França'},RNS:{r:'sch',c:'🇫🇷 Rennes, França'},ETZ:{r:'sch',c:'🇫🇷 Metz, França'},SXB:{r:'sch',c:'🇫🇷 Estrasburgo, França'},BIQ:{r:'sch',c:'🇫🇷 Biarritz, França'},
+AMS:{r:'sch',c:'🇳🇱 Amesterdão, Holanda'},EIN:{r:'sch',c:'🇳🇱 Eindhoven, Holanda'},RTM:{r:'sch',c:'🇳🇱 Roterdão, Holanda'},MST:{r:'sch',c:'🇳🇱 Maastricht, Holanda'},GRQ:{r:'sch',c:'🇳🇱 Groningen, Holanda'},
+BCN:{r:'sch',c:'🇪🇸 Barcelona, Espanha'},MAD:{r:'sch',c:'🇪🇸 Madrid, Espanha'},AGP:{r:'sch',c:'🇪🇸 Málaga, Espanha'},VLC:{r:'sch',c:'🇪🇸 Valência, Espanha'},SVQ:{r:'sch',c:'🇪🇸 Sevilha, Espanha'},PMI:{r:'sch',c:'🇪🇸 Palma Maiorca, Espanha'},IBZ:{r:'sch',c:'🇪🇸 Ibiza, Espanha'},TFS:{r:'sch',c:'🇪🇸 Tenerife Sul, Espanha'},LPA:{r:'sch',c:'🇪🇸 Gran Canária, Espanha'},ACE:{r:'sch',c:'🇪🇸 Lanzarote, Espanha'},FUE:{r:'sch',c:'🇪🇸 Fuerteventura, Espanha'},ALC:{r:'sch',c:'🇪🇸 Alicante, Espanha'},BIO:{r:'sch',c:'🇪🇸 Bilbau, Espanha'},SCQ:{r:'sch',c:'🇪🇸 Santiago Compostela, Espanha'},VGO:{r:'sch',c:'🇪🇸 Vigo, Espanha'},GRX:{r:'sch',c:'🇪🇸 Granada, Espanha'},REU:{r:'sch',c:'🇪🇸 Reus, Espanha'},GRO:{r:'sch',c:'🇪🇸 Girona, Espanha'},XRY:{r:'sch',c:'🇪🇸 Jerez, Espanha'},OVD:{r:'sch',c:'🇪🇸 Astúrias, Espanha'},SDR:{r:'sch',c:'🇪🇸 Santander, Espanha'},ZAZ:{r:'sch',c:'🇪🇸 Saragoça, Espanha'},
+FCO:{r:'sch',c:'🇮🇹 Roma Fiumicino, Itália'},MXP:{r:'sch',c:'🇮🇹 Milão Malpensa, Itália'},BGY:{r:'sch',c:'🇮🇹 Milão Bérgamo, Itália'},VCE:{r:'sch',c:'🇮🇹 Veneza, Itália'},NAP:{r:'sch',c:'🇮🇹 Nápoles, Itália'},BLQ:{r:'sch',c:'🇮🇹 Bolonha, Itália'},PSA:{r:'sch',c:'🇮🇹 Pisa, Itália'},FLR:{r:'sch',c:'🇮🇹 Florença, Itália'},CTA:{r:'sch',c:'🇮🇹 Catânia, Itália'},PMO:{r:'sch',c:'🇮🇹 Palermo, Itália'},BRI:{r:'sch',c:'🇮🇹 Bari, Itália'},TRN:{r:'sch',c:'🇮🇹 Turim, Itália'},CIA:{r:'sch',c:'🇮🇹 Roma Ciampino, Itália'},GOA:{r:'sch',c:'🇮🇹 Génova, Itália'},TSF:{r:'sch',c:'🇮🇹 Treviso, Itália'},VRN:{r:'sch',c:'🇮🇹 Verona, Itália'},CAG:{r:'sch',c:'🇮🇹 Cagliari, Itália'},OLB:{r:'sch',c:'🇮🇹 Olbia, Itália'},SUF:{r:'sch',c:'🇮🇹 Lamezia, Itália'},
+ZRH:{r:'sch',c:'🇨🇭 Zurique, Suíça'},GVA:{r:'sch',c:'🇨🇭 Genebra, Suíça'},BSL:{r:'sch',c:'🇨🇭 Basileia, Suíça'},
+VIE:{r:'sch',c:'🇦🇹 Viena, Áustria'},SZG:{r:'sch',c:'🇦🇹 Salzburgo, Áustria'},INN:{r:'sch',c:'🇦🇹 Innsbruck, Áustria'},GRZ:{r:'sch',c:'🇦🇹 Graz, Áustria'},
+BRU:{r:'sch',c:'🇧🇪 Bruxelas, Bélgica'},CRL:{r:'sch',c:'🇧🇪 Charleroi, Bélgica'},ANR:{r:'sch',c:'🇧🇪 Antuérpia, Bélgica'},
+LUX:{r:'sch',c:'🇱🇺 Luxemburgo'},
+CPH:{r:'sch',c:'🇩🇰 Copenhaga, Dinamarca'},BLL:{r:'sch',c:'🇩🇰 Billund, Dinamarca'},AAL:{r:'sch',c:'🇩🇰 Aalborg, Dinamarca'},
+OSL:{r:'sch',c:'🇳🇴 Oslo, Noruega'},BGO:{r:'sch',c:'🇳🇴 Bergen, Noruega'},SVG:{r:'sch',c:'🇳🇴 Stavanger, Noruega'},TRD:{r:'sch',c:'🇳🇴 Trondheim, Noruega'},TOS:{r:'sch',c:'🇳🇴 Tromsø, Noruega'},
+ARN:{r:'sch',c:'🇸🇪 Estocolmo, Suécia'},GOT:{r:'sch',c:'🇸🇪 Gotemburgo, Suécia'},MMX:{r:'sch',c:'🇸🇪 Malmö, Suécia'},
+HEL:{r:'sch',c:'🇫🇮 Helsínquia, Finlândia'},TMP:{r:'sch',c:'🇫🇮 Tampere, Finlândia'},TKU:{r:'sch',c:'🇫🇮 Turku, Finlândia'},
+WAW:{r:'sch',c:'🇵🇱 Varsóvia, Polónia'},KRK:{r:'sch',c:'🇵🇱 Cracóvia, Polónia'},GDN:{r:'sch',c:'🇵🇱 Gdansk, Polónia'},WRO:{r:'sch',c:'🇵🇱 Breslávia, Polónia'},POZ:{r:'sch',c:'🇵🇱 Poznan, Polónia'},KTW:{r:'sch',c:'🇵🇱 Katowice, Polónia'},WMI:{r:'sch',c:'🇵🇱 Varsóvia Modlin, Polónia'},RZE:{r:'sch',c:'🇵🇱 Rzeszów, Polónia'},
+PRG:{r:'sch',c:'🇨🇿 Praga, Chéquia'},BRQ:{r:'sch',c:'🇨🇿 Brno, Chéquia'},
+BUD:{r:'sch',c:'🇭🇺 Budapeste, Hungria'},DEB:{r:'sch',c:'🇭🇺 Debrecen, Hungria'},
+ATH:{r:'sch',c:'🇬🇷 Atenas, Grécia'},SKG:{r:'sch',c:'🇬🇷 Tessalónica, Grécia'},HER:{r:'sch',c:'🇬🇷 Heraclião Creta, Grécia'},CHQ:{r:'sch',c:'🇬🇷 Chania Creta, Grécia'},RHO:{r:'sch',c:'🇬🇷 Rodes, Grécia'},CFU:{r:'sch',c:'🇬🇷 Corfu, Grécia'},JMK:{r:'sch',c:'🇬🇷 Mykonos, Grécia'},JTR:{r:'sch',c:'🇬🇷 Santorini, Grécia'},KGS:{r:'sch',c:'🇬🇷 Kos, Grécia'},ZTH:{r:'sch',c:'🇬🇷 Zakynthos, Grécia'},
+RIX:{r:'sch',c:'🇱🇻 Riga, Letónia'},TLL:{r:'sch',c:'🇪🇪 Tallin, Estónia'},VNO:{r:'sch',c:'🇱🇹 Vilnius, Lituânia'},KUN:{r:'sch',c:'🇱🇹 Kaunas, Lituânia'},
+LJU:{r:'sch',c:'🇸🇮 Liubliana, Eslovénia'},BTS:{r:'sch',c:'🇸🇰 Bratislava, Eslováquia'},
+MLT:{r:'sch',c:'🇲🇹 Malta'},MLA:{r:'sch',c:'🇲🇹 Malta'},
+KEF:{r:'sch',c:'🇮🇸 Reiquiavique, Islândia'},
+OPO:{r:'sch',c:'🇵🇹 Porto, Portugal'},FAO:{r:'sch',c:'🇵🇹 Faro, Portugal'},FNC:{r:'sch',c:'🇵🇹 Madeira, Portugal'},PDL:{r:'sch',c:'🇵🇹 Açores, Portugal'},TER:{r:'sch',c:'🇵🇹 Terceira, Portugal'},HOR:{r:'sch',c:'🇵🇹 Horta, Portugal'},
+ZAG:{r:'sch',c:'🇭🇷 Zagreb, Croácia'},DBV:{r:'sch',c:'🇭🇷 Dubrovnik, Croácia'},SPU:{r:'sch',c:'🇭🇷 Split, Croácia'},PUY:{r:'sch',c:'🇭🇷 Pula, Croácia'},ZAD:{r:'sch',c:'🇭🇷 Zadar, Croácia'},
+
+/* ── REINO UNIDO (Brexit — controlo passaportes, fila longa) ── */
+LHR:{r:'uk',c:'🇬🇧 Londres Heathrow, Reino Unido'},LGW:{r:'uk',c:'🇬🇧 Londres Gatwick, Reino Unido'},STN:{r:'uk',c:'🇬🇧 Londres Stansted, Reino Unido'},LTN:{r:'uk',c:'🇬🇧 Londres Luton, Reino Unido'},LCY:{r:'uk',c:'🇬🇧 Londres City, Reino Unido'},SEN:{r:'uk',c:'🇬🇧 Londres Southend, Reino Unido'},
+MAN:{r:'uk',c:'🇬🇧 Manchester, Reino Unido'},BHX:{r:'uk',c:'🇬🇧 Birmingham, Reino Unido'},EDI:{r:'uk',c:'🇬🇧 Edimburgo, Reino Unido'},GLA:{r:'uk',c:'🇬🇧 Glasgow, Reino Unido'},BFS:{r:'uk',c:'🇬🇧 Belfast, Reino Unido'},BRS:{r:'uk',c:'🇬🇧 Bristol, Reino Unido'},LPL:{r:'uk',c:'🇬🇧 Liverpool, Reino Unido'},NCL:{r:'uk',c:'🇬🇧 Newcastle, Reino Unido'},LBA:{r:'uk',c:'🇬🇧 Leeds, Reino Unido'},ABZ:{r:'uk',c:'🇬🇧 Aberdeen, Reino Unido'},EMA:{r:'uk',c:'🇬🇧 East Midlands, Reino Unido'},CWL:{r:'uk',c:'🇬🇧 Cardiff, Reino Unido'},BOH:{r:'uk',c:'🇬🇧 Bournemouth, Reino Unido'},EXT:{r:'uk',c:'🇬🇧 Exeter, Reino Unido'},JER:{r:'uk',c:'🇬🇧 Jersey, Reino Unido'},
+
+/* ── EUROPA NÃO-SCHENGEN (controlo passaportes, mas voo curto) ── */
+DUB:{r:'eur',c:'🇮🇪 Dublin, Irlanda'},SNN:{r:'eur',c:'🇮🇪 Shannon, Irlanda'},ORK:{r:'eur',c:'🇮🇪 Cork, Irlanda'},KNO:{r:'eur',c:'🇮🇪 Knock, Irlanda'},
+IST:{r:'eur',c:'🇹🇷 Istambul, Turquia'},SAW:{r:'eur',c:'🇹🇷 Istambul Sabiha, Turquia'},AYT:{r:'eur',c:'🇹🇷 Antalya, Turquia'},ESB:{r:'eur',c:'🇹🇷 Ancara, Turquia'},ADB:{r:'eur',c:'🇹🇷 Izmir, Turquia'},DLM:{r:'eur',c:'🇹🇷 Dalaman, Turquia'},BJV:{r:'eur',c:'🇹🇷 Bodrum, Turquia'},TZX:{r:'eur',c:'🇹🇷 Trabzon, Turquia'},
+OTP:{r:'eur',c:'🇷🇴 Bucareste, Roménia'},CLJ:{r:'eur',c:'🇷🇴 Cluj, Roménia'},TSR:{r:'eur',c:'🇷🇴 Timisoara, Roménia'},IAS:{r:'eur',c:'🇷🇴 Iasi, Roménia'},SBZ:{r:'eur',c:'🇷🇴 Sibiu, Roménia'},
+SOF:{r:'eur',c:'🇧🇬 Sófia, Bulgária'},VAR:{r:'eur',c:'🇧🇬 Varna, Bulgária'},BOJ:{r:'eur',c:'🇧🇬 Burgas, Bulgária'},
+BEG:{r:'eur',c:'🇷🇸 Belgrado, Sérvia'},INI:{r:'eur',c:'🇷🇸 Nis, Sérvia'},
+SKP:{r:'eur',c:'🇲🇰 Skopje, Macedónia'},TIA:{r:'eur',c:'🇦🇱 Tirana, Albânia'},SJJ:{r:'eur',c:'🇧🇦 Sarajevo, Bósnia'},TGD:{r:'eur',c:'🇲🇪 Podgorica, Montenegro'},TIV:{r:'eur',c:'🇲🇪 Tivat, Montenegro'},PRN:{r:'eur',c:'🇽🇰 Pristina, Kosovo'},
+KIV:{r:'eur',c:'🇲🇩 Chisinau, Moldávia'},LCA:{r:'eur',c:'🇨🇾 Larnaca, Chipre'},PFO:{r:'eur',c:'🇨🇾 Paphos, Chipre'},
+KBP:{r:'eur',c:'🇺🇦 Kiev, Ucrânia'},SVO:{r:'eur',c:'🇷🇺 Moscovo, Rússia'},LED:{r:'eur',c:'🇷🇺 São Petersburgo, Rússia'},
+GEO:{r:'eur',c:'🇬🇪 Tbilisi, Geórgia'},EVN:{r:'eur',c:'🇦🇲 Erevan, Arménia'},
+
+/* ── NORTE DE ÁFRICA ── */
+CMN:{r:'africa',c:'🇲🇦 Casablanca, Marrocos'},RAK:{r:'africa',c:'🇲🇦 Marraquexe, Marrocos'},FEZ:{r:'africa',c:'🇲🇦 Fez, Marrocos'},TNG:{r:'africa',c:'🇲🇦 Tânger, Marrocos'},AGA:{r:'africa',c:'🇲🇦 Agadir, Marrocos'},NDR:{r:'africa',c:'🇲🇦 Nador, Marrocos'},OUD:{r:'africa',c:'🇲🇦 Oujda, Marrocos'},
+ALG:{r:'africa',c:'🇩🇿 Argel, Argélia'},ORN:{r:'africa',c:'🇩🇿 Orão, Argélia'},
+TUN:{r:'africa',c:'🇹🇳 Tunis, Tunísia'},DJE:{r:'africa',c:'🇹🇳 Djerba, Tunísia'},
+CAI:{r:'africa',c:'🇪🇬 Cairo, Egito'},HRG:{r:'africa',c:'🇪🇬 Hurghada, Egito'},SSH:{r:'africa',c:'🇪🇬 Sharm el-Sheikh, Egito'},LXR:{r:'africa',c:'🇪🇬 Luxor, Egito'},
+TIP:{r:'africa',c:'🇱🇾 Trípoli, Líbia'},
+
+/* ── ÁFRICA SUBSAARIANA ── */
+LAD:{r:'africa',c:'🇦🇴 Luanda, Angola'},MPM:{r:'africa',c:'🇲🇿 Maputo, Moçambique'},LOS:{r:'africa',c:'🇳🇬 Lagos, Nigéria'},ABV:{r:'africa',c:'🇳🇬 Abuja, Nigéria'},ACC:{r:'africa',c:'🇬🇭 Acra, Gana'},DKR:{r:'africa',c:'🇸🇳 Dacar, Senegal'},NBO:{r:'africa',c:'🇰🇪 Nairobi, Quénia'},ADD:{r:'africa',c:'🇪🇹 Addis Abeba, Etiópia'},JNB:{r:'africa',c:'🇿🇦 Joanesburgo, África do Sul'},CPT:{r:'africa',c:'🇿🇦 Cidade do Cabo, África do Sul'},DUR:{r:'africa',c:'🇿🇦 Durban, África do Sul'},DSS:{r:'africa',c:'🇸🇳 Dacar Blaise, Senegal'},ABJ:{r:'africa',c:'🇨🇮 Abidjan, Costa do Marfim'},RAI:{r:'africa',c:'🇨🇻 Praia, Cabo Verde'},SID:{r:'africa',c:'🇨🇻 Sal, Cabo Verde'},BVC:{r:'africa',c:'🇨🇻 Boa Vista, Cabo Verde'},LUN:{r:'africa',c:'🇿🇲 Lusaka, Zâmbia'},DAR:{r:'africa',c:'🇹🇿 Dar es Salaam, Tanzânia'},EBB:{r:'africa',c:'🇺🇬 Entebbe, Uganda'},KGL:{r:'africa',c:'🇷🇼 Kigali, Ruanda'},LFW:{r:'africa',c:'🇹🇬 Lomé, Togo'},OXB:{r:'africa',c:'🇬🇼 Bissau, Guiné-Bissau'},SSG:{r:'africa',c:'🇬🇶 Malabo, Guiné Equatorial'},FNA:{r:'africa',c:'🇸🇱 Freetown, Serra Leoa'},BKO:{r:'africa',c:'🇲🇱 Bamako, Mali'},
+
+/* ── MÉDIO ORIENTE / GOLFO ── */
+TLV:{r:'mideast',c:'🇮🇱 Tel Aviv, Israel'},DXB:{r:'mideast',c:'🇦🇪 Dubai, Emirados'},AUH:{r:'mideast',c:'🇦🇪 Abu Dhabi, Emirados'},DOH:{r:'mideast',c:'🇶🇦 Doha, Qatar'},RUH:{r:'mideast',c:'🇸🇦 Riade, Arábia Saudita'},JED:{r:'mideast',c:'🇸🇦 Jeddah, Arábia Saudita'},BAH:{r:'mideast',c:'🇧🇭 Bahrein'},MCT:{r:'mideast',c:'🇴🇲 Mascate, Omã'},KWI:{r:'mideast',c:'🇰🇼 Kuwait'},AMM:{r:'mideast',c:'🇯🇴 Amã, Jordânia'},BEY:{r:'mideast',c:'🇱🇧 Beirute, Líbano'},IKA:{r:'mideast',c:'🇮🇷 Teerão, Irão'},BGW:{r:'mideast',c:'🇮🇶 Bagdade, Iraque'},
+
+/* ── AMÉRICA DO NORTE (EUA + Canadá) ── */
+JFK:{r:'na',c:'🇺🇸 Nova Iorque JFK, EUA'},EWR:{r:'na',c:'🇺🇸 Newark, EUA'},LGA:{r:'na',c:'🇺🇸 Nova Iorque LaGuardia, EUA'},BOS:{r:'na',c:'🇺🇸 Boston, EUA'},IAD:{r:'na',c:'🇺🇸 Washington Dulles, EUA'},DCA:{r:'na',c:'🇺🇸 Washington Reagan, EUA'},MIA:{r:'na',c:'🇺🇸 Miami, EUA'},FLL:{r:'na',c:'🇺🇸 Fort Lauderdale, EUA'},ORD:{r:'na',c:'🇺🇸 Chicago, EUA'},LAX:{r:'na',c:'🇺🇸 Los Angeles, EUA'},SFO:{r:'na',c:'🇺🇸 São Francisco, EUA'},ATL:{r:'na',c:'🇺🇸 Atlanta, EUA'},DFW:{r:'na',c:'🇺🇸 Dallas, EUA'},DEN:{r:'na',c:'🇺🇸 Denver, EUA'},SEA:{r:'na',c:'🇺🇸 Seattle, EUA'},PHL:{r:'na',c:'🇺🇸 Filadélfia, EUA'},CLT:{r:'na',c:'🇺🇸 Charlotte, EUA'},PHX:{r:'na',c:'🇺🇸 Phoenix, EUA'},IAH:{r:'na',c:'🇺🇸 Houston, EUA'},MSP:{r:'na',c:'🇺🇸 Minneapolis, EUA'},DTW:{r:'na',c:'🇺🇸 Detroit, EUA'},MCO:{r:'na',c:'🇺🇸 Orlando, EUA'},TPA:{r:'na',c:'🇺🇸 Tampa, EUA'},SAN:{r:'na',c:'🇺🇸 San Diego, EUA'},LAS:{r:'na',c:'🇺🇸 Las Vegas, EUA'},HNL:{r:'na',c:'🇺🇸 Honolulu, EUA'},
+YYZ:{r:'na',c:'🇨🇦 Toronto, Canadá'},YUL:{r:'na',c:'🇨🇦 Montreal, Canadá'},YVR:{r:'na',c:'🇨🇦 Vancouver, Canadá'},YOW:{r:'na',c:'🇨🇦 Ottawa, Canadá'},YHZ:{r:'na',c:'🇨🇦 Halifax, Canadá'},YEG:{r:'na',c:'🇨🇦 Edmonton, Canadá'},YYC:{r:'na',c:'🇨🇦 Calgary, Canadá'},
+
+/* ── BRASIL (voo longo + muitos passageiros + fila enorme) ── */
+GRU:{r:'brazil',c:'🇧🇷 São Paulo Guarulhos'},VCP:{r:'brazil',c:'🇧🇷 Campinas Viracopos'},CGH:{r:'brazil',c:'🇧🇷 São Paulo Congonhas'},GIG:{r:'brazil',c:'🇧🇷 Rio de Janeiro Galeão'},SDU:{r:'brazil',c:'🇧🇷 Rio Santos Dumont'},CNF:{r:'brazil',c:'🇧🇷 Belo Horizonte Confins'},PLU:{r:'brazil',c:'🇧🇷 BH Pampulha'},BSB:{r:'brazil',c:'🇧🇷 Brasília'},SSA:{r:'brazil',c:'🇧🇷 Salvador'},REC:{r:'brazil',c:'🇧🇷 Recife'},FOR:{r:'brazil',c:'🇧🇷 Fortaleza'},POA:{r:'brazil',c:'🇧🇷 Porto Alegre'},CWB:{r:'brazil',c:'🇧🇷 Curitiba'},BEL:{r:'brazil',c:'🇧🇷 Belém'},MAO:{r:'brazil',c:'🇧🇷 Manaus'},NAT:{r:'brazil',c:'🇧🇷 Natal'},MCZ:{r:'brazil',c:'🇧🇷 Maceió'},AJU:{r:'brazil',c:'🇧🇷 Aracaju'},SLZ:{r:'brazil',c:'🇧🇷 São Luís'},THE:{r:'brazil',c:'🇧🇷 Teresina'},CGB:{r:'brazil',c:'🇧🇷 Cuiabá'},CGR:{r:'brazil',c:'🇧🇷 Campo Grande'},GYN:{r:'brazil',c:'🇧🇷 Goiânia'},VIX:{r:'brazil',c:'🇧🇷 Vitória'},FLN:{r:'brazil',c:'🇧🇷 Florianópolis'},JPA:{r:'brazil',c:'🇧🇷 João Pessoa'},IGU:{r:'brazil',c:'🇧🇷 Foz do Iguaçu'},
+
+/* ── AMÉRICA LATINA (exceto Brasil) ── */
+EZE:{r:'latam',c:'🇦🇷 Buenos Aires, Argentina'},AEP:{r:'latam',c:'🇦🇷 Buenos Aires Aeroparque'},COR:{r:'latam',c:'🇦🇷 Córdoba, Argentina'},MDZ:{r:'latam',c:'🇦🇷 Mendoza, Argentina'},
+SCL:{r:'latam',c:'🇨🇱 Santiago, Chile'},LIM:{r:'latam',c:'🇵🇪 Lima, Peru'},MVD:{r:'latam',c:'🇺🇾 Montevidéu, Uruguai'},ASU:{r:'latam',c:'🇵🇾 Assunção, Paraguai'},
+BOG:{r:'latam',c:'🇨🇴 Bogotá, Colômbia'},MDE:{r:'latam',c:'🇨🇴 Medellín, Colômbia'},CTG:{r:'latam',c:'🇨🇴 Cartagena, Colômbia'},
+MEX:{r:'latam',c:'🇲🇽 Cidade do México'},CUN:{r:'latam',c:'🇲🇽 Cancún, México'},GDL:{r:'latam',c:'🇲🇽 Guadalajara, México'},
+PTY:{r:'latam',c:'🇵🇦 Cidade do Panamá'},SJO:{r:'latam',c:'🇨🇷 San José, Costa Rica'},HAV:{r:'latam',c:'🇨🇺 Havana, Cuba'},SDQ:{r:'latam',c:'🇩🇴 Santo Domingo, Rep. Dominicana'},PUJ:{r:'latam',c:'🇩🇴 Punta Cana, Rep. Dominicana'},GUA:{r:'latam',c:'🇬🇹 Guatemala'},SAL:{r:'latam',c:'🇸🇻 San Salvador'},UIO:{r:'latam',c:'🇪🇨 Quito, Equador'},GYE:{r:'latam',c:'🇪🇨 Guayaquil, Equador'},CCS:{r:'latam',c:'🇻🇪 Caracas, Venezuela'},LPB:{r:'latam',c:'🇧🇴 La Paz, Bolívia'},
+
+/* ── ÁSIA / OCEANIA ── */
+PEK:{r:'asia',c:'🇨🇳 Pequim, China'},PVG:{r:'asia',c:'🇨🇳 Xangai, China'},CAN:{r:'asia',c:'🇨🇳 Guangzhou, China'},CTU:{r:'asia',c:'🇨🇳 Chengdu, China'},SZX:{r:'asia',c:'🇨🇳 Shenzhen, China'},
+HKG:{r:'asia',c:'🇭🇰 Hong Kong'},TPE:{r:'asia',c:'🇹🇼 Taipei, Taiwan'},
+NRT:{r:'asia',c:'🇯🇵 Tóquio Narita, Japão'},HND:{r:'asia',c:'🇯🇵 Tóquio Haneda, Japão'},KIX:{r:'asia',c:'🇯🇵 Osaka, Japão'},
+ICN:{r:'asia',c:'🇰🇷 Seul Incheon, Coreia do Sul'},
+SIN:{r:'asia',c:'🇸🇬 Singapura'},KUL:{r:'asia',c:'🇲🇾 Kuala Lumpur, Malásia'},BKK:{r:'asia',c:'🇹🇭 Banguecoque, Tailândia'},HKT:{r:'asia',c:'🇹🇭 Phuket, Tailândia'},
+DEL:{r:'asia',c:'🇮🇳 Nova Delhi, Índia'},BOM:{r:'asia',c:'🇮🇳 Mumbai, Índia'},BLR:{r:'asia',c:'🇮🇳 Bangalore, Índia'},MAA:{r:'asia',c:'🇮🇳 Chennai, Índia'},CCU:{r:'asia',c:'🇮🇳 Calcutá, Índia'},HYD:{r:'asia',c:'🇮🇳 Hyderabad, Índia'},
+CMB:{r:'asia',c:'🇱🇰 Colombo, Sri Lanka'},DAC:{r:'asia',c:'🇧🇩 Daca, Bangladesh'},KTM:{r:'asia',c:'🇳🇵 Katmandu, Nepal'},
+SGN:{r:'asia',c:'🇻🇳 Ho Chi Minh, Vietname'},HAN:{r:'asia',c:'🇻🇳 Hanói, Vietname'},MNL:{r:'asia',c:'🇵🇭 Manila, Filipinas'},CGK:{r:'asia',c:'🇮🇩 Jacarta, Indonésia'},DPS:{r:'asia',c:'🇮🇩 Bali, Indonésia'},RGN:{r:'asia',c:'🇲🇲 Yangon, Myanmar'},PNH:{r:'asia',c:'🇰🇭 Phnom Penh, Camboja'},
+TAS:{r:'asia',c:'🇺🇿 Tashkent, Uzbequistão'},ALA:{r:'asia',c:'🇰🇿 Almaty, Cazaquistão'},
+SYD:{r:'asia',c:'🇦🇺 Sydney, Austrália'},MEL:{r:'asia',c:'🇦🇺 Melbourne, Austrália'},BNE:{r:'asia',c:'🇦🇺 Brisbane, Austrália'},PER:{r:'asia',c:'🇦🇺 Perth, Austrália'},
+AKL:{r:'asia',c:'🇳🇿 Auckland, Nova Zelândia'},WLG:{r:'asia',c:'🇳🇿 Wellington, Nova Zelândia'},CHC:{r:'asia',c:'🇳🇿 Christchurch, Nova Zelândia'}
 };
+
 /* Prefixos de companhia → hub principal (para resolver o "???") */
-const AIRLINE_HUB={TP:'LIS',FR:'DUB',U2:'LGW',W6:'BUD',LH:'FRA',LX:'ZRH',OS:'VIE',SN:'BRU',AF:'CDG',KL:'AMS',BA:'LHR',IB:'MAD',VY:'BCN',AZ:'FCO',EW:'CGN',DE:'FRA',TK:'IST',EK:'DXB',QR:'DOH',EY:'AUH',LA:'SCL',G3:'GRU',AD:'GRU',JJ:'GRU',AA:'DFW',DL:'ATL',UA:'EWR',AC:'YYZ',SU:'SVO',SK:'CPH',AY:'HEL',DY:'OSL',LO:'WAW',OK:'PRG',RO:'OTP',BT:'RIX'};
+const AIRLINE_HUB={TP:'LIS',NI:'LIS',FR:'DUB',U2:'LGW',W6:'BUD',W4:'BUD',LH:'FRA',LX:'ZRH',OS:'VIE',SN:'BRU',AF:'CDG',KL:'AMS',BA:'LHR',IB:'MAD',VY:'BCN',AZ:'FCO',EW:'CGN',DE:'FRA',TK:'IST',PC:'SAW',EK:'DXB',QR:'DOH',EY:'AUH',SV:'RUH',LA:'SCL',JJ:'GRU',G3:'GRU',AD:'GRU',AA:'DFW',DL:'ATL',UA:'EWR',AC:'YYZ',WS:'YYC',SU:'SVO',SK:'CPH',AY:'HEL',DY:'OSL',LO:'WAW',OK:'PRG',RO:'OTP',BT:'RIX',TO:'ORY',DT:'LAD',S4:'RAI',AT:'CMN',TU:'TUN',MS:'CAI',ET:'ADD',SA:'JNB',KQ:'NBO',TM:'MPM',QF:'SYD',NZ:'AKL',SQ:'SIN',TG:'BKK',MH:'KUL',CX:'HKG',NH:'NRT',JL:'NRT',KE:'ICN',OZ:'ICN',AI:'DEL',CA:'PEK',MU:'PVG',CZ:'CAN',EI:'DUB',AV:'BOG',AM:'MEX',CM:'PTY',AR:'EZE',UX:'MAD',QS:'PRG',LS:'MAN',BY:'MAN',TOM:'MAN',MT:'LGW',ZB:'LTN'};
+
 function getIataInfo(iata){if(!iata)return null;return IATA_DATA[iata.toUpperCase()]||null;}
 function guessDepAirport(flight){
   if(!flight)return null;
-  const code=String(flight).replace(/\s/g,'').match(/^([A-Z]{2})\d/);
-  if(!code)return null;
-  const hub=AIRLINE_HUB[code[1]];
-  return hub||null;
+  const code=String(flight).replace(/\s/g,'');
+  /* Tentar 2 letras primeiro, depois 3 (Ryanair FR, TAP TP, TUI BY, etc) */
+  const m2=code.match(/^([A-Z]{2})\d/);
+  if(m2 && AIRLINE_HUB[m2[1]]) return AIRLINE_HUB[m2[1]];
+  const m3=code.match(/^([A-Z]{3})\d/);
+  if(m3 && AIRLINE_HUB[m3[1]]) return AIRLINE_HUB[m3[1]];
+  return null;
 }
 function regionLabel(r){
-  if(r==='eu')return{text:'Europa · Saída rápida ~20min',cls:'eu'};
-  if(r==='inter')return{text:'Intercontinental · ~45-60min',cls:'inter'};
-  if(r==='long')return{text:'Longa distância · +60min',cls:'long'};
+  if(r==='sch')     return{text:'Schengen · Sem passaporte · ~15-25min',cls:'eu'};
+  if(r==='uk')      return{text:'Reino Unido · Controlo passaportes · ~40-60min',cls:'inter'};
+  if(r==='eur')     return{text:'Europa não-Schengen · Controlo passaportes · ~30-45min',cls:'inter'};
+  if(r==='na')      return{text:'América do Norte · Controlo + voo longo · ~45-60min',cls:'inter'};
+  if(r==='africa')  return{text:'África · ~45-60min',cls:'inter'};
+  if(r==='mideast') return{text:'Médio Oriente · ~45-60min',cls:'inter'};
+  if(r==='latam')   return{text:'América Latina · ~50-75min',cls:'long'};
+  if(r==='brazil')  return{text:'Brasil · Voo longo + muitos passageiros · ~60-90min',cls:'long'};
+  if(r==='asia')    return{text:'Ásia / Oceania · Voo muito longo · ~60-90min',cls:'long'};
   return null;
 }
 function calcFlightProgress(depTime, arrTime){
@@ -1382,7 +1482,7 @@ function buildDiaCard(v){
       ${middleHtml}
       <div class="dc-bottom">
         <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')"><option value="">— Atribuir motorista —</option>${drvOpts}</select>
-        <a class="dc-act wpp-c${wppCCls}" href="${wppCUrl}" target="_blank">${WPP_ICO} Cliente</a>
+        <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
         <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}')">⚡ Motorista</button>
       </div>
     </div>`;
@@ -1425,6 +1525,21 @@ function diaDispatch(cardId, type, client, lang, origin, hora){
   const txt = fn(drv, client, origin, hora);
   window.open(`https://wa.me/${drvObj.phone.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`, '_blank');
 }
+
+/* ─── CLIENTE MSG — Envia template ao CLIENTE com nome do motorista seleccionado ─── */
+function diaClientMsg(cardId, type, client, lang, origin, hora, clientPhone){
+  if(!clientPhone){ alert('⚠️ Este cliente não tem número de telefone.'); return; }
+  const sel = document.getElementById('dcdrv-'+cardId);
+  const drv = (sel ? sel.value : '') || _diaDriverMap[cardId] || '';
+  if(!drv){ alert('⚠️ Seleciona um motorista primeiro para enviar a mensagem ao cliente.'); sel&&sel.focus(); return; }
+  const fn = TEMPLATES[type]?.[lang]
+          || TEMPLATES[type]?.EN
+          || TEMPLATES[type]?.PT;
+  if(!fn){ alert('Template não encontrado para tipo: ' + type); return; }
+  const txt = fn(drv, client, origin, hora);
+  window.open(`https://wa.me/${clientPhone}?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
   /* ─── SYNC VIAGENS — HUB CENTRAL ─── */
 function toggleViagensCfg(){
   const cfg = document.getElementById('sbViagensCfg');
