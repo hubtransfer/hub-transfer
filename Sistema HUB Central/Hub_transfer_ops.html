@@ -95,7 +95,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dia-stat-n{font-family:var(--mono);font-size:1.4rem;font-weight:700;line-height:1}
 .dia-stat-l{font-family:var(--mono);font-size:.46rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
 .dia-stat.s-c .dia-stat-n{color:var(--chegada)}
-.dia-stat.s-r .dia-stat-n{color:var(--recolha)}
+.dia-stat.s-tour .dia-stat-n{color:#a855f7}
 .dia-stat.s-t .dia-stat-n{color:var(--accent)}
 .dia-sync-bar{display:flex;align-items:center;gap:.45rem;padding:.5rem .75rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;flex-shrink:0}
 .dia-sync-info{flex:1;font-family:var(--mono);font-size:.53rem;color:var(--text-dim);line-height:1.7}
@@ -291,7 +291,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dia-stat-n{font-family:var(--mono);font-size:1.4rem;font-weight:700;line-height:1}
 .dia-stat-l{font-family:var(--mono);font-size:.46rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
 .dia-stat.s-c .dia-stat-n{color:var(--chegada)}
-.dia-stat.s-r .dia-stat-n{color:var(--recolha)}
+.dia-stat.s-tour .dia-stat-n{color:#a855f7}
 .dia-stat.s-t .dia-stat-n{color:var(--accent)}
 .dia-sync-bar{display:flex;align-items:center;gap:.45rem;padding:.5rem .75rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px}
 .dia-sync-info{flex:1;font-family:var(--mono);font-size:.53rem;color:var(--text-dim);line-height:1.7}
@@ -1153,8 +1153,9 @@ function renderDia(){
 
   const today = new Date().toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'/');
   const list  = HUB_VIAGENS;
-  const nc    = list.filter(v=>v.type==='CHEGADA').length;
-  const nr    = list.filter(v=>v.type==='RECOLHA').length;
+  const nc    = list.filter(v=>detectTipo(v.origin,v.flight)==='CHEGADA').length;
+  const nt    = list.filter(v=>detectTipo(v.origin,v.flight)==='TOUR').length;
+  const nr    = list.filter(v=>detectTipo(v.origin,v.flight)==='RECOLHA').length;
   const semMotorista = list.filter(v=>!v.driver).length;
 
   // Status bar de sync
@@ -1163,11 +1164,11 @@ function renderDia(){
 
   let html = `<div class="dia-wrap">`;
 
-  // Stats
   html += `<div class="dia-stats">
     <div class="dia-stat s-t"><div class="dia-stat-n">${list.length}</div><div class="dia-stat-l">Total</div></div>
     <div class="dia-stat s-c"><div class="dia-stat-n">${nc}</div><div class="dia-stat-l">Chegadas</div></div>
     <div class="dia-stat s-r"><div class="dia-stat-n">${nr}</div><div class="dia-stat-l">Recolhas</div></div>
+    ${nt>0?`<div class="dia-stat s-tour"><div class="dia-stat-n">${nt}</div><div class="dia-stat-l">Tours</div></div>`:''}
   </div>`;
 
   // Sync bar
@@ -1189,12 +1190,13 @@ function renderDia(){
   }
 
   // Chegadas
-  const chegadas = list.filter(v=>v.type==='CHEGADA');
-  const recolhas = list.filter(v=>v.type==='RECOLHA');
+  const chegadas = list.filter(v=>detectTipo(v.origin,v.flight)==='CHEGADA');
+  const tours    = list.filter(v=>detectTipo(v.origin,v.flight)==='TOUR');
+  const recolhas = list.filter(v=>detectTipo(v.origin,v.flight)==='RECOLHA');
 
 function buildDiaCard(v){
     // Detecta tipo real baseado na origem e voo (igual ao GAS)
-    const tipo = v.type || detectTipo(v.origin, v.flight);
+    const tipo = detectTipo(v.origin, v.flight) || v.type || 'RECOLHA';
     const isC  = tipo === 'CHEGADA';
     const isT  = tipo === 'TOUR';
     const tc   = isC ? 'dc-chegada' : isT ? 'dc-tour' : 'dc-recolha';
@@ -1329,6 +1331,10 @@ function buildDiaCard(v){
   if(chegadas.length){
     html += `<div class="dia-section-lbl">▼ Chegadas (${chegadas.length})</div>`;
     html += `<div class="dia-timeline">${chegadas.map(buildDiaCard).join('')}</div>`;
+  }
+  if(tours.length){
+    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:#a855f7">◆ Tours (${tours.length})</div>`;
+    html += `<div class="dia-timeline">${tours.map(buildDiaCard).join('')}</div>`;
   }
   if(recolhas.length){
     html += `<div class="dia-section-lbl" style="margin-top:.5rem">▲ Recolhas (${recolhas.length})</div>`;
