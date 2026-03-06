@@ -316,7 +316,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);white-space:nowrap}
 .dc-drv-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--recolha-dim);border:1px solid var(--recolha-glow);color:var(--recolha);white-space:nowrap}
 .dc-nodrv-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;white-space:nowrap}
-.dc-flight-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap}
+.dc-flight-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap;text-decoration:none;cursor:pointer;transition:opacity .15s}
+.dc-flight-tag:hover{opacity:.75;border-color:rgba(59,130,246,.6)}
 .dc-navbtns{display:flex;flex-direction:column;gap:.22rem;padding:.5rem .55rem;justify-content:center;border-left:1px solid var(--border);flex-shrink:0}
 .dc-flight{padding:.45rem .75rem;border-bottom:1px solid var(--border);background:rgba(245,158,11,.04)}
 .dc-frow{display:flex;align-items:center;gap:.4rem}
@@ -1190,7 +1191,7 @@ function buildDiaCard(v){
     // Tags
     const paxTag  = v.pax  ? `<span class="dc-tag">👤 ${v.pax}</span>`  : '';
     const bagsTag = v.bags ? `<span class="dc-tag">🧳 ${v.bags}</span>` : '';
-    const fltTag  = v.flight ? `<span class="dc-flight-tag">✈ ${v.flight}</span>` : '';
+    const fltTag  = v.flight ? `<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank" title="Ver voo em tempo real">✈ ${v.flight} ↗</a>` : '';
     const drvTag  = v.driver
       ? `<span class="dc-drv-tag">🚗 ${v.driver}</span>`
       : `<span class="dc-nodrv-tag">⚠️ Sem motorista</span>`;
