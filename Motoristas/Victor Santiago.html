@@ -227,16 +227,11 @@ function regionHint(iata){
 let viagens = [];
 
 function sanitizeViagens(rawList){
-  /* Filtra SÓ as viagens deste motorista — match flexível (ignora case, espaços extra, acentos) */
-  const normalize = (s) => String(s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const myName = normalize(MOTORISTA);
+  /* Filtra SÓ as viagens deste motorista e remove qualquer campo que exponha dados da empresa */
   return rawList
-    .filter(v => {
-      const d = normalize(v.driver);
-      /* Match exacto ou parcial (ex: "Victor" match "Victor Santiago") */
-      return d === myName || d.includes(myName) || myName.includes(d);
-    })
+    .filter(v => (v.driver||'').toLowerCase().trim() === MOTORISTA.toLowerCase().trim())
     .map(v => ({
+      /* Só guardar o que o motorista precisa ver */
       id: v.id,
       client: v.client,
       phone: v.phone,
@@ -253,6 +248,7 @@ function sanitizeViagens(rawList){
       depCity: v.depCity, arrCity: v.arrCity,
       depTime: v.depTime, arrTime: v.arrTime,
       depTerminal: v.depTerminal, arrTerminal: v.arrTerminal,
+      /* Não guardar: driver (redundante, é ele), nem qualquer campo interno */
     }));
 }
 
@@ -260,19 +256,23 @@ async function syncViagens(){
   if(!MOTORISTA||!GAS_URL) return;
   const main = document.getElementById('main');
   try{
-    /* Usar directamente ?action=viagens — o mesmo endpoint do painel principal */
-    const resp = await fetch(GAS_URL + '?action=viagens&t=' + Date.now(), {redirect:'follow'});
+    const resp = await fetch(GAS_URL + '?action=motorista&nome=' + encodeURIComponent(MOTORISTA) + '&t=' + Date.now(), {redirect:'follow'});
     if(!resp.ok) throw new Error('HTTP '+resp.status);
-    const text = await resp.text();
-    let data;
-    try{ data = JSON.parse(text); }catch(e){ throw new Error('Resposta não é JSON'); }
+    const data = await resp.json();
     const raw = Array.isArray(data) ? data : (data.viagens || []);
     viagens = sanitizeViagens(raw);
-    console.log('[HUB] Sync OK:', raw.length, 'total,', viagens.length, 'para', MOTORISTA);
     render();
   } catch(err){
-    console.warn('[HUB] Sync falhou:', err.message);
-    main.innerHTML = `<div class="error-msg">⚠️ Erro ao sincronizar: ${err.message}<br><br>Verifica se o URL do GAS está correcto.</div>`;
+    try {
+      const resp2 = await fetch(GAS_URL + '?action=viagens&t=' + Date.now(), {redirect:'follow'});
+      if(!resp2.ok) throw new Error('HTTP '+resp2.status);
+      const data2 = await resp2.json();
+      const raw2 = Array.isArray(data2) ? data2 : (data2.viagens || []);
+      viagens = sanitizeViagens(raw2);
+      render();
+    } catch(err2){
+      main.innerHTML = `<div class="error-msg">⚠️ Erro ao sincronizar: ${err2.message}</div>`;
+    }
   }
 }
 
