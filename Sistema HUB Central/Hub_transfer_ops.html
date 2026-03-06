@@ -327,7 +327,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-flight{padding:.45rem .75rem;border-bottom:1px solid var(--border);background:rgba(245,158,11,.04)}
 .dc-frow{display:flex;align-items:center;gap:.4rem}
 .dc-fapt{text-align:center;flex-shrink:0}
-.dc-fcode{font-family:var(--mono);font-size:.95rem;font-weight:700;letter-spacing:.03em;line-height:1}
+.dc-fcode{font-family:var(--mono);font-size:1.1rem;font-weight:700;letter-spacing:.03em;line-height:1}
 .dc-fcity{font-family:var(--mono);font-size:.44rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
 .dc-fline{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
 .dc-fnum{font-family:var(--mono);font-size:.48rem;color:var(--chegada);letter-spacing:.06em}
@@ -351,35 +351,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-fnum-link{text-decoration:none;color:var(--chegada);transition:opacity .15s}
 .dc-fnum-link:hover{opacity:.7}
 
-/* ── Indicador região do voo ── */
-.dc-origin-hint{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .5rem;border-radius:4px;font-family:var(--mono);font-size:.5rem;letter-spacing:.04em;margin-top:.2rem}
+/* ── Indicador origem/país do voo ── */
+.dc-origin-hint{display:flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:4px;font-family:var(--mono);font-size:.52rem;letter-spacing:.04em;margin-top:.25rem;width:fit-content;margin-left:auto;margin-right:auto}
 .dc-origin-hint.eu{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa}
 .dc-origin-hint.inter{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--chegada)}
 .dc-origin-hint.long{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171}
 
 /* ── Bloco visual RECOLHA: rota A→B ── */
-.dc-route-block{padding:.55rem .85rem;border-bottom:1px solid var(--border);background:rgba(16,185,129,.04)}
-.dc-route-visual{display:flex;align-items:stretch;gap:.6rem}
-.dc-route-dots{display:flex;flex-direction:column;align-items:center;gap:0;padding:.2rem 0;flex-shrink:0;width:18px}
+.dc-route-block{padding:.6rem .85rem;border-bottom:1px solid var(--border);background:rgba(16,185,129,.04)}
+.dc-route-visual{display:flex;align-items:stretch;gap:.65rem}
+.dc-route-dots{display:flex;flex-direction:column;align-items:center;gap:0;padding:.15rem 0;flex-shrink:0;width:16px}
 .dc-route-dot-a{width:10px;height:10px;border-radius:50%;background:var(--recolha);flex-shrink:0}
-.dc-route-line{flex:1;width:2px;background:linear-gradient(180deg,var(--recolha),var(--recolha-glow));margin:2px auto}
+.dc-route-line{flex:1;width:2px;background:linear-gradient(180deg,var(--recolha),var(--recolha-glow));margin:3px auto}
 .dc-route-dot-b{width:10px;height:10px;border-radius:3px;background:var(--accent);flex-shrink:0}
-.dc-route-addrs{flex:1;display:flex;flex-direction:column;gap:.35rem}
-.dc-route-addr{display:flex;flex-direction:column;gap:1px}
-.dc-route-lbl{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
-.dc-route-val{font-family:var(--mono);font-size:.6rem;color:var(--text);line-height:1.3}
+.dc-route-addrs{flex:1;display:flex;flex-direction:column;gap:.4rem}
+.dc-route-addr{display:flex;flex-direction:column;gap:2px}
+.dc-route-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
+.dc-route-val{font-family:var(--mono);font-size:.62rem;color:var(--text);line-height:1.3}
 .dc-route-btns{display:flex;gap:.25rem;margin-top:.15rem}
-.dc-route-btn{font-family:var(--mono);font-size:.52rem;padding:.15rem .4rem;border-radius:3px;text-decoration:none;transition:all .15s;white-space:nowrap}
+.dc-route-btn{font-family:var(--mono);font-size:.52rem;padding:.15rem .42rem;border-radius:3px;text-decoration:none;transition:all .15s;white-space:nowrap}
 .dc-route-btn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);color:#4285f4}
 .dc-route-btn.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.25);color:#35c5f0}
 
 /* ── Bloco visual TOUR ── */
-.dc-tour-block{padding:.55rem .85rem;border-bottom:1px solid var(--border);background:rgba(168,85,247,.04)}
-.dc-tour-visual{display:flex;align-items:center;gap:.6rem}
-.dc-tour-icon{font-size:1.5rem;flex-shrink:0}
+.dc-tour-block{padding:.6rem .85rem;border-bottom:1px solid var(--border);background:rgba(168,85,247,.04)}
+.dc-tour-visual{display:flex;align-items:center;gap:.65rem}
+.dc-tour-icon{font-size:1.4rem;flex-shrink:0}
 .dc-tour-info{flex:1;display:flex;flex-direction:column;gap:.2rem}
-.dc-tour-lbl{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
-.dc-tour-val{font-family:var(--mono);font-size:.6rem;color:var(--text);line-height:1.3}
+.dc-tour-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
+.dc-tour-val{font-family:var(--mono);font-size:.62rem;color:var(--text);line-height:1.3}
 .dc-bottom{display:flex;align-items:center;gap:.4rem;padding:.4rem .7rem;background:var(--surface2);flex-wrap:wrap}
 .dc-drv-sel{flex:1;min-width:120px;padding:.3rem .5rem;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:.58rem;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath stroke='%23566480' stroke-width='1.4' d='M1 1l3.5 3.5L8 1'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .4rem center;padding-right:1.4rem;transition:border-color .15s}
 .dc-drv-sel:focus{border-color:var(--recolha)}
@@ -506,10 +506,42 @@ function detectTipo(origin,flight){
   if(!isApt)return'RECOLHA';
   return'TOUR';
 }
-/* ── MAPA DE REGIÕES POR IATA — tempo estimado de saída do aeroporto ── */
-const IATA_REGIONS={FRA:'eu',MUC:'eu',CDG:'eu',ORY:'eu',AMS:'eu',BCN:'eu',MAD:'eu',FCO:'eu',MXP:'eu',BER:'eu',ZRH:'eu',VIE:'eu',BRU:'eu',CPH:'eu',OSL:'eu',ARN:'eu',HEL:'eu',WAW:'eu',PRG:'eu',BUD:'eu',ATH:'eu',DUB:'eu',EDI:'eu',MAN:'eu',GVA:'eu',LYS:'eu',NCE:'eu',HAM:'eu',DUS:'eu',STR:'eu',CGN:'eu',BGY:'eu',VCE:'eu',NAP:'eu',PMI:'eu',AGP:'eu',VLC:'eu',SVQ:'eu',OPO:'eu',FAO:'eu',FNC:'eu',PDL:'eu',TFS:'eu',LPA:'eu',ACE:'eu',IBZ:'eu',LUX:'eu',EIN:'eu',BOD:'eu',TLS:'eu',MRS:'eu',BLQ:'eu',PSA:'eu',FLR:'eu',CTA:'eu',PMO:'eu',GOT:'eu',KRK:'eu',GDN:'eu',RIX:'eu',TLL:'eu',VNO:'eu',SOF:'eu',OTP:'eu',BEG:'eu',ZAG:'eu',LJU:'eu',DBV:'eu',SPU:'eu',LHR:'eu',LGW:'eu',STN:'eu',LTN:'eu',BHX:'eu',GLA:'eu',BFS:'eu',LPL:'eu',BRS:'eu',IST:'eu',SAW:'eu',AYT:'eu',TLV:'inter',CMN:'inter',RAK:'inter',FEZ:'inter',ALG:'inter',TUN:'inter',CAI:'inter',JFK:'inter',EWR:'inter',BOS:'inter',IAD:'inter',MIA:'inter',ORD:'inter',LAX:'inter',SFO:'inter',ATL:'inter',DFW:'inter',YYZ:'inter',YUL:'inter',MEX:'inter',PTY:'inter',BOG:'inter',DXB:'inter',DOH:'inter',AUH:'inter',RUH:'inter',JED:'inter',GRU:'long',GIG:'long',CNF:'long',BSB:'long',SSA:'long',REC:'long',FOR:'long',POA:'long',CWB:'long',BEL:'long',MAO:'long',VCP:'long',SDU:'long',NAT:'long',MCZ:'long',EZE:'long',SCL:'long',LIM:'long',MVD:'long',PEK:'long',PVG:'long',HKG:'long',NRT:'long',HND:'long',ICN:'long',SIN:'long',KUL:'long',BKK:'long',DEL:'long',BOM:'long',JNB:'long',CPT:'long',NBO:'long',ADD:'long',LOS:'long',LAD:'long',SYD:'long',MEL:'long',AKL:'long'};
-function getFlightRegion(iata){return iata?IATA_REGIONS[iata.toUpperCase()]||null:null;}
-function regionLabel(r){if(r==='eu')return{text:'🇪🇺 EU · Saída rápida ~20min',cls:'eu'};if(r==='inter')return{text:'🌍 Intercontinental · ~45-60min',cls:'inter'};if(r==='long')return{text:'🌎 Longa distância · +60min',cls:'long'};return null;}
+
+/* ═══ IATA: região, país, e hub por prefixo da companhia ═══ */
+const IATA_DATA={
+FRA:{r:'eu',c:'🇩🇪 Alemanha'},MUC:{r:'eu',c:'🇩🇪 Munique'},CDG:{r:'eu',c:'🇫🇷 Paris'},ORY:{r:'eu',c:'🇫🇷 Paris'},AMS:{r:'eu',c:'🇳🇱 Amesterdão'},BCN:{r:'eu',c:'🇪🇸 Barcelona'},MAD:{r:'eu',c:'🇪🇸 Madrid'},FCO:{r:'eu',c:'🇮🇹 Roma'},MXP:{r:'eu',c:'🇮🇹 Milão'},BER:{r:'eu',c:'🇩🇪 Berlim'},ZRH:{r:'eu',c:'🇨🇭 Zurique'},VIE:{r:'eu',c:'🇦🇹 Viena'},BRU:{r:'eu',c:'🇧🇪 Bruxelas'},CPH:{r:'eu',c:'🇩🇰 Copenhaga'},OSL:{r:'eu',c:'🇳🇴 Oslo'},ARN:{r:'eu',c:'🇸🇪 Estocolmo'},HEL:{r:'eu',c:'🇫🇮 Helsínquia'},WAW:{r:'eu',c:'🇵🇱 Varsóvia'},PRG:{r:'eu',c:'🇨🇿 Praga'},BUD:{r:'eu',c:'🇭🇺 Budapeste'},ATH:{r:'eu',c:'🇬🇷 Atenas'},DUB:{r:'eu',c:'🇮🇪 Dublin'},EDI:{r:'eu',c:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Edimburgo'},MAN:{r:'eu',c:'🇬🇧 Manchester'},GVA:{r:'eu',c:'🇨🇭 Genebra'},NCE:{r:'eu',c:'🇫🇷 Nice'},HAM:{r:'eu',c:'🇩🇪 Hamburgo'},DUS:{r:'eu',c:'🇩🇪 Düsseldorf'},STR:{r:'eu',c:'🇩🇪 Stuttgart'},BGY:{r:'eu',c:'🇮🇹 Bérgamo'},VCE:{r:'eu',c:'🇮🇹 Veneza'},NAP:{r:'eu',c:'🇮🇹 Nápoles'},PMI:{r:'eu',c:'🇪🇸 Palma de Maiorca'},AGP:{r:'eu',c:'🇪🇸 Málaga'},VLC:{r:'eu',c:'🇪🇸 Valência'},SVQ:{r:'eu',c:'🇪🇸 Sevilha'},OPO:{r:'eu',c:'🇵🇹 Porto'},FAO:{r:'eu',c:'🇵🇹 Faro'},FNC:{r:'eu',c:'🇵🇹 Madeira'},PDL:{r:'eu',c:'🇵🇹 Açores'},LUX:{r:'eu',c:'🇱🇺 Luxemburgo'},BOD:{r:'eu',c:'🇫🇷 Bordeaux'},TLS:{r:'eu',c:'🇫🇷 Toulouse'},MRS:{r:'eu',c:'🇫🇷 Marselha'},BLQ:{r:'eu',c:'🇮🇹 Bolonha'},PSA:{r:'eu',c:'🇮🇹 Pisa'},FLR:{r:'eu',c:'🇮🇹 Florença'},CTA:{r:'eu',c:'🇮🇹 Catânia'},PMO:{r:'eu',c:'🇮🇹 Palermo'},GOT:{r:'eu',c:'🇸🇪 Gotemburgo'},KRK:{r:'eu',c:'🇵🇱 Cracóvia'},GDN:{r:'eu',c:'🇵🇱 Gdansk'},RIX:{r:'eu',c:'🇱🇻 Riga'},TLL:{r:'eu',c:'🇪🇪 Tallin'},VNO:{r:'eu',c:'🇱🇹 Vilnius'},SOF:{r:'eu',c:'🇧🇬 Sófia'},OTP:{r:'eu',c:'🇷🇴 Bucareste'},BEG:{r:'eu',c:'🇷🇸 Belgrado'},ZAG:{r:'eu',c:'🇭🇷 Zagreb'},LJU:{r:'eu',c:'🇸🇮 Liubliana'},DBV:{r:'eu',c:'🇭🇷 Dubrovnik'},SPU:{r:'eu',c:'🇭🇷 Split'},LHR:{r:'eu',c:'🇬🇧 Londres'},LGW:{r:'eu',c:'🇬🇧 Londres'},STN:{r:'eu',c:'🇬🇧 Londres'},LTN:{r:'eu',c:'🇬🇧 Londres'},BHX:{r:'eu',c:'🇬🇧 Birmingham'},GLA:{r:'eu',c:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Glasgow'},BFS:{r:'eu',c:'🇬🇧 Belfast'},LPL:{r:'eu',c:'🇬🇧 Liverpool'},BRS:{r:'eu',c:'🇬🇧 Bristol'},IST:{r:'eu',c:'🇹🇷 Istambul'},SAW:{r:'eu',c:'🇹🇷 Istambul'},AYT:{r:'eu',c:'🇹🇷 Antalya'},TFS:{r:'eu',c:'🇪🇸 Tenerife'},LPA:{r:'eu',c:'🇪🇸 Gran Canária'},ACE:{r:'eu',c:'🇪🇸 Lanzarote'},IBZ:{r:'eu',c:'🇪🇸 Ibiza'},NTE:{r:'eu',c:'🇫🇷 Nantes'},LIL:{r:'eu',c:'🇫🇷 Lille'},TLV:{r:'inter',c:'🇮🇱 Israel'},CMN:{r:'inter',c:'🇲🇦 Casablanca'},RAK:{r:'inter',c:'🇲🇦 Marraquexe'},FEZ:{r:'inter',c:'🇲🇦 Fez'},ALG:{r:'inter',c:'🇩🇿 Argel'},TUN:{r:'inter',c:'🇹🇳 Tunis'},CAI:{r:'inter',c:'🇪🇬 Cairo'},JFK:{r:'inter',c:'🇺🇸 Nova Iorque'},EWR:{r:'inter',c:'🇺🇸 Newark'},BOS:{r:'inter',c:'🇺🇸 Boston'},IAD:{r:'inter',c:'🇺🇸 Washington'},MIA:{r:'inter',c:'🇺🇸 Miami'},ORD:{r:'inter',c:'🇺🇸 Chicago'},LAX:{r:'inter',c:'🇺🇸 Los Angeles'},SFO:{r:'inter',c:'🇺🇸 São Francisco'},ATL:{r:'inter',c:'🇺🇸 Atlanta'},DFW:{r:'inter',c:'🇺🇸 Dallas'},YYZ:{r:'inter',c:'🇨🇦 Toronto'},YUL:{r:'inter',c:'🇨🇦 Montreal'},MEX:{r:'inter',c:'🇲🇽 México'},PTY:{r:'inter',c:'🇵🇦 Panamá'},BOG:{r:'inter',c:'🇨🇴 Bogotá'},DXB:{r:'inter',c:'🇦🇪 Dubai'},DOH:{r:'inter',c:'🇶🇦 Doha'},AUH:{r:'inter',c:'🇦🇪 Abu Dhabi'},RUH:{r:'inter',c:'🇸🇦 Riade'},JED:{r:'inter',c:'🇸🇦 Jeddah'},GRU:{r:'long',c:'🇧🇷 São Paulo'},GIG:{r:'long',c:'🇧🇷 Rio de Janeiro'},CNF:{r:'long',c:'🇧🇷 Belo Horizonte'},BSB:{r:'long',c:'🇧🇷 Brasília'},SSA:{r:'long',c:'🇧🇷 Salvador'},REC:{r:'long',c:'🇧🇷 Recife'},FOR:{r:'long',c:'🇧🇷 Fortaleza'},POA:{r:'long',c:'🇧🇷 Porto Alegre'},CWB:{r:'long',c:'🇧🇷 Curitiba'},BEL:{r:'long',c:'🇧🇷 Belém'},MAO:{r:'long',c:'🇧🇷 Manaus'},VCP:{r:'long',c:'🇧🇷 Campinas'},NAT:{r:'long',c:'🇧🇷 Natal'},MCZ:{r:'long',c:'🇧🇷 Maceió'},EZE:{r:'long',c:'🇦🇷 Buenos Aires'},SCL:{r:'long',c:'🇨🇱 Santiago'},LIM:{r:'long',c:'🇵🇪 Lima'},MVD:{r:'long',c:'🇺🇾 Montevidéu'},PEK:{r:'long',c:'🇨🇳 Pequim'},PVG:{r:'long',c:'🇨🇳 Xangai'},HKG:{r:'long',c:'🇭🇰 Hong Kong'},NRT:{r:'long',c:'🇯🇵 Tóquio'},HND:{r:'long',c:'🇯🇵 Tóquio'},ICN:{r:'long',c:'🇰🇷 Seul'},SIN:{r:'long',c:'🇸🇬 Singapura'},KUL:{r:'long',c:'🇲🇾 Kuala Lumpur'},BKK:{r:'long',c:'🇹🇭 Banguecoque'},DEL:{r:'long',c:'🇮🇳 Delhi'},BOM:{r:'long',c:'🇮🇳 Mumbai'},JNB:{r:'long',c:'🇿🇦 Joanesburgo'},CPT:{r:'long',c:'🇿🇦 Cidade do Cabo'},NBO:{r:'long',c:'🇰🇪 Nairobi'},ADD:{r:'long',c:'🇪🇹 Addis Abeba'},LOS:{r:'long',c:'🇳🇬 Lagos'},LAD:{r:'long',c:'🇦🇴 Luanda'},MPM:{r:'long',c:'🇲🇿 Maputo'},SYD:{r:'long',c:'🇦🇺 Sydney'},MEL:{r:'long',c:'🇦🇺 Melbourne'},AKL:{r:'long',c:'🇳🇿 Auckland'}
+};
+/* Prefixos de companhia → hub principal (para resolver o "???") */
+const AIRLINE_HUB={TP:'LIS',FR:'DUB',U2:'LGW',W6:'BUD',LH:'FRA',LX:'ZRH',OS:'VIE',SN:'BRU',AF:'CDG',KL:'AMS',BA:'LHR',IB:'MAD',VY:'BCN',AZ:'FCO',EW:'CGN',DE:'FRA',TK:'IST',EK:'DXB',QR:'DOH',EY:'AUH',LA:'SCL',G3:'GRU',AD:'GRU',JJ:'GRU',AA:'DFW',DL:'ATL',UA:'EWR',AC:'YYZ',SU:'SVO',SK:'CPH',AY:'HEL',DY:'OSL',LO:'WAW',OK:'PRG',RO:'OTP',BT:'RIX'};
+function getIataInfo(iata){if(!iata)return null;return IATA_DATA[iata.toUpperCase()]||null;}
+function guessDepAirport(flight){
+  if(!flight)return null;
+  const code=String(flight).replace(/\s/g,'').match(/^([A-Z]{2})\d/);
+  if(!code)return null;
+  const hub=AIRLINE_HUB[code[1]];
+  return hub||null;
+}
+function regionLabel(r){
+  if(r==='eu')return{text:'Europa · Saída rápida ~20min',cls:'eu'};
+  if(r==='inter')return{text:'Intercontinental · ~45-60min',cls:'inter'};
+  if(r==='long')return{text:'Longa distância · +60min',cls:'long'};
+  return null;
+}
+function calcFlightProgress(depTime, arrTime){
+  /* Estima progresso do voo: 0-100 baseado na hora actual vs dep/arr */
+  if(!depTime||!arrTime)return 50; /* fallback centro */
+  const now = new Date();
+  const hNow = now.getHours()*60 + now.getMinutes();
+  const parseTm = (t)=>{const m=String(t).match(/(\d{1,2}):(\d{2})/); return m?parseInt(m[1])*60+parseInt(m[2]):null;};
+  const dM=parseTm(depTime), aM=parseTm(arrTime);
+  if(dM===null||aM===null)return 50;
+  const dur = aM > dM ? aM-dM : (aM+1440)-dM; /* handle overnight */
+  if(dur<=0)return 50;
+  const elapsed = hNow >= dM ? hNow-dM : (hNow+1440)-dM;
+  if(elapsed<0)return 5; /* ainda não partiu */
+  if(elapsed>=dur)return 95; /* já aterrou */
+  return Math.round((elapsed/dur)*90)+5;
+}
 const TEMPLATES={
   CHEGADA:{
     PT:(m,c)=>`Oi, ${c}! 👋 Aqui é o ${m}, da HUB Transfer.\nBem-vindo(a) a Portugal! 🇵🇹 Espero que o voo tenha sido tranquilo.\nVou te ajudar a sair do aeroporto sem stress.\n\nEstou enviando a foto abaixo para facilitar chegar no nosso ponto de encontro.\n\nPor favor, me avisa quando:\n1️⃣ Passar pelo controle de passaportes\n2️⃣ Estiver com as malas na mão\n\nTe vejo em breve! Se precisar de algo, pode me enviar uma mensagem. 👍`,
@@ -1224,10 +1256,7 @@ function renderDia(){
     return;
   }
 
-  // Chegadas
-  const chegadas = list.filter(v=>detectTipo(v.origin,v.flight)==='CHEGADA');
-  const tours    = list.filter(v=>detectTipo(v.origin,v.flight)==='TOUR');
-  const recolhas = list.filter(v=>detectTipo(v.origin,v.flight)==='RECOLHA');
+  // Viagens ordenadas cronologicamente (sem agrupamento por tipo)
 
 function buildDiaCard(v){
     const tipo = detectTipo(v.origin, v.flight) || v.type || 'RECOLHA';
@@ -1246,7 +1275,7 @@ function buildDiaCard(v){
     const destino = v.destination || '—';
     const paxTag  = v.pax  ? `<span class="dc-tag">👤 ${v.pax}</span>`  : '';
     const bagsTag = v.bags ? `<span class="dc-tag">🧳 ${v.bags}</span>` : '';
-    const fltTag  = v.flight ? `<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank" title="Ver voo em tempo real">✈ ${v.flight} ↗</a>` : '';
+    const fltTag  = v.flight ? `<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">✈ ${v.flight} ↗</a>` : '';
     const drvTag  = v.driver
       ? `<span class="dc-drv-tag">🚗 ${v.driver}</span>`
       : `<span class="dc-nodrv-tag">⚠️ Sem motorista</span>`;
@@ -1254,12 +1283,12 @@ function buildDiaCard(v){
     const gmUrl   = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(navAddr)}`;
     const wzUrl   = `https://waze.com/ul?q=${encodeURIComponent(navAddr)}&navigate=yes`;
 
-    // ═══ BLOCO VISUAL POR TIPO ═══
     let middleHtml = '';
 
     if(isC && v.flight){
-      // ── CHEGADA: Avião + indicador de região ──
-      const dep   = (v.depAirport||v.depIata||'???').toUpperCase();
+      /* ── CHEGADA: Bloco de voo com aeroporto real + país + barra progresso ── */
+      let dep = (v.depAirport||v.depIata||'').toUpperCase();
+      if(!dep||dep==='???') dep = guessDepAirport(v.flight) || '???';
       const arr   = (v.arrAirport||v.arrIata||'LIS').toUpperCase();
       const depC  = v.depCity || '';
       const arrC  = v.arrCity || 'Lisboa';
@@ -1267,16 +1296,23 @@ function buildDiaCard(v){
       const arrT  = v.arrTime || '—:—';
       const depTm = v.depTerminal ? `T${v.depTerminal}` : '';
       const arrTm = v.arrTerminal ? `T${v.arrTerminal}` : '';
-      const region = getFlightRegion(dep);
+      /* Info do aeroporto de origem */
+      const depInfo = getIataInfo(dep);
+      const depCountry = depInfo ? depInfo.c : (depC || '');
+      const region = depInfo ? depInfo.r : null;
       const rlabel = regionLabel(region);
-      const hintHtml = rlabel ? `<div class="dc-origin-hint ${rlabel.cls}">${rlabel.text}</div>` : '';
+      const hintHtml = rlabel
+        ? `<div class="dc-origin-hint ${rlabel.cls}">${depCountry} · ${rlabel.text}</div>`
+        : depCountry ? `<div class="dc-origin-hint eu">${depCountry}</div>` : '';
+      /* Barra de progresso real */
+      const progress = calcFlightProgress(depT, arrT);
       middleHtml = `
       <div class="dc-flight">
         <div class="dc-frow">
-          <div class="dc-fapt"><div class="dc-fcode">${dep}</div><div class="dc-fcity">${depC}</div></div>
+          <div class="dc-fapt"><div class="dc-fcode">${dep}</div><div class="dc-fcity">${depCountry}</div></div>
           <div class="dc-fline">
             <a class="dc-fnum dc-fnum-link" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">${v.flight} ↗</a>
-            <div class="dc-ftrack"><div class="dc-fprog"></div><span class="dc-fplane">✈</span></div>
+            <div class="dc-ftrack"><div class="dc-fprog" style="width:${progress}%"></div><span class="dc-fplane" style="left:${progress}%">✈</span></div>
             <div class="dc-ftimes">
               <div><div class="dc-ftime">${depT}</div><div class="dc-fterm">${depTm}</div></div>
               <div style="text-align:right"><div class="dc-ftime">${arrT}</div><div class="dc-fterm">${arrTm}</div></div>
@@ -1297,7 +1333,7 @@ function buildDiaCard(v){
         </div>
       </div>`;
     } else if(isR){
-      // ── RECOLHA: Rota visual A→B com pontos ──
+      /* ── RECOLHA: Rota visual A→B ── */
       middleHtml = `
       <div class="dc-route-block">
         <div class="dc-route-visual">
@@ -1314,8 +1350,8 @@ function buildDiaCard(v){
           </div>
         </div>
       </div>`;
-    } else if(isT){
-      // ── TOUR: Bússola ──
+    } else {
+      /* ── TOUR: Bússola ── */
       middleHtml = `
       <div class="dc-tour-block">
         <div class="dc-tour-visual">
@@ -1323,22 +1359,9 @@ function buildDiaCard(v){
           <div class="dc-tour-info">
             <div class="dc-tour-lbl">📍 Ponto de encontro</div><div class="dc-tour-val">${origem}</div>
             <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
-            ${destino!=='—'?`<div class="dc-tour-lbl" style="margin-top:.35rem">🏁 Destino</div><div class="dc-tour-val">${destino}</div>
+            ${destino!=='—'?`<div class="dc-tour-lbl" style="margin-top:.3rem">🏁 Destino</div><div class="dc-tour-val">${destino}</div>
             <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
           </div>
-        </div>
-      </div>`;
-    } else {
-      // ── Fallback ──
-      middleHtml = `
-      <div class="dc-addrs">
-        <div class="dc-addr-block">
-          <div class="dc-addr-lbl">📍 Origem</div><div class="dc-addr-val">${origem}</div>
-          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
-        </div>
-        <div class="dc-addr-block">
-          <div class="dc-addr-lbl">📍 Destino</div><div class="dc-addr-val">${destino}</div>
-          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
         </div>
       </div>`;
     }
@@ -1365,18 +1388,12 @@ function buildDiaCard(v){
     </div>`;
   }
 
-  if(chegadas.length){
-    html += `<div class="dia-section-lbl" style="color:var(--chegada)">✈ Chegadas (${chegadas.length})</div>`;
-    html += `<div class="dia-timeline">${chegadas.map(buildDiaCard).join('')}</div>`;
-  }
-  if(tours.length){
-    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:#a855f7">🧭 Tours (${tours.length})</div>`;
-    html += `<div class="dia-timeline">${tours.map(buildDiaCard).join('')}</div>`;
-  }
-  if(recolhas.length){
-    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:var(--recolha)">🚗 Recolhas (${recolhas.length})</div>`;
-    html += `<div class="dia-timeline">${recolhas.map(buildDiaCard).join('')}</div>`;
-  }
+  /* ═══ TIMELINE CRONOLÓGICA — tudo misturado por hora ═══ */
+  const allSorted = [...list].sort((a,b)=>{
+    const ph = (t)=>{const m=String(t||'99:99').match(/(\d{1,2}):(\d{2})/);return m?parseInt(m[1])*60+parseInt(m[2]):9999;};
+    return ph(a.pickupTime)-ph(b.pickupTime);
+  });
+  html += `<div class="dia-timeline">${allSorted.map(buildDiaCard).join('')}</div>`;
 
   html += `</div>`;
   wrap.innerHTML = html;
