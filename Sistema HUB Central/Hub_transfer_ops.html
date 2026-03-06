@@ -10,7 +10,8 @@
   --bg:#07090f;--surface:#0f1320;--surface2:#141929;--surface3:#1a2035;--border:#1d2840;--border2:#242f4a;
   --chegada:#f59e0b;--chegada-dim:rgba(245,158,11,.12);--chegada-glow:rgba(245,158,11,.3);
   --recolha:#10b981;--recolha-dim:rgba(16,185,129,.12);--recolha-glow:rgba(16,185,129,.3);
-  --text:#dde4f0;--text-dim:#566480;--text-muted:#2d3a52;
+  --tour:#a855f7;--tour-dim:rgba(168,85,247,.12);--tour-glow:rgba(168,85,247,.3);
+  --text:#dde4f0;--text-dim:#8294b0;--text-muted:#2d3a52;
   --accent:#3b82f6;--accent-dim:rgba(59,130,246,.14);
   --danger:#ef4444;--warn:#f59e0b;--wpp:#25d366;
   --side-w:180px;
@@ -310,17 +311,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-tour .dc-hora{color:#a855f7}
 .dc-row1{display:grid;grid-template-columns:68px 1fr auto;border-bottom:1px solid var(--border)}
 .dc-timebox{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.55rem .2rem;border-right:1px solid var(--border);background:var(--surface2);gap:1px;flex-shrink:0}
-.dc-hora{font-family:var(--mono);font-size:1.1rem;font-weight:700;line-height:1;letter-spacing:.01em}
+.dc-hora{font-family:var(--mono);font-size:1.3rem;font-weight:700;line-height:1;letter-spacing:.01em}
 .dc-chegada .dc-hora{color:var(--chegada)}
 .dc-recolha .dc-hora{color:var(--recolha)}
 .dc-tipo-lbl{font-family:var(--mono);font-size:.42rem;color:var(--text-muted);letter-spacing:.07em;text-transform:uppercase;margin-top:1px}
 .dc-info{padding:.5rem .7rem;display:flex;flex-direction:column;gap:.18rem;min-width:0}
-.dc-client-name{font-size:.92rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-client-name{font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
 .dc-tags-row{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap}
 .dc-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);white-space:nowrap}
-.dc-drv-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--recolha-dim);border:1px solid var(--recolha-glow);color:var(--recolha);white-space:nowrap}
-.dc-nodrv-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;white-space:nowrap}
-.dc-flight-tag{font-family:var(--mono);font-size:.48rem;padding:.07rem .3rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap;text-decoration:none;cursor:pointer;transition:opacity .15s}
+.dc-drv-tag{font-family:var(--mono);font-size:.55rem;padding:.1rem .35rem;border-radius:3px;background:var(--recolha-dim);border:1px solid var(--recolha-glow);color:var(--recolha);white-space:nowrap}
+.dc-nodrv-tag{font-family:var(--mono);font-size:.55rem;padding:.1rem .35rem;border-radius:3px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;white-space:nowrap}
+.dc-flight-tag{font-family:var(--mono);font-size:.55rem;padding:.1rem .35rem;border-radius:3px;background:var(--accent-dim);border:1px solid rgba(59,130,246,.3);color:#60a5fa;white-space:nowrap;text-decoration:none;cursor:pointer;transition:opacity .15s}
 .dc-flight-tag:hover{opacity:.75;border-color:rgba(59,130,246,.6)}
 .dc-navbtns{display:flex;flex-direction:column;gap:.22rem;padding:.5rem .55rem;justify-content:center;border-left:1px solid var(--border);flex-shrink:0}
 .dc-flight{padding:.45rem .75rem;border-bottom:1px solid var(--border);background:rgba(245,158,11,.04)}
@@ -349,6 +350,36 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-addr-btn.wz:hover{background:rgba(53,197,240,.2)}
 .dc-fnum-link{text-decoration:none;color:var(--chegada);transition:opacity .15s}
 .dc-fnum-link:hover{opacity:.7}
+
+/* ── Indicador região do voo ── */
+.dc-origin-hint{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .5rem;border-radius:4px;font-family:var(--mono);font-size:.5rem;letter-spacing:.04em;margin-top:.2rem}
+.dc-origin-hint.eu{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa}
+.dc-origin-hint.inter{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--chegada)}
+.dc-origin-hint.long{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171}
+
+/* ── Bloco visual RECOLHA: rota A→B ── */
+.dc-route-block{padding:.55rem .85rem;border-bottom:1px solid var(--border);background:rgba(16,185,129,.04)}
+.dc-route-visual{display:flex;align-items:stretch;gap:.6rem}
+.dc-route-dots{display:flex;flex-direction:column;align-items:center;gap:0;padding:.2rem 0;flex-shrink:0;width:18px}
+.dc-route-dot-a{width:10px;height:10px;border-radius:50%;background:var(--recolha);flex-shrink:0}
+.dc-route-line{flex:1;width:2px;background:linear-gradient(180deg,var(--recolha),var(--recolha-glow));margin:2px auto}
+.dc-route-dot-b{width:10px;height:10px;border-radius:3px;background:var(--accent);flex-shrink:0}
+.dc-route-addrs{flex:1;display:flex;flex-direction:column;gap:.35rem}
+.dc-route-addr{display:flex;flex-direction:column;gap:1px}
+.dc-route-lbl{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
+.dc-route-val{font-family:var(--mono);font-size:.6rem;color:var(--text);line-height:1.3}
+.dc-route-btns{display:flex;gap:.25rem;margin-top:.15rem}
+.dc-route-btn{font-family:var(--mono);font-size:.52rem;padding:.15rem .4rem;border-radius:3px;text-decoration:none;transition:all .15s;white-space:nowrap}
+.dc-route-btn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);color:#4285f4}
+.dc-route-btn.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.25);color:#35c5f0}
+
+/* ── Bloco visual TOUR ── */
+.dc-tour-block{padding:.55rem .85rem;border-bottom:1px solid var(--border);background:rgba(168,85,247,.04)}
+.dc-tour-visual{display:flex;align-items:center;gap:.6rem}
+.dc-tour-icon{font-size:1.5rem;flex-shrink:0}
+.dc-tour-info{flex:1;display:flex;flex-direction:column;gap:.2rem}
+.dc-tour-lbl{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
+.dc-tour-val{font-family:var(--mono);font-size:.6rem;color:var(--text);line-height:1.3}
 .dc-bottom{display:flex;align-items:center;gap:.4rem;padding:.4rem .7rem;background:var(--surface2);flex-wrap:wrap}
 .dc-drv-sel{flex:1;min-width:120px;padding:.3rem .5rem;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:.58rem;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath stroke='%23566480' stroke-width='1.4' d='M1 1l3.5 3.5L8 1'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .4rem center;padding-right:1.4rem;transition:border-color .15s}
 .dc-drv-sel:focus{border-color:var(--recolha)}
@@ -475,6 +506,10 @@ function detectTipo(origin,flight){
   if(!isApt)return'RECOLHA';
   return'TOUR';
 }
+/* ── MAPA DE REGIÕES POR IATA — tempo estimado de saída do aeroporto ── */
+const IATA_REGIONS={FRA:'eu',MUC:'eu',CDG:'eu',ORY:'eu',AMS:'eu',BCN:'eu',MAD:'eu',FCO:'eu',MXP:'eu',BER:'eu',ZRH:'eu',VIE:'eu',BRU:'eu',CPH:'eu',OSL:'eu',ARN:'eu',HEL:'eu',WAW:'eu',PRG:'eu',BUD:'eu',ATH:'eu',DUB:'eu',EDI:'eu',MAN:'eu',GVA:'eu',LYS:'eu',NCE:'eu',HAM:'eu',DUS:'eu',STR:'eu',CGN:'eu',BGY:'eu',VCE:'eu',NAP:'eu',PMI:'eu',AGP:'eu',VLC:'eu',SVQ:'eu',OPO:'eu',FAO:'eu',FNC:'eu',PDL:'eu',TFS:'eu',LPA:'eu',ACE:'eu',IBZ:'eu',LUX:'eu',EIN:'eu',BOD:'eu',TLS:'eu',MRS:'eu',BLQ:'eu',PSA:'eu',FLR:'eu',CTA:'eu',PMO:'eu',GOT:'eu',KRK:'eu',GDN:'eu',RIX:'eu',TLL:'eu',VNO:'eu',SOF:'eu',OTP:'eu',BEG:'eu',ZAG:'eu',LJU:'eu',DBV:'eu',SPU:'eu',LHR:'eu',LGW:'eu',STN:'eu',LTN:'eu',BHX:'eu',GLA:'eu',BFS:'eu',LPL:'eu',BRS:'eu',IST:'eu',SAW:'eu',AYT:'eu',TLV:'inter',CMN:'inter',RAK:'inter',FEZ:'inter',ALG:'inter',TUN:'inter',CAI:'inter',JFK:'inter',EWR:'inter',BOS:'inter',IAD:'inter',MIA:'inter',ORD:'inter',LAX:'inter',SFO:'inter',ATL:'inter',DFW:'inter',YYZ:'inter',YUL:'inter',MEX:'inter',PTY:'inter',BOG:'inter',DXB:'inter',DOH:'inter',AUH:'inter',RUH:'inter',JED:'inter',GRU:'long',GIG:'long',CNF:'long',BSB:'long',SSA:'long',REC:'long',FOR:'long',POA:'long',CWB:'long',BEL:'long',MAO:'long',VCP:'long',SDU:'long',NAT:'long',MCZ:'long',EZE:'long',SCL:'long',LIM:'long',MVD:'long',PEK:'long',PVG:'long',HKG:'long',NRT:'long',HND:'long',ICN:'long',SIN:'long',KUL:'long',BKK:'long',DEL:'long',BOM:'long',JNB:'long',CPT:'long',NBO:'long',ADD:'long',LOS:'long',LAD:'long',SYD:'long',MEL:'long',AKL:'long'};
+function getFlightRegion(iata){return iata?IATA_REGIONS[iata.toUpperCase()]||null:null;}
+function regionLabel(r){if(r==='eu')return{text:'🇪🇺 EU · Saída rápida ~20min',cls:'eu'};if(r==='inter')return{text:'🌍 Intercontinental · ~45-60min',cls:'inter'};if(r==='long')return{text:'🌎 Longa distância · +60min',cls:'long'};return null;}
 const TEMPLATES={
   CHEGADA:{
     PT:(m,c)=>`Oi, ${c}! 👋 Aqui é o ${m}, da HUB Transfer.\nBem-vindo(a) a Portugal! 🇵🇹 Espero que o voo tenha sido tranquilo.\nVou te ajudar a sair do aeroporto sem stress.\n\nEstou enviando a foto abaixo para facilitar chegar no nosso ponto de encontro.\n\nPor favor, me avisa quando:\n1️⃣ Passar pelo controle de passaportes\n2️⃣ Estiver com as malas na mão\n\nTe vejo em breve! Se precisar de algo, pode me enviar uma mensagem. 👍`,
@@ -1195,149 +1230,151 @@ function renderDia(){
   const recolhas = list.filter(v=>detectTipo(v.origin,v.flight)==='RECOLHA');
 
 function buildDiaCard(v){
-    // Detecta tipo real baseado na origem e voo (igual ao GAS)
     const tipo = detectTipo(v.origin, v.flight) || v.type || 'RECOLHA';
     const isC  = tipo === 'CHEGADA';
     const isT  = tipo === 'TOUR';
+    const isR  = tipo === 'RECOLHA';
     const tc   = isC ? 'dc-chegada' : isT ? 'dc-tour' : 'dc-recolha';
-    const icoLbl = isC ? '▼ CHEGADA' : isT ? '◆ TOUR' : '▲ RECOLHA';
+    const icoLbl = isC ? '✈ CHEGADA' : isT ? '🧭 TOUR' : '🚗 RECOLHA';
 
-    // Hora limpa HH:MM
     let hora = '—:—';
     if(v.pickupTime){
       const m = String(v.pickupTime).match(/(\d{1,2}):(\d{2})/);
       hora = m ? `${m[1].padStart(2,'0')}:${m[2]}` : String(v.pickupTime).slice(0,5);
     }
-
-    const origem  = v.origin      || '—';
+    const origem  = v.origin || '—';
     const destino = v.destination || '—';
-
-    // Tags
     const paxTag  = v.pax  ? `<span class="dc-tag">👤 ${v.pax}</span>`  : '';
     const bagsTag = v.bags ? `<span class="dc-tag">🧳 ${v.bags}</span>` : '';
     const fltTag  = v.flight ? `<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank" title="Ver voo em tempo real">✈ ${v.flight} ↗</a>` : '';
     const drvTag  = v.driver
       ? `<span class="dc-drv-tag">🚗 ${v.driver}</span>`
       : `<span class="dc-nodrv-tag">⚠️ Sem motorista</span>`;
-
-    // Navegação directa
     const navAddr = isC ? destino : origem;
     const gmUrl   = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(navAddr)}`;
     const wzUrl   = `https://waze.com/ul?q=${encodeURIComponent(navAddr)}&navigate=yes`;
 
-    // Endereços clicáveis A e B
-    const endA_lbl  = isC ? '✈ Origem' : '📍 Hotel / Morada';
-    const endB_lbl  = isC ? '📍 Hotel / Destino' : '✈ Aeroporto';
-    const endA_url  = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}`;
-    const endB_url  = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}`;
+    // ═══ BLOCO VISUAL POR TIPO ═══
+    let middleHtml = '';
 
-    // Bloco visual do voo (só chegadas com número de voo)
-    let flightHtml = '';
     if(isC && v.flight){
+      // ── CHEGADA: Avião + indicador de região ──
       const dep   = (v.depAirport||v.depIata||'???').toUpperCase();
       const arr   = (v.arrAirport||v.arrIata||'LIS').toUpperCase();
-      const depC  = v.depCity     || '';
-      const arrC  = v.arrCity     || 'Lisboa';
-      const depT  = v.depTime     || '—:—';
-      const arrT  = v.arrTime     || '—:—';
+      const depC  = v.depCity || '';
+      const arrC  = v.arrCity || 'Lisboa';
+      const depT  = v.depTime || '—:—';
+      const arrT  = v.arrTime || '—:—';
       const depTm = v.depTerminal ? `T${v.depTerminal}` : '';
       const arrTm = v.arrTerminal ? `T${v.arrTerminal}` : '';
-      flightHtml = `
+      const region = getFlightRegion(dep);
+      const rlabel = regionLabel(region);
+      const hintHtml = rlabel ? `<div class="dc-origin-hint ${rlabel.cls}">${rlabel.text}</div>` : '';
+      middleHtml = `
       <div class="dc-flight">
         <div class="dc-frow">
-          <div class="dc-fapt">
-            <div class="dc-fcode">${dep}</div>
-            <div class="dc-fcity">${depC}</div>
-          </div>
+          <div class="dc-fapt"><div class="dc-fcode">${dep}</div><div class="dc-fcity">${depC}</div></div>
           <div class="dc-fline">
-            <a class="dc-fnum dc-fnum-link" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank" title="Ver voo em tempo real">${v.flight} ↗</a>
-            <div class="dc-ftrack">
-              <div class="dc-fprog"></div>
-              <span class="dc-fplane">✈</span>
-            </div>
+            <a class="dc-fnum dc-fnum-link" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">${v.flight} ↗</a>
+            <div class="dc-ftrack"><div class="dc-fprog"></div><span class="dc-fplane">✈</span></div>
             <div class="dc-ftimes">
               <div><div class="dc-ftime">${depT}</div><div class="dc-fterm">${depTm}</div></div>
               <div style="text-align:right"><div class="dc-ftime">${arrT}</div><div class="dc-fterm">${arrTm}</div></div>
             </div>
+            ${hintHtml}
           </div>
-          <div class="dc-fapt">
-            <div class="dc-fcode" style="color:var(--chegada)">${arr}</div>
-            <div class="dc-fcity">${arrC}</div>
+          <div class="dc-fapt"><div class="dc-fcode" style="color:var(--chegada)">${arr}</div><div class="dc-fcity">${arrC}</div></div>
+        </div>
+      </div>
+      <div class="dc-addrs">
+        <div class="dc-addr-block">
+          <div class="dc-addr-lbl">✈ Aeroporto</div><div class="dc-addr-val">📍 ${origem}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+        </div>
+        <div class="dc-addr-block">
+          <div class="dc-addr-lbl">📍 Hotel / Destino</div><div class="dc-addr-val">📍 ${destino}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+        </div>
+      </div>`;
+    } else if(isR){
+      // ── RECOLHA: Rota visual A→B com pontos ──
+      middleHtml = `
+      <div class="dc-route-block">
+        <div class="dc-route-visual">
+          <div class="dc-route-dots"><div class="dc-route-dot-a"></div><div class="dc-route-line"></div><div class="dc-route-dot-b"></div></div>
+          <div class="dc-route-addrs">
+            <div class="dc-route-addr">
+              <div class="dc-route-lbl">📍 Recolha</div><div class="dc-route-val">${origem}</div>
+              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+            </div>
+            <div class="dc-route-addr">
+              <div class="dc-route-lbl">✈ Destino</div><div class="dc-route-val">${destino}</div>
+              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+            </div>
           </div>
+        </div>
+      </div>`;
+    } else if(isT){
+      // ── TOUR: Bússola ──
+      middleHtml = `
+      <div class="dc-tour-block">
+        <div class="dc-tour-visual">
+          <div class="dc-tour-icon">🧭</div>
+          <div class="dc-tour-info">
+            <div class="dc-tour-lbl">📍 Ponto de encontro</div><div class="dc-tour-val">${origem}</div>
+            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+            ${destino!=='—'?`<div class="dc-tour-lbl" style="margin-top:.35rem">🏁 Destino</div><div class="dc-tour-val">${destino}</div>
+            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
+          </div>
+        </div>
+      </div>`;
+    } else {
+      // ── Fallback ──
+      middleHtml = `
+      <div class="dc-addrs">
+        <div class="dc-addr-block">
+          <div class="dc-addr-lbl">📍 Origem</div><div class="dc-addr-val">${origem}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+        </div>
+        <div class="dc-addr-block">
+          <div class="dc-addr-lbl">📍 Destino</div><div class="dc-addr-val">${destino}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
         </div>
       </div>`;
     }
 
-    // Selector motorista
     const cardId  = v.id || (v.client||'x').replace(/\W/g,'');
     const drvOpts = DRIVERS.map(d=>
       `<option value="${d.name}"${v.driver===d.name?' selected':''}>${d.name}${d.viatura?' · '+d.viatura:''}</option>`
     ).join('');
-
-    // WhatsApp cliente
     const wppCUrl = v.phone ? `https://wa.me/${v.phone.replace(/\D/g,'')}` : '#';
     const wppCCls = v.phone ? '' : ' dis';
 
     return `<div class="dc ${tc}" id="dcard-${cardId}">
-
       <div class="dc-row1">
-        <div class="dc-timebox">
-          <div class="dc-hora">${hora}</div>
-          <div class="dc-tipo-lbl">${icoLbl}</div>
-        </div>
-        <div class="dc-info">
-          <div class="dc-client-name">${v.client||'—'}</div>
-          <div class="dc-tags-row">${drvTag}${fltTag}${paxTag}${bagsTag}</div>
-        </div>
-        <div class="dc-navbtns">
-          <a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a>
-          <a class="dc-navbtn wz" href="${wzUrl}"  target="_blank">🔷 Waze</a>
-        </div>
+        <div class="dc-timebox"><div class="dc-hora">${hora}</div><div class="dc-tipo-lbl">${icoLbl}</div></div>
+        <div class="dc-info"><div class="dc-client-name">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${paxTag}${bagsTag}</div></div>
+        <div class="dc-navbtns"><a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a><a class="dc-navbtn wz" href="${wzUrl}" target="_blank">🔷 Waze</a></div>
       </div>
-
-      ${flightHtml}
-
-      <div class="dc-addrs">
-        <div class="dc-addr-block">
-          <div class="dc-addr-lbl">${endA_lbl}</div>
-          <div class="dc-addr-val">📍 ${origem}</div>
-          <div class="dc-addr-btns">
-            <a class="dc-addr-btn gm" href="${endA_url}" target="_blank">🗺 Maps</a>
-            <a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a>
-          </div>
-        </div>
-        <div class="dc-addr-block">
-          <div class="dc-addr-lbl">${endB_lbl}</div>
-          <div class="dc-addr-val">📍 ${destino}</div>
-          <div class="dc-addr-btns">
-            <a class="dc-addr-btn gm" href="${endB_url}" target="_blank">🗺 Maps</a>
-            <a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a>
-          </div>
-        </div>
-      </div>
-
+      ${middleHtml}
       <div class="dc-bottom">
-        <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')">
-          <option value="">— Atribuir motorista —</option>
-          ${drvOpts}
-        </select>
+        <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')"><option value="">— Atribuir motorista —</option>${drvOpts}</select>
         <a class="dc-act wpp-c${wppCCls}" href="${wppCUrl}" target="_blank">${WPP_ICO} Cliente</a>
         <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}')">⚡ Motorista</button>
       </div>
-
     </div>`;
   }
 
   if(chegadas.length){
-    html += `<div class="dia-section-lbl">▼ Chegadas (${chegadas.length})</div>`;
+    html += `<div class="dia-section-lbl" style="color:var(--chegada)">✈ Chegadas (${chegadas.length})</div>`;
     html += `<div class="dia-timeline">${chegadas.map(buildDiaCard).join('')}</div>`;
   }
   if(tours.length){
-    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:#a855f7">◆ Tours (${tours.length})</div>`;
+    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:#a855f7">🧭 Tours (${tours.length})</div>`;
     html += `<div class="dia-timeline">${tours.map(buildDiaCard).join('')}</div>`;
   }
   if(recolhas.length){
-    html += `<div class="dia-section-lbl" style="margin-top:.5rem">▲ Recolhas (${recolhas.length})</div>`;
+    html += `<div class="dia-section-lbl" style="margin-top:.5rem;color:var(--recolha)">🚗 Recolhas (${recolhas.length})</div>`;
     html += `<div class="dia-timeline">${recolhas.map(buildDiaCard).join('')}</div>`;
   }
 
