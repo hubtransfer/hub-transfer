@@ -227,9 +227,24 @@ const TEMPLATES={
 };
 function clientMsg(phone,tipo,client,lang,origin,hora){
   if(!phone){alert('⚠️ Cliente sem telefone.');return;}
+  const h=cleanHora(hora);
   const fn=TEMPLATES[tipo]?.[lang]||TEMPLATES[tipo]?.EN||TEMPLATES[tipo]?.PT;
   if(!fn)return;
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(fn(MOTORISTA,client,origin,hora))}`,'_blank');
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(fn(MOTORISTA,client,origin,h))}`,'_blank');
+}
+function cleanHora(h){
+  if(!h)return'—:—';const s=String(h);
+  const m=s.match(/(\d{1,2}):(\d{2})/);
+  if(m)return m[1].padStart(2,'0')+':'+m[2];
+  try{const d=new Date(s);if(!isNaN(d.getTime()))return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}catch(e){}
+  return s.slice(0,5)||'—:—';
+}
+const DDI_LANG={'351':'PT','55':'PT','34':'ES','54':'ES','56':'ES','57':'ES','52':'ES','33':'FR','32':'FR','221':'FR','212':'FR','213':'FR','216':'FR','225':'FR','237':'FR','243':'FR','39':'IT','49':'DE','43':'DE','44':'EN','1':'EN','61':'EN','353':'EN','27':'EN','234':'EN','254':'EN','244':'PT','258':'PT','238':'PT'};
+function resolveLanguage(lang,phone){
+  const valid=['PT','EN','ES','FR','IT','DE'];const u=String(lang||'').toUpperCase().trim();
+  if(u&&valid.includes(u))return u;
+  if(phone){const p=String(phone).replace(/\D/g,'');const t3=DDI_LANG[p.slice(0,3)],t2=DDI_LANG[p.slice(0,2)],t1=DDI_LANG[p.slice(0,1)];const f=t3||t2||t1;if(f&&valid.includes(f))return f;}
+  return'EN';
 }
 
 /* ── SYNC ── */
@@ -283,6 +298,9 @@ function render(){
     const paxTag=v.pax?`<span class="dc-tag">👤 ${v.pax}</span>`:'';
     const bagsTag=v.bags?`<span class="dc-tag">🧳 ${v.bags}</span>`:'';
     const fltTag=v.flight?`<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">✈ ${v.flight} ↗</a>`:'';
+    const _lang=resolveLanguage(v.language,v.phone);
+    const langFlags={PT:'🇵🇹',EN:'🇬🇧',FR:'🇫🇷',ES:'🇪🇸',IT:'🇮🇹',DE:'🇩🇪'};
+    const langTag=`<span class="dc-tag">${langFlags[_lang]||'🌐'} ${_lang}</span>`;
     const navAddr=isC?destino:origem;
     const gmUrl=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(navAddr)}`;
     const wzUrl=`https://waze.com/ul?q=${encodeURIComponent(navAddr)}&navigate=yes`;
@@ -332,11 +350,15 @@ function render(){
     html+=`<div class="dc ${tc}">
       <div class="dc-row1">
         <div class="dc-timebox"><div class="dc-hora">${hora}</div><div class="dc-tipo-lbl">${icoLbl}</div></div>
-        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${esc(v.client)}')">${v.client||'—'}</div><div class="dc-tags-row">${fltTag}${paxTag}${bagsTag}</div></div>
+        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${esc(v.client)}')">${v.client||'—'}</div><div class="dc-tags-row">${fltTag}${langTag}${paxTag}${bagsTag}</div></div>
         <div class="dc-navbtns"><a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a><a class="dc-navbtn wz" href="${wzUrl}" target="_blank">🔷 Waze</a></div>
       </div>
       ${mid}
-      ${v.phone?`<div class="dc-bottom"><button class="dc-act wpp" onclick="clientMsg('${v.phone.replace(/\D/g,'')}','${tipo}','${esc(v.client)}','${v.language||'EN'}','${esc(origem)}','${hora}')">💬 WhatsApp Cliente</button></div>`:''}
+      ${v.phone?`<div class="dc-bottom">
+        <span style="font-family:var(--mono);font-size:.55rem;color:var(--text-dim);cursor:pointer;padding:.1rem .4rem;border-radius:3px;background:var(--surface);border:1px solid var(--border)" onclick="navigator.clipboard.writeText('${v.phone.replace(/\D/g,'')}').then(()=>this.textContent='✅ Copiado!');setTimeout(()=>this.textContent='📞 ${v.phone}',2000)" title="Copiar número">📞 ${v.phone}</span>
+        <button class="dc-act wpp" onclick="clientMsg('${v.phone.replace(/\D/g,'')}','${tipo}','${esc(v.client)}','${_lang}','${esc(origem)}','${hora}')">💬 WhatsApp</button>
+        <a class="dc-act wpp" href="sms:${v.phone.replace(/\D/g,'')}" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.28);color:var(--accent);flex:0">💬 SMS</a>
+      </div>`:''}
     </div>`;
   });
   main.innerHTML=html;
