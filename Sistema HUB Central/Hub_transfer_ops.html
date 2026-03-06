@@ -395,6 +395,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-phone{font-family:var(--mono);font-size:.55rem;padding:.1rem .4rem;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all .15s;white-space:nowrap}
 .dc-phone:hover{border-color:var(--accent);color:var(--text)}
 .dc-act.sms{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.28);color:var(--accent);text-decoration:none;flex:0}
+/* ── Dar Baixa ── */
+.dc-act.done{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28);color:var(--recolha)}
+.dc-act.done:hover{background:rgba(16,185,129,.2)}
+.dc-act.done.loading{opacity:.5;pointer-events:none}
+.dc.dc-done{opacity:.4;border-left-color:var(--text-muted)!important}
+.dc.dc-done:hover{opacity:.65}
+/* ── Preço motorista ── */
+.dc-price{font-family:var(--mono);font-size:.58rem;font-weight:700;padding:.12rem .5rem;border-radius:4px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--recolha);white-space:nowrap}
+/* ── Date Picker ── */
+.dia-date-bar{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+.dia-date-btn{padding:.32rem .6rem;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:.58rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.dia-date-btn:hover{border-color:var(--chegada);color:var(--chegada);background:var(--chegada-dim)}
+.dia-date-btn.active{border-color:var(--chegada);color:var(--chegada);background:var(--chegada-dim)}
+.dia-date-input{padding:.3rem .5rem;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--mono);font-size:.58rem;cursor:pointer;outline:none;color-scheme:dark}
+.dia-date-input:focus{border-color:var(--chegada)}
+.dia-drv-filter{padding:.3rem .5rem;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--mono);font-size:.58rem;cursor:pointer;outline:none;color-scheme:dark;min-width:140px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath stroke='%23566480' stroke-width='1.4' d='M1 1l3.5 3.5L8 1'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .4rem center;padding-right:1.4rem}
+.dia-drv-filter:focus{border-color:var(--recolha)}
+.dia-drv-filter option{background:#141929}
+/* ── Resumo de pagamento ── */
+.dia-pay-summary{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;flex-wrap:wrap}
+.dia-pay-item{font-family:var(--mono);font-size:.58rem;color:var(--text-dim)}
+.dia-pay-total{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--recolha);margin-left:auto}
 .dc-navbtn{display:inline-flex;align-items:center;gap:.22rem;padding:.28rem .52rem;border-radius:4px;font-family:var(--mono);font-size:.52rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;text-decoration:none;flex-shrink:0}
 .dc-navbtn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.3);color:#4285f4}
 .dc-navbtn.gm:hover{background:rgba(66,133,244,.2)}
@@ -687,6 +709,21 @@ let nextId=1;
 let currentTab='current';  // current | chegadas | recolhas | past | cancelled
 let subFilter='all';       // all | CHEGADA | RECOLHA  (for current)
 let modalDrvPhone='';
+
+/* ── Data selecionada (default: hoje) ── */
+let SELECTED_DATE = ''; /* vazio = hoje */
+let SELECTED_DRIVER = ''; /* vazio = todos */
+function todayStr(){ return new Date().toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'/'); }
+function dateToParam(d){ /* DD/MM/YYYY → DD/MM/YYYY para o GAS */ return d || todayStr(); }
+function dateToISO(ddmmyyyy){ const p=ddmmyyyy.split('/');return `${p[2]}-${p[1]}-${p[0]}`; }
+function isoToDate(iso){ const p=iso.split('-');return `${p[2]}/${p[1]}/${p[0]}`; }
+
+/* ── Preço por viagem para motorista ── */
+function calcDriverPrice(platform){
+  const p = String(platform||'').toLowerCase().trim();
+  if(p.includes('talixo') || p.includes('world transfer') || p.includes('wt driver') || p.includes('wt ') || p==='wt') return 9;
+  return 10;
+}
 </script>
 
 <!-- ── TOPBAR ── -->
@@ -1332,12 +1369,22 @@ function renderDia(){
   document.getElementById('pzone').style.display = 'none';
   document.getElementById('hdrFilters').style.display = 'none';
 
-  const today = new Date().toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'/');
-  const list  = HUB_VIAGENS;
+  const displayDate = SELECTED_DATE || todayStr();
+  const isToday = displayDate === todayStr();
+  const listAll = HUB_VIAGENS;
+  const list = SELECTED_DRIVER
+    ? listAll.filter(v => (v.driver||'').toLowerCase().trim() === SELECTED_DRIVER.toLowerCase().trim())
+    : listAll;
   const nc    = list.filter(v=>detectTipo(v.origin,v.flight)==='CHEGADA').length;
   const nt    = list.filter(v=>detectTipo(v.origin,v.flight)==='TOUR').length;
   const nr    = list.filter(v=>detectTipo(v.origin,v.flight)==='RECOLHA').length;
+  const activas = list.filter(v=>!v.concluida);
+  const concluidas = list.filter(v=>v.concluida);
   const semMotorista = list.filter(v=>!v.driver).length;
+
+  /* Calcular pagamentos */
+  let totalPay = 0;
+  list.forEach(v=>{ if(v.driver) totalPay += calcDriverPrice(v.platform); });
 
   // Status bar de sync
   const urlOk = !!HUB_VIAGENS_URL;
@@ -1352,11 +1399,26 @@ function renderDia(){
     ${nt>0?`<div class="dia-stat s-tour"><div class="dia-stat-n">${nt}</div><div class="dia-stat-l">Tours</div></div>`:''}
   </div>`;
 
+  /* ── Date Picker ── */
+  const isoDate = SELECTED_DATE ? dateToISO(SELECTED_DATE) : new Date().toISOString().slice(0,10);
+  const yesterday = new Date(Date.now()-86400000).toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'});
+  const tomorrow  = new Date(Date.now()+86400000).toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'});
+  html += `<div class="dia-date-bar">
+    <button class="dia-date-btn" onclick="loadDate('${yesterday}')">◀ Ontem</button>
+    <button class="dia-date-btn ${isToday?'active':''}" onclick="loadDate('')">📅 Hoje</button>
+    <button class="dia-date-btn" onclick="loadDate('${tomorrow}')">Amanhã ▶</button>
+    <input type="date" class="dia-date-input" value="${isoDate}" onchange="loadDate(isoToDate(this.value))">
+    <select class="dia-drv-filter" onchange="filterDriver(this.value)">
+      <option value="">👥 Todos os motoristas</option>
+      ${getDriverOptions()}
+    </select>
+  </div>`;
+
   // Sync bar
   html += `<div class="dia-sync-bar">
     <div class="dia-sync-info">
-      <strong>${today}</strong> · ${urlOk ? 'Ligado ao HUB Central' : '⚠️ URL não configurado'}<br>
-      ${list.length ? `Último sync: ${lastSync}` : urlOk ? 'Clica em Sincronizar' : 'Configura o URL na sidebar'}
+      <strong>${displayDate}</strong>${!isToday?' · 📆 Histórico':''}${SELECTED_DRIVER?' · 🚗 '+SELECTED_DRIVER:''} · ${urlOk ? 'Ligado ao HUB Central' : '⚠️ URL não configurado'}<br>
+      ${list.length ? `${list.length}${SELECTED_DRIVER?' de '+listAll.length:''} viagens · Último sync: ${lastSync}` : urlOk ? 'Clica em Sincronizar' : 'Configura o URL na sidebar'}
       ${semMotorista > 0 ? ` · <span style="color:var(--danger)">${semMotorista} sem motorista</span>` : ''}
     </div>
     <button class="dia-sync-btn" id="diaSyncBtn" onclick="syncViagens(true)">🔄 Sincronizar</button>
@@ -1493,10 +1555,15 @@ function buildDiaCard(v){
     const wppCUrl = v.phone ? `https://wa.me/${v.phone.replace(/\D/g,'')}` : '#';
     const wppCCls = v.phone ? '' : ' dis';
 
-    return `<div class="dc ${tc}" id="dcard-${cardId}">
+    const isDone = v.concluida || v.status === 'CONCLUIDA' || v.status === 'FINALIZOU';
+    const doneClass = isDone ? ' dc-done' : '';
+    const priceVal = v.driver ? calcDriverPrice(v.platform) : 0;
+    const priceTag = v.driver ? `<span class="dc-price">€${priceVal}</span>` : '';
+
+    return `<div class="dc ${tc}${doneClass}" id="dcard-${cardId}">
       <div class="dc-row1">
         <div class="dc-timebox"><div class="dc-hora">${hora}</div><div class="dc-tipo-lbl">${icoLbl}</div></div>
-        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${(v.client||'').replace(/'/g,"\\'")}')" style="cursor:pointer">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${langTag}${paxTag}${bagsTag}</div></div>
+        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${(v.client||'').replace(/'/g,"\\'")}')" style="cursor:pointer">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${langTag}${paxTag}${bagsTag}${priceTag}</div></div>
         <div class="dc-navbtns"><a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a><a class="dc-navbtn wz" href="${wzUrl}" target="_blank">🔷 Waze</a></div>
       </div>
       ${middleHtml}
@@ -1506,8 +1573,25 @@ function buildDiaCard(v){
         <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
         ${v.phone ? `<button class="dc-act sms" onclick="diaSmsMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">💬 SMS</button>` : ''}
         <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}')">⚡ Motorista</button>
+        ${isDone ? `<span class="dc-act done" style="pointer-events:none">✅ Concluída</span>` : `<button class="dc-act done" id="done-${cardId}" onclick="darBaixa('${v.id||''}','${v.rowIndex||''}','${cardId}')">✅ Dar Baixa</button>`}
       </div>
     </div>`;
+  }
+
+  /* ── Resumo pagamento motoristas ── */
+  if(list.length && list.some(v=>v.driver)){
+    const drivers = {};
+    list.forEach(v=>{
+      if(!v.driver) return;
+      if(!drivers[v.driver]) drivers[v.driver] = {count:0, total:0};
+      drivers[v.driver].count++;
+      drivers[v.driver].total += calcDriverPrice(v.platform);
+    });
+    html += `<div class="dia-pay-summary">`;
+    Object.keys(drivers).sort().forEach(d=>{
+      html += `<span class="dia-pay-item">${d}: ${drivers[d].count}× = <strong>€${drivers[d].total}</strong></span>`;
+    });
+    html += `<span class="dia-pay-total">Total: €${totalPay}</span></div>`;
   }
 
   /* ═══ TIMELINE CRONOLÓGICA — tudo misturado por hora ═══ */
@@ -1666,6 +1750,52 @@ function resolveLanguage(lang, phone){
   return 'EN';
 }
 
+/* ─── DAR BAIXA — Marcar viagem como concluída ─── */
+async function darBaixa(id, rowIndex, cardId){
+  if(!confirm('Confirmar conclusão desta viagem?')) return;
+  const btn = document.getElementById('done-'+cardId);
+  if(btn){ btn.classList.add('loading'); btn.textContent='⏳...'; }
+  try{
+    const url = HUB_VIAGENS_URL + '?action=completar&id=' + encodeURIComponent(id) + '&row=' + (rowIndex||'') + '&t=' + Date.now();
+    const resp = await fetch(url, {redirect:'follow'});
+    const data = await resp.json();
+    if(data.success){
+      if(btn){ btn.textContent='✅ Concluída'; btn.style.pointerEvents='none'; }
+      const card = document.getElementById('dcard-'+cardId);
+      if(card) card.classList.add('dc-done');
+      /* Actualizar localmente */
+      const v = HUB_VIAGENS.find(x=>(x.id||'')==id);
+      if(v){ v.concluida = true; v.status = 'CONCLUIDA'; }
+    } else {
+      alert('⚠️ Erro: ' + (data.error||'Não foi possível dar baixa'));
+      if(btn){ btn.classList.remove('loading'); btn.textContent='✅ Dar Baixa'; }
+    }
+  }catch(err){
+    alert('⚠️ Erro de rede: ' + err.message);
+    if(btn){ btn.classList.remove('loading'); btn.textContent='✅ Dar Baixa'; }
+  }
+}
+
+/* ─── LOAD DATE — Carregar viagens de outra data ─── */
+function loadDate(dateStr){
+  SELECTED_DATE = dateStr; /* vazio = hoje */
+  SELECTED_DRIVER = ''; /* reset filtro motorista ao mudar data */
+  syncViagens(true);
+}
+
+/* ─── FILTRO MOTORISTA ─── */
+function filterDriver(name){
+  SELECTED_DRIVER = name;
+  renderDia();
+}
+function getDriverOptions(){
+  const drivers = {};
+  HUB_VIAGENS.forEach(function(v){ if(v.driver) drivers[v.driver] = (drivers[v.driver]||0) + 1; });
+  return Object.keys(drivers).sort().map(function(d){
+    return '<option value="'+d+'"'+(SELECTED_DRIVER===d?' selected':'')+'>'+d+' ('+drivers[d]+')</option>';
+  }).join('');
+}
+
   /* ─── SYNC VIAGENS — HUB CENTRAL ─── */
 function toggleViagensCfg(){
   const cfg = document.getElementById('sbViagensCfg');
@@ -1702,7 +1832,8 @@ async function syncViagens(manual){
   if(!HUB_VIAGENS_URL){ setViagensStatus('offline','URL não configurado'); if(currentTab==='dia')renderDia(); return; }
   setViagensStatus('loading','A sincronizar...');
   try{
-    const url  = HUB_VIAGENS_URL + '?action=viagens&t=' + Date.now();
+    let url = HUB_VIAGENS_URL + '?action=viagens&t=' + Date.now();
+    if(SELECTED_DATE) url += '&data=' + encodeURIComponent(SELECTED_DATE);
     const resp = await fetch(url, {redirect:'follow'});
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
@@ -1711,7 +1842,8 @@ async function syncViagens(manual){
     HUB_VIAGENS = list;
     const ts = new Date().toLocaleString('pt-PT',{timeZone:'Europe/Lisbon',hour:'2-digit',minute:'2-digit'});
     localStorage.setItem('hub_viagens_last_sync', ts);
-    setViagensStatus('online', `${list.length} viagens · ${ts}`);
+    const dateLabel = SELECTED_DATE || todayStr();
+    setViagensStatus('online', `${list.length} viagens · ${dateLabel} · ${ts}`);
     updateCounts();
     if(manual){
       const btn = document.getElementById('sbViagensSync');
