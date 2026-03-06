@@ -397,6 +397,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-navbtn.wz:hover{background:rgba(53,197,240,.2)}
   
 /* ── EMPTY ── */
+/* ── PLACA NOME CLIENTE (fullscreen) ── */
+.nameplate{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.nameplate.open{display:flex}
+.nameplate-logo{font-family:var(--mono);font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,158,11,.4);margin-bottom:.5rem}
+.nameplate-name{font-family:var(--sans);font-weight:800;color:#f59e0b;text-align:center;text-transform:uppercase;letter-spacing:.06em;line-height:1.1;word-break:break-word;max-width:95vw}
+.nameplate-hint{position:absolute;bottom:1.2rem;font-family:var(--mono);font-size:.55rem;color:rgba(255,255,255,.15);letter-spacing:.1em}
+@media(orientation:portrait){.nameplate-rotate{display:flex;align-items:center;gap:.4rem;margin-top:1rem;font-family:var(--mono);font-size:.55rem;color:rgba(255,255,255,.2)}.nameplate-rotate .rot-ico{display:inline-block;animation:rotH 2s ease-in-out infinite}@keyframes rotH{0%,100%{transform:rotate(0)}50%{transform:rotate(90deg)}}}
+@media(orientation:landscape){.nameplate-rotate{display:none}}
+
 .empty{text-align:center;padding:2.5rem 2rem 3rem;color:var(--text-dim);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .empty-ico{font-size:2rem;margin-bottom:.6rem;opacity:.5}
 .empty-txt{font-family:var(--mono);font-size:.65rem;color:var(--text-muted);letter-spacing:.08em;line-height:1.9}
@@ -1476,7 +1485,7 @@ function buildDiaCard(v){
     return `<div class="dc ${tc}" id="dcard-${cardId}">
       <div class="dc-row1">
         <div class="dc-timebox"><div class="dc-hora">${hora}</div><div class="dc-tipo-lbl">${icoLbl}</div></div>
-        <div class="dc-info"><div class="dc-client-name">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${paxTag}${bagsTag}</div></div>
+        <div class="dc-info"><div class="dc-client-name" onclick="showNameplate('${(v.client||'').replace(/'/g,"\\'")}')" style="cursor:pointer">${v.client||'—'}</div><div class="dc-tags-row">${drvTag}${fltTag}${paxTag}${bagsTag}</div></div>
         <div class="dc-navbtns"><a class="dc-navbtn gm" href="${gmUrl}" target="_blank">🗺 Maps</a><a class="dc-navbtn wz" href="${wzUrl}" target="_blank">🔷 Waze</a></div>
       </div>
       ${middleHtml}
@@ -1657,6 +1666,38 @@ async function syncDrivers(manual){
     );
   }
   renderAll();
+}
+
+/* ═══ PLACA NOME CLIENTE — fullscreen ═══ */
+function showNameplate(name){
+  let ov = document.getElementById('nameplate');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'nameplate';
+    ov.className = 'nameplate';
+    ov.innerHTML = `
+      <div class="nameplate-logo">HUB TRANSFER</div>
+      <div class="nameplate-name" id="npName"></div>
+      <div class="nameplate-rotate"><span class="rot-ico">📱</span> Deita o telemóvel para placa maior</div>
+      <div class="nameplate-hint">toca para fechar</div>
+    `;
+    ov.onclick = ()=>{ ov.classList.remove('open'); document.body.style.overflow=''; };
+    document.body.appendChild(ov);
+  }
+  const el = document.getElementById('npName');
+  el.textContent = name;
+  let sz = 18;
+  el.style.fontSize = sz + 'vw';
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(()=>{
+    const maxW = window.innerWidth * 0.92;
+    const maxH = window.innerHeight * 0.55;
+    while((el.scrollWidth > maxW || el.scrollHeight > maxH) && sz > 3){
+      sz -= 0.5;
+      el.style.fontSize = sz + 'vw';
+    }
+  });
 }
 
 // ─── INIT ───
