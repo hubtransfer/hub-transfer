@@ -95,6 +95,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .dc-addr-btn{font-family:var(--mono);font-size:.52rem;padding:.15rem .4rem;border-radius:3px;text-decoration:none;white-space:nowrap}
 .dc-addr-btn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);color:#4285f4}
 .dc-addr-btn.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.25);color:#35c5f0}
+.dc-loc-name{font-family:var(--sans);font-size:.65rem;font-weight:700;color:var(--text);margin-bottom:.1rem}
+.dc-loc-addr{font-family:var(--mono);font-size:.52rem;color:var(--text-dim);margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Rota RECOLHA ── */
 .dc-route-block{padding:.6rem .85rem;border-bottom:1px solid var(--border);background:rgba(16,185,129,.04)}
@@ -246,6 +248,17 @@ function cleanHora(h){
   try{const d=new Date(s);if(!isNaN(d.getTime()))return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}catch(e){}
   return s.slice(0,5)||'—:—';
 }
+function splitLocation(raw){
+  if(!raw||raw==='—')return{name:'',addr:raw||'—'};
+  const s=String(raw).trim(),parts=s.split(',').map(p=>p.trim());
+  if(parts.length<2)return{name:'',addr:s};
+  const f=parts[0].toLowerCase();
+  const kw=['hotel','hostel','residencial','aparthotel','guest house','guesthouse','pousada','resort','villa','palace','suites','lodge','inn','b&b','apartment','apartamento','residence','aeroporto','airport','terminal','humberto delgado','portela','epic sana','sana','turim','ibis','novotel','mercure','marriott','hilton','sheraton','radisson','holiday inn','pestana','altis','tivoli','dom pedro','corinthia','intercontinental','ritz','sofitel','hyatt','inspira','memmo','heritage','rossio','empire','gota','escola','museu','estação','praça','centro','parque','jardim','castelo','miradouro','restaurante','café','igreja'];
+  const has=kw.some(k=>f.includes(k));
+  const isStreet=/^(rua|r\.|av\.|av |avenida|alameda|travessa|tv\.|largo|praça|estrada|calçada|beco|campo|cais)/i.test(parts[0]);
+  if(has&&!/^\d/.test(parts[0])&&!isStreet){return{name:parts[0],addr:parts.slice(1).join(', ')};}
+  return{name:'',addr:s};
+}
 const DDI_LANG={'351':'PT','55':'PT','34':'ES','54':'ES','56':'ES','57':'ES','52':'ES','33':'FR','32':'FR','221':'FR','212':'FR','213':'FR','216':'FR','225':'FR','237':'FR','243':'FR','39':'IT','49':'DE','43':'DE','44':'EN','1':'EN','61':'EN','353':'EN','27':'EN','234':'EN','254':'EN','244':'PT','258':'PT','238':'PT'};
 function resolveLanguage(lang,phone){
   const valid=['PT','EN','ES','FR','IT','DE'];const u=String(lang||'').toUpperCase().trim();
@@ -302,6 +315,7 @@ function render(){
     const icoLbl=isC?'✈ CHEGADA':isT?'🧭 TOUR':'🚗 RECOLHA';
     let hora='—:—';if(v.pickupTime){const m=String(v.pickupTime).match(/(\d{1,2}):(\d{2})/);hora=m?`${m[1].padStart(2,'0')}:${m[2]}`:'—:—';}
     const origem=v.origin||'—',destino=v.destination||'—';
+    const locO=splitLocation(origem),locD=splitLocation(destino);
     const paxTag=v.pax?`<span class="dc-tag">👤 ${v.pax}</span>`:'';
     const bagsTag=v.bags?`<span class="dc-tag">🧳 ${v.bags}</span>`:'';
     const fltTag=v.flight?`<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">✈ ${v.flight} ↗</a>`:'';
@@ -337,20 +351,20 @@ function render(){
         </div>
         <div class="dc-fapt"><div class="dc-fcode" style="color:var(--chegada)">${arr}</div><div class="dc-fcity">${arrC}</div></div>
       </div></div>
-      <div class="dc-addrs"><div class="dc-addr-block"><div class="dc-addr-lbl">✈ Aeroporto</div><div class="dc-addr-val">📍 ${origem}</div><div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
-      <div class="dc-addr-block"><div class="dc-addr-lbl">📍 Hotel / Destino</div><div class="dc-addr-val">📍 ${destino}</div><div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div></div></div>`;
+      <div class="dc-addrs"><div class="dc-addr-block"><div class="dc-addr-lbl">✈ Aeroporto</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:""}<div class="dc-loc-addr">📍 ${locO.addr}</div><div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
+      <div class="dc-addr-block"><div class="dc-addr-lbl">📍 Hotel / Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:""}<div class="dc-loc-addr">📍 ${locD.addr}</div><div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div></div></div>`;
     }else if(isR){
       mid=`<div class="dc-route-block"><div class="dc-route-visual">
         <div class="dc-route-dots"><div class="dc-route-dot-a"></div><div class="dc-route-line"></div><div class="dc-route-dot-b"></div></div>
         <div class="dc-route-addrs">
-          <div><div class="dc-route-lbl">📍 Recolha</div><div class="dc-route-val">${origem}</div><div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
-          <div style="margin-top:.3rem"><div class="dc-route-lbl">✈ Destino</div><div class="dc-route-val">${destino}</div><div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
+          <div><div class="dc-route-lbl">📍 Recolha</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:""}<div class="dc-route-val">${locO.addr}</div><div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
+          <div style="margin-top:.3rem"><div class="dc-route-lbl">✈ Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:""}<div class="dc-route-val">${locD.addr}</div><div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div></div>
         </div></div></div>`;
     }else{
       mid=`<div class="dc-tour-block"><div style="display:flex;align-items:center;gap:.6rem"><div style="font-size:1.4rem">🧭</div><div style="flex:1">
-        <div class="dc-route-lbl">📍 Ponto de encontro</div><div class="dc-route-val">${origem}</div>
-        <div class="dc-route-btns" style="margin-top:.15rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
-        ${destino!=='—'?`<div class="dc-route-lbl" style="margin-top:.3rem">🏁 Destino</div><div class="dc-route-val">${destino}</div><div class="dc-route-btns" style="margin-top:.15rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
+        <div class="dc-route-lbl">📍 Ponto de encontro</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:""}<div class="dc-route-val">${locO.addr}</div>
+        <div class="dc-route-btns" style="margin-top:.15rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+        ${destino!=='—'?`<div class="dc-route-lbl" style="margin-top:.3rem">🏁 Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:""}<div class="dc-route-val">${locD.addr}</div><div class="dc-route-btns" style="margin-top:.15rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
       </div></div></div>`;
     }
 
