@@ -112,6 +112,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc:hover{border-color:var(--border2)}
 .dc.dc-chegada{border-left:3px solid var(--chegada)}
 .dc.dc-recolha{border-left:3px solid var(--recolha)}
+.dc.dc-tour{border-left:3px solid #a855f7}
+.dc-tour .dc-hora{color:#a855f7}
 .dc-top{display:grid;grid-template-columns:64px 1fr auto;min-height:72px}
 .dc-time{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem .25rem;border-right:1px solid var(--border);background:var(--surface2);gap:2px}
 .dc-h{font-family:var(--mono);font-size:1.05rem;font-weight:700;line-height:1;letter-spacing:.01em}
@@ -304,6 +306,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc:hover{border-color:var(--border2)}
 .dc.dc-chegada{border-left:3px solid var(--chegada)}
 .dc.dc-recolha{border-left:3px solid var(--recolha)}
+.dc.dc-tour{border-left:3px solid #a855f7}
+.dc-tour .dc-hora{color:#a855f7}
 .dc-row1{display:grid;grid-template-columns:68px 1fr auto;border-bottom:1px solid var(--border)}
 .dc-timebox{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.55rem .2rem;border-right:1px solid var(--border);background:var(--surface2);gap:1px;flex-shrink:0}
 .dc-hora{font-family:var(--mono);font-size:1.1rem;font-weight:700;line-height:1;letter-spacing:.01em}
@@ -463,25 +467,40 @@ const DRIVERS_FALLBACK = [
 
 const PLATFORMS=['Talixo','Empire Lisbon','Empire Marques','WT Driver'];
 
+function detectTipo(origin,flight){
+  const o=String(origin||'').toLowerCase();
+  const isApt=o.includes('aeroporto')||o.includes('airport')||o.includes('humberto delgado')||o.includes('portela')||o.includes('lis)');
+  const hasF=!!(flight&&String(flight).trim()&&String(flight).trim()!=='.');
+  if(isApt&&hasF)return'CHEGADA';
+  if(!isApt)return'RECOLHA';
+  return'TOUR';
+}
 const TEMPLATES={
   CHEGADA:{
-    PT:(m,c)=>`Olá! 👋 Sou o ${m}, seu motorista do HUB Transfer.\n\nEspero que tenha feito uma boa viagem!\n\nPor favor, diga-me passo a passo onde está:\n• Quando estiver no controlo de passaportes\n• A caminho da recolha de bagagens\n• Quando tiver as suas bagagens\n\nAté já! 🚗`,
-    EN:(m,c)=>`Hi! 👋 I'm ${m}, your HUB Transfer driver.\n\nI hope you had a great trip!\n\nCan you tell me step by step where you are?\n• When you're at passport control\n• Going to luggage claim\n• When you have your luggage\n\nSee you soon! 🚗`,
-    ES:(m,c)=>`¡Hola! 👋 Soy ${m}, su conductor de HUB Transfer.\n\n¡Espero que haya tenido un buen viaje!\n\n¿Puede decirme dónde está?\n• Al control de pasaportes\n• Recogiendo el equipaje\n• Cuando tenga sus maletas\n\n¡Hasta pronto! 🚗`,
-    FR:(m,c)=>`Bonjour! 👋 Je suis ${m}, votre chauffeur HUB Transfer.\n\nJ'espère que vous avez fait un bon voyage!\n\nPouvez-vous me dire où vous êtes?\n• Au contrôle des passeports\n• En route vers les bagages\n• Quand vous avez vos bagages\n\nÀ bientôt! 🚗`,
-    IT:(m,c)=>`Ciao! 👋 Sono ${m}, il tuo autista HUB Transfer.\n\nSpero che tu abbia fatto un buon viaggio!\n\nPuoi dirmi dove sei?\n• Al controllo passaporti\n• Andando a ritirare i bagagli\n• Quando hai le valigie\n\nA presto! 🚗`,
-    DE:(m,c)=>`Hallo! 👋 Ich bin ${m}, Ihr HUB Transfer Fahrer.\n\nIch hoffe, Sie hatten eine gute Reise!\n\nKönnen Sie mir sagen, wo Sie sind?\n• An der Passkontrolle\n• Auf dem Weg zur Gepäckausgabe\n• Wenn Sie Ihr Gepäck haben\n\nBis gleich! 🚗`,
+    PT:(m,c)=>`Oi, ${c}! 👋 Aqui é o ${m}, da HUB Transfer.\nBem-vindo(a) a Portugal! 🇵🇹 Espero que o voo tenha sido tranquilo.\nVou te ajudar a sair do aeroporto sem stress.\n\nEstou enviando a foto abaixo para facilitar chegar no nosso ponto de encontro.\n\nPor favor, me avisa quando:\n1️⃣ Passar pelo controle de passaportes\n2️⃣ Estiver com as malas na mão\n\nTe vejo em breve! Se precisar de algo, pode me enviar uma mensagem. 👍`,
+    EN:(m,c)=>`Hi ${c}! 👋 I'm ${m}, from HUB Transfer.\nWelcome to Portugal! 🇵🇹 I hope you had a pleasant flight.\nI'm here to make your arrival stress-free.\n\nI'm sending the photo below to help you find our meeting point.\n\nPlease let me know when:\n1️⃣ You pass through passport control\n2️⃣ You have your luggage ready\n\nSee you soon! If you need anything, just send me a message. 👍`,
+    ES:(m,c)=>`¡Hola, ${c}! 👋 Soy ${m}, de HUB Transfer.\n¡Bienvenido(a) a Portugal! 🇵🇹 Espero que el vuelo haya sido tranquilo.\nTe ayudaré a salir del aeropuerto sin estrés.\n\nTe envío la foto abajo para facilitar que llegues a nuestro punto de encuentro.\n\nPor favor, avísame cuando:\n1️⃣ Pases el control de pasaportes\n2️⃣ Tengas tus maletas contigo\n\n¡Te veo pronto! Si necesitas algo, puedes enviarme un mensaje. 👍`,
+    FR:(m,c)=>`Bonjour ${c} ! 👋 C'est ${m}, de HUB Transfer.\nBienvenue au Portugal ! 🇵🇹 J'espère que vous avez fait un bon vol.\nJe vais vous aider à quitter l'aéroport sans stress.\n\nJe vous envoie la photo ci-dessous pour vous aider à trouver notre point de rencontre.\n\nMerci de me prévenir quand :\n1️⃣ Vous passez le contrôle des passeports\n2️⃣ Vous avez récupéré vos bagages\n\nÀ très vite ! Si vous avez besoin de quelque chose, envoyez-moi un message. 👍`,
+    IT:(m,c)=>`Ciao ${c}! 👋 Sono ${m}, di HUB Transfer.\nBenvenuto(a) in Portogallo! 🇵🇹 Spero che il volo sia stato tranquillo.\nTi aiuterò a uscire dall'aeroporto senza stress.\n\nTi invio la foto qui sotto per aiutarti a trovare il nostro punto di incontro.\n\nPer favore, avvisami quando:\n1️⃣ Passi il controllo passaporti\n2️⃣ Hai preso i bagagli\n\nCi vediamo presto! Se hai bisogno di qualcosa, mandami un messaggio. 👍`,
+    DE:(m,c)=>`Hallo ${c}! 👋 Ich bin ${m}, von HUB Transfer.\nWillkommen in Portugal! 🇵🇹 Ich hoffe, Sie hatten einen angenehmen Flug.\nIch helfe Ihnen, den Flughafen stressfrei zu verlassen.\n\nIch schicke Ihnen das Foto unten, um Ihnen zu helfen, unseren Treffpunkt zu finden.\n\nBitte geben Sie mir Bescheid, wenn:\n1️⃣ Sie durch die Passkontrolle gehen\n2️⃣ Sie Ihr Gepäck haben\n\nBis gleich! Wenn Sie etwas brauchen, schicken Sie mir einfach eine Nachricht. 👍`,
   },
   RECOLHA:{
-    PT:(m,c)=>`Olá, ${c}! 👋\n\nSou o ${m}, o seu motorista do HUB Transfer.\n\nJá estou a caminho! 🚗\n\nAvise-me quando estiver pronto:\n• Quando descer com as bagagens\n• Se precisar de mais alguns minutos\n\nAté já!`,
-    EN:(m,c)=>`Hi, ${c}! 👋\n\nI'm ${m}, your HUB Transfer driver.\n\nI'm on my way to pick you up! 🚗\n\nPlease let me know when you're ready:\n• When you come down with your luggage\n• If you need a few more minutes\n\nSee you soon!`,
-    ES:(m,c)=>`¡Hola, ${c}! 👋\n\nSoy ${m}, su conductor de HUB Transfer.\n\n¡Estoy en camino! 🚗\n\nAvíseme cuando esté listo:\n• Cuando baje con el equipaje\n• Si necesita unos minutos más\n\n¡Hasta pronto!`,
-    FR:(m,c)=>`Bonjour, ${c}! 👋\n\nJe suis ${m}, votre chauffeur HUB Transfer.\n\nJe suis en route! 🚗\n\nPrévenez-moi quand vous serez prêt:\n• Quand vous descendez avec vos bagages\n• Si vous avez besoin de quelques minutes\n\nÀ bientôt!`,
-    IT:(m,c)=>`Ciao, ${c}! 👋\n\nSono ${m}, il tuo autista HUB Transfer.\n\nSto arrivando! 🚗\n\nFammi sapere quando sei pronto:\n• Quando scendi con i bagagli\n• Se hai bisogno di qualche minuto\n\nA presto!`,
-    DE:(m,c)=>`Hallo, ${c}! 👋\n\nIch bin ${m}, Ihr HUB Transfer Fahrer.\n\nIch bin auf dem Weg! 🚗\n\nBitte lassen Sie mich wissen, wenn Sie bereit sind:\n• Wenn Sie mit dem Gepäck herunterkommen\n• Wenn Sie noch ein paar Minuten brauchen\n\nBis gleich!`,
-  }
+    PT:(m,c,o,h)=>`Olá, ${c}! 👋 Aqui é o ${m}, da HUB Transfer.\nSou o motorista responsável pelo seu transfer de hoje.\n\n📍 Estarei em *${o||'sua morada'}* no horário combinado: *${h||'—'}*\n\nQuando eu chegar, vou te avisar por aqui! 😊\n\nSe precisar de algo ou houver qualquer alteração, me avise por aqui. 👍`,
+    EN:(m,c,o,h)=>`Hello, ${c}! 👋 I'm ${m}, from HUB Transfer.\nI'm the driver for your transfer today.\n\n📍 I'll be at *${o||'your address'}* at the scheduled time: *${h||'—'}*\n\nI'll let you know when I arrive! 😊\n\nIf you need anything or there are any changes, just message me here. 👍`,
+    ES:(m,c,o,h)=>`¡Hola, ${c}! 👋 Soy ${m}, de HUB Transfer.\nSoy el conductor de su transfer de hoy.\n\n📍 Estaré en *${o||'su dirección'}* a la hora acordada: *${h||'—'}*\n\n¡Te avisaré cuando llegue! 😊\n\nSi necesita algo o hay algún cambio, escríbame por aquí. 👍`,
+    FR:(m,c,o,h)=>`Bonjour ${c} ! 👋 C'est ${m}, de HUB Transfer.\nJe suis le chauffeur pour votre transfert aujourd'hui.\n\n📍 Je serai à *${o||'votre adresse'}* à l'heure prévue : *${h||'—'}*\n\nJe vous préviendrai quand j'arriverai ! 😊\n\nSi vous avez besoin de quoi que ce soit, envoyez-moi un message ici. 👍`,
+    IT:(m,c,o,h)=>`Ciao ${c}! 👋 Sono ${m}, di HUB Transfer.\nSono l'autista per il tuo transfer di oggi.\n\n📍 Sarò a *${o||'il tuo indirizzo'}* all'orario previsto: *${h||'—'}*\n\nTi avviserò quando arrivo! 😊\n\nSe hai bisogno di qualcosa o ci sono cambiamenti, scrivimi qui. 👍`,
+    DE:(m,c,o,h)=>`Hallo ${c}! 👋 Ich bin ${m}, von HUB Transfer.\nIch bin der Fahrer für Ihren Transfer heute.\n\n📍 Ich werde um *${h||'—'}* an *${o||'Ihrer Adresse'}* sein.\n\nIch gebe Ihnen Bescheid, wenn ich ankomme! 😊\n\nWenn Sie etwas brauchen, schreiben Sie mir hier. 👍`,
+  },
+  TOUR:{
+    PT:(m,c,o,h)=>`Olá, ${c}! 👋 Aqui é o ${m}, da HUB Transfer.\nEstou confirmando o seu transfer de hoje.\n\n📍 Estarei em *${o||'sua morada'}* às *${h||'—'}*\n\nQualquer dúvida, é só me enviar uma mensagem aqui. 😊 👍`,
+    EN:(m,c,o,h)=>`Hello, ${c}! 👋 I'm ${m}, from HUB Transfer.\nConfirming your transfer for today.\n\n📍 I'll be at *${o||'your address'}* at *${h||'—'}*\n\nFeel free to message me here if you need anything. 😊 👍`,
+    ES:(m,c,o,h)=>`¡Hola, ${c}! 👋 Soy ${m}, de HUB Transfer.\nConfirmando su transfer para hoy.\n\n📍 Estaré en *${o||'su dirección'}* a las *${h||'—'}*\n\nPuede escribirme aquí si necesita algo. 😊 👍`,
+    FR:(m,c,o,h)=>`Bonjour ${c} ! 👋 C'est ${m}, de HUB Transfer.\nJe confirme votre transfert pour aujourd'hui.\n\n📍 Je serai à *${o||'votre adresse'}* à *${h||'—'}*\n\nN'hésitez pas à m'écrire si vous avez besoin de quoi que ce soit. 😊 👍`,
+    IT:(m,c,o,h)=>`Ciao ${c}! 👋 Sono ${m}, di HUB Transfer.\nConferma del tuo transfer per oggi.\n\n📍 Sarò a *${o||'il tuo indirizzo'}* alle *${h||'—'}*\n\nScrivimi qui se hai bisogno di qualcosa. 😊 👍`,
+    DE:(m,c,o,h)=>`Hallo ${c}! 👋 Ich bin ${m}, von HUB Transfer.\nIch bestätige Ihren Transfer für heute.\n\n📍 Ich werde um *${h||'—'}* an *${o||'Ihrer Adresse'}* sein.\n\nSchreiben Sie mir hier, wenn Sie etwas brauchen. 😊 👍`,
+  },
 };
-
 let SERVICES={current:[],past:[],cancelled:[]};
 let nextId=1;
 let currentTab='current';  // current | chegadas | recolhas | past | cancelled
@@ -1174,9 +1193,12 @@ function renderDia(){
   const recolhas = list.filter(v=>v.type==='RECOLHA');
 
 function buildDiaCard(v){
-    const isC = v.type === 'CHEGADA';
-    const tc  = isC ? 'dc-chegada' : 'dc-recolha';
-    const icoLbl = isC ? '▼ CHEGADA' : '▲ RECOLHA';
+    // Detecta tipo real baseado na origem e voo (igual ao GAS)
+    const tipo = v.type || detectTipo(v.origin, v.flight);
+    const isC  = tipo === 'CHEGADA';
+    const isT  = tipo === 'TOUR';
+    const tc   = isC ? 'dc-chegada' : isT ? 'dc-tour' : 'dc-recolha';
+    const icoLbl = isC ? '▼ CHEGADA' : isT ? '◆ TOUR' : '▲ RECOLHA';
 
     // Hora limpa HH:MM
     let hora = '—:—';
@@ -1298,7 +1320,7 @@ function buildDiaCard(v){
           ${drvOpts}
         </select>
         <a class="dc-act wpp-c${wppCCls}" href="${wppCUrl}" target="_blank">${WPP_ICO} Cliente</a>
-        <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${v.type||'RECOLHA'}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}')">⚡ Motorista</button>
+        <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${v.language||'EN'}','${(v.origin||'').replace(/'/g,"\\'")}','${v.pickupTime||''}')">⚡ Motorista</button>
       </div>
 
     </div>`;
@@ -1329,26 +1351,21 @@ function diaSetDriver(sel, cardId){
     else         { tag.className='dc-nodrv-tag'; tag.textContent='⚠️ Sem motorista'; }
   }
 }
-function diaDispatch(cardId, type, client, lang){
-  // Lê SEMPRE o select actual — garante que usa motorista seleccionado neste momento
+function diaDispatch(cardId, type, client, lang, origin, hora){
   const sel = document.getElementById('dcdrv-'+cardId);
   const drv = (sel ? sel.value : '') || _diaDriverMap[cardId] || '';
   if(!drv){ alert('⚠️ Seleciona um motorista primeiro!'); sel&&sel.focus(); return; }
-
   const drvObj = DRIVERS.find(d=>d.name===drv);
-  if(!drvObj?.phone){ alert('⚠️ ' + drv + ' não tem número na HUB Central.\nVerifica a aba Motoristas.'); return; }
-
-  // Escolhe template correcto: CHEGADA ou RECOLHA, no idioma certo
+  if(!drvObj?.phone){ alert('⚠️ ' + drv + ' não tem número na HUB Central.'); return; }
   const fn = TEMPLATES[type]?.[lang]
           || TEMPLATES[type]?.EN
           || TEMPLATES[type]?.PT;
   if(!fn){ alert('Template não encontrado para tipo: ' + type); return; }
-
-  const txt = fn(drv, client);
-  // Abre WhatsApp com template já preenchido com nome do motorista seleccionado
+  // Passa todos os parâmetros — CHEGADA usa (motorista,cliente), RECOLHA/TOUR usa (motorista,cliente,origem,hora)
+  const txt = fn(drv, client, origin, hora);
   window.open(`https://wa.me/${drvObj.phone.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`, '_blank');
 }
-/* ─── SYNC VIAGENS — HUB CENTRAL ─── */
+  /* ─── SYNC VIAGENS — HUB CENTRAL ─── */
 function toggleViagensCfg(){
   const cfg = document.getElementById('sbViagensCfg');
   cfg.classList.toggle('show');
