@@ -348,6 +348,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-addr-btn.gm:hover{background:rgba(66,133,244,.2)}
 .dc-addr-btn.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.25);color:#35c5f0}
 .dc-addr-btn.wz:hover{background:rgba(53,197,240,.2)}
+.dc-loc-name{font-family:var(--sans);font-size:.65rem;font-weight:700;color:var(--text);margin-bottom:.1rem}
+.dc-loc-addr{font-family:var(--mono);font-size:.52rem;color:var(--text-dim);margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dc-fnum-link{text-decoration:none;color:var(--chegada);transition:opacity .15s}
 .dc-fnum-link:hover{opacity:.7}
 
@@ -1385,6 +1387,8 @@ function buildDiaCard(v){
     }
     const origem  = v.origin || '—';
     const destino = v.destination || '—';
+    const locO = splitLocation(origem);
+    const locD = splitLocation(destino);
     const paxTag  = v.pax  ? `<span class="dc-tag">👤 ${v.pax}</span>`  : '';
     const bagsTag = v.bags ? `<span class="dc-tag">🧳 ${v.bags}</span>` : '';
     const fltTag  = v.flight ? `<a class="dc-flight-tag" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank">✈ ${v.flight} ↗</a>` : '';
@@ -1440,12 +1444,12 @@ function buildDiaCard(v){
       </div>
       <div class="dc-addrs">
         <div class="dc-addr-block">
-          <div class="dc-addr-lbl">✈ Aeroporto</div><div class="dc-addr-val">📍 ${origem}</div>
-          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+          <div class="dc-addr-lbl">✈ Aeroporto</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:''}<div class="dc-loc-addr">📍 ${locO.addr}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
         </div>
         <div class="dc-addr-block">
-          <div class="dc-addr-lbl">📍 Hotel / Destino</div><div class="dc-addr-val">📍 ${destino}</div>
-          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+          <div class="dc-addr-lbl">📍 Hotel / Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:''}<div class="dc-loc-addr">📍 ${locD.addr}</div>
+          <div class="dc-addr-btns"><a class="dc-addr-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
         </div>
       </div>`;
     } else if(isR){
@@ -1456,12 +1460,12 @@ function buildDiaCard(v){
           <div class="dc-route-dots"><div class="dc-route-dot-a"></div><div class="dc-route-line"></div><div class="dc-route-dot-b"></div></div>
           <div class="dc-route-addrs">
             <div class="dc-route-addr">
-              <div class="dc-route-lbl">📍 Recolha</div><div class="dc-route-val">${origem}</div>
-              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+              <div class="dc-route-lbl">📍 Recolha</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:''}<div class="dc-route-val">${locO.addr}</div>
+              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
             </div>
             <div class="dc-route-addr">
-              <div class="dc-route-lbl">✈ Destino</div><div class="dc-route-val">${destino}</div>
-              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+              <div class="dc-route-lbl">✈ Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:''}<div class="dc-route-val">${locD.addr}</div>
+              <div class="dc-route-btns"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
             </div>
           </div>
         </div>
@@ -1473,10 +1477,10 @@ function buildDiaCard(v){
         <div class="dc-tour-visual">
           <div class="dc-tour-icon">🧭</div>
           <div class="dc-tour-info">
-            <div class="dc-tour-lbl">📍 Ponto de encontro</div><div class="dc-tour-val">${origem}</div>
-            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(origem)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a></div>
-            ${destino!=='—'?`<div class="dc-tour-lbl" style="margin-top:.3rem">🏁 Destino</div><div class="dc-tour-val">${destino}</div>
-            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destino)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
+            <div class="dc-tour-lbl">📍 Ponto de encontro</div>${locO.name?`<div class="dc-loc-name">${locO.name}</div>`:''}<div class="dc-tour-val">${locO.addr}</div>
+            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locO.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locO.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>
+            ${destino!=='—'?`<div class="dc-tour-lbl" style="margin-top:.3rem">🏁 Destino</div>${locD.name?`<div class="dc-loc-name">${locD.name}</div>`:''}<div class="dc-tour-val">${locD.addr}</div>
+            <div class="dc-route-btns" style="margin-top:.2rem"><a class="dc-route-btn gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locD.addr)}" target="_blank">🗺 Maps</a><a class="dc-route-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(locD.addr)}&navigate=yes" target="_blank">🔷 Waze</a></div>`:''}
           </div>
         </div>
       </div>`;
@@ -1500,7 +1504,7 @@ function buildDiaCard(v){
         <select class="dc-drv-sel" id="dcdrv-${cardId}" onchange="diaSetDriver(this,'${cardId}')"><option value="">— Atribuir motorista —</option>${drvOpts}</select>
         ${v.phone ? `<span class="dc-phone" onclick="navigator.clipboard.writeText('${v.phone.replace(/\D/g,'')}').then(()=>this.textContent='✅ Copiado!');setTimeout(()=>this.textContent='📞 ${v.phone}',2000)" title="Clica para copiar">📞 ${v.phone}</span>` : ''}
         <button class="dc-act wpp-c${wppCCls}" onclick="diaClientMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">${WPP_ICO} Cliente</button>
-        ${v.phone ? `<a class="dc-act sms" href="sms:${v.phone.replace(/\D/g,'')}">💬 SMS</a>` : ''}
+        ${v.phone ? `<button class="dc-act sms" onclick="diaSmsMsg('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}','${(v.phone||'').replace(/\D/g,'')}')">💬 SMS</button>` : ''}
         <button class="dc-act tmpl" onclick="diaDispatch('${cardId}','${tipo}','${(v.client||'').replace(/'/g,"\\'")}','${_resolvedLang}','${(v.origin||'').replace(/'/g,"\\'")}','${hora}')">⚡ Motorista</button>
       </div>
     </div>`;
@@ -1558,6 +1562,55 @@ function diaClientMsg(cardId, type, client, lang, origin, hora, clientPhone){
 }
 
 /* ─── HORA LIMPA — Extrai HH:MM de qualquer formato ─── */
+/* ─── SMS MSG — Mesmo template mas abre SMS em vez de WhatsApp ─── */
+function diaSmsMsg(cardId, type, client, lang, origin, hora, clientPhone){
+  if(!clientPhone){ alert('⚠️ Este cliente não tem número de telefone.'); return; }
+  const sel = document.getElementById('dcdrv-'+cardId);
+  const drv = (sel ? sel.value : '') || _diaDriverMap[cardId] || '';
+  if(!drv){ alert('⚠️ Seleciona um motorista primeiro.'); sel&&sel.focus(); return; }
+  const resolvedLang = resolveLanguage(lang);
+  const horaClean = cleanHora(hora);
+  const fn = TEMPLATES[type]?.[resolvedLang] || TEMPLATES[type]?.EN || TEMPLATES[type]?.PT;
+  if(!fn) return;
+  const txt = fn(drv, client, origin, horaClean);
+  /* sms:NUMBER?&body=TEXT funciona em iOS e Android */
+  window.open(`sms:${clientPhone}?&body=${encodeURIComponent(txt)}`, '_self');
+}
+
+/* ─── SEPARAR NOME DO ESTABELECIMENTO DO ENDEREÇO ─── */
+function splitLocation(raw){
+  if(!raw || raw==='—') return {name:'',addr:raw||'—',full:raw||'—'};
+  const s = String(raw).trim();
+  const parts = s.split(',').map(p=>p.trim());
+  if(parts.length < 2) return {name:'',addr:s,full:s};
+  const first = parts[0].toLowerCase();
+  /* Detectar se o primeiro segmento é um nome de estabelecimento */
+  const keywords = ['hotel','hostel','residencial','aparthotel','guest house','guesthouse',
+    'pension','pousada','albergue','resort','villa','palace','palácio','suites','lodge',
+    'inn','b&b','bed and','airbnb','flat','apartment','apartamento','residence','residência',
+    'aeroporto','airport','terminal','humberto delgado','portela',
+    'epic sana','sana','turim','ibis','novotel','mercure','marriott','hilton','sheraton',
+    'radisson','holiday inn','best western','accor','melia','meliã','pestana','altis',
+    'tivoli','vip','jupiter','dom pedro','corinthia','intercontinental','four seasons',
+    'ritz','sofitel','crowne','hyatt','lux','inspira','memmo','bairro alto','the vintage',
+    'lisbon','lisboa','heritage','rossio','marquês','marques','empire','gota',
+    'escola','museu','museum','estação','station','praça','plaza','centro','center',
+    'parque','park','jardim','garden','castelo','castle','palacio','miradouro',
+    'restaurante','restaurant','café','cafe','bar','clube','club','igreja','church'];
+  const hasKeyword = keywords.some(k => first.includes(k));
+  /* Se começa com número (ex: "Rua X 123") provavelmente é endereço directo */
+  const startsWithNumber = /^\d/.test(parts[0]);
+  /* Se tem "Rua","Av.","R.","Alameda","Travessa","Largo","Praça" no início é endereço */
+  const streetPrefixes = /^(rua|r\.|av\.|av |avenida|alameda|travessa|tv\.|largo|praça|pc\.|estrada|calçada|beco|campo|cais)/i;
+  const isStreet = streetPrefixes.test(parts[0]);
+  if(hasKeyword && !startsWithNumber && !isStreet){
+    const nome = parts[0];
+    const endereco = parts.slice(1).join(', ');
+    return {name:nome, addr:endereco, full:s};
+  }
+  return {name:'', addr:s, full:s};
+}
+
 function cleanHora(h){
   if(!h) return '—:—';
   const s = String(h);
