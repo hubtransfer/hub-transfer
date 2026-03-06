@@ -335,8 +335,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
 .dc-addr-block{padding:.38rem .7rem;display:flex;flex-direction:column;gap:2px}
 .dc-addr-block:first-child{border-right:1px solid var(--border)}
 .dc-addr-lbl{font-family:var(--mono);font-size:.44rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
-.dc-addr-link{font-family:var(--mono);font-size:.52rem;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:.25rem;transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dc-addr-link:hover{color:#93c5fd}
+.dc-addr-val{font-family:var(--mono);font-size:.5rem;color:var(--text-dim);margin-bottom:.18rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-addr-btns{display:flex;gap:.25rem}
+.dc-addr-btn{font-family:var(--mono);font-size:.46rem;padding:.12rem .35rem;border-radius:3px;text-decoration:none;transition:all .15s;white-space:nowrap}
+.dc-addr-btn.gm{background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);color:#4285f4}
+.dc-addr-btn.gm:hover{background:rgba(66,133,244,.2)}
+.dc-addr-btn.wz{background:rgba(53,197,240,.1);border:1px solid rgba(53,197,240,.25);color:#35c5f0}
+.dc-addr-btn.wz:hover{background:rgba(53,197,240,.2)}
+.dc-fnum-link{text-decoration:none;color:var(--chegada);transition:opacity .15s}
+.dc-fnum-link:hover{opacity:.7}
 .dc-bottom{display:flex;align-items:center;gap:.4rem;padding:.4rem .7rem;background:var(--surface2);flex-wrap:wrap}
 .dc-drv-sel{flex:1;min-width:120px;padding:.3rem .5rem;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:.58rem;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath stroke='%23566480' stroke-width='1.4' d='M1 1l3.5 3.5L8 1'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .4rem center;padding-right:1.4rem;transition:border-color .15s}
 .dc-drv-sel:focus{border-color:var(--recolha)}
@@ -1218,7 +1225,7 @@ function buildDiaCard(v){
             <div class="dc-fcity">${depC}</div>
           </div>
           <div class="dc-fline">
-            <div class="dc-fnum">${v.flight}</div>
+            <a class="dc-fnum dc-fnum-link" href="https://www.google.com/search?q=${encodeURIComponent(v.flight)}" target="_blank" title="Ver voo em tempo real">${v.flight} ↗</a>
             <div class="dc-ftrack">
               <div class="dc-fprog"></div>
               <span class="dc-fplane">✈</span>
@@ -1268,11 +1275,19 @@ function buildDiaCard(v){
       <div class="dc-addrs">
         <div class="dc-addr-block">
           <div class="dc-addr-lbl">${endA_lbl}</div>
-          <a class="dc-addr-link" href="${endA_url}" target="_blank">📍 ${origem}</a>
+          <div class="dc-addr-val">📍 ${origem}</div>
+          <div class="dc-addr-btns">
+            <a class="dc-addr-btn gm" href="${endA_url}" target="_blank">🗺 Maps</a>
+            <a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(origem)}&navigate=yes" target="_blank">🔷 Waze</a>
+          </div>
         </div>
         <div class="dc-addr-block">
           <div class="dc-addr-lbl">${endB_lbl}</div>
-          <a class="dc-addr-link" href="${endB_url}" target="_blank">📍 ${destino}</a>
+          <div class="dc-addr-val">📍 ${destino}</div>
+          <div class="dc-addr-btns">
+            <a class="dc-addr-btn gm" href="${endB_url}" target="_blank">🗺 Maps</a>
+            <a class="dc-addr-btn wz" href="https://waze.com/ul?q=${encodeURIComponent(destino)}&navigate=yes" target="_blank">🔷 Waze</a>
+          </div>
         </div>
       </div>
 
@@ -1314,15 +1329,23 @@ function diaSetDriver(sel, cardId){
   }
 }
 function diaDispatch(cardId, type, client, lang){
-  const drv = _diaDriverMap[cardId]
-    || document.getElementById('dcdrv-'+cardId)?.value || '';
-  if(!drv){ alert('⚠️ Seleciona um motorista primeiro!'); return; }
+  // Lê SEMPRE o select actual — garante que usa motorista seleccionado neste momento
+  const sel = document.getElementById('dcdrv-'+cardId);
+  const drv = (sel ? sel.value : '') || _diaDriverMap[cardId] || '';
+  if(!drv){ alert('⚠️ Seleciona um motorista primeiro!'); sel&&sel.focus(); return; }
+
   const drvObj = DRIVERS.find(d=>d.name===drv);
-  if(!drvObj?.phone){ alert('⚠️ Motorista sem número na HUB Central.'); return; }
-  const fn  = TEMPLATES[type]?.[lang] || TEMPLATES[type]?.EN || TEMPLATES[type]?.PT;
-  if(!fn){ alert('Template não encontrado.'); return; }
+  if(!drvObj?.phone){ alert('⚠️ ' + drv + ' não tem número na HUB Central.\nVerifica a aba Motoristas.'); return; }
+
+  // Escolhe template correcto: CHEGADA ou RECOLHA, no idioma certo
+  const fn = TEMPLATES[type]?.[lang]
+          || TEMPLATES[type]?.EN
+          || TEMPLATES[type]?.PT;
+  if(!fn){ alert('Template não encontrado para tipo: ' + type); return; }
+
   const txt = fn(drv, client);
-  window.open(`https://wa.me/${drvObj.phone.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`,'_blank');
+  // Abre WhatsApp com template já preenchido com nome do motorista seleccionado
+  window.open(`https://wa.me/${drvObj.phone.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`, '_blank');
 }
 /* ─── SYNC VIAGENS — HUB CENTRAL ─── */
 function toggleViagensCfg(){
