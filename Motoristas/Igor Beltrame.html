@@ -303,7 +303,7 @@ const normalize=(s)=>String(s||'').toLowerCase().trim().normalize('NFD').replace
 function sanitize(raw){
   const me=normalize(MOTORISTA);
   return raw.filter(v=>{const d=normalize(v.driver);return d===me||d.includes(me)||me.includes(d);})
-    .map(v=>({id:v.id,client:v.client,phone:v.phone,origin:v.origin,destination:v.destination,pickupTime:v.pickupTime,flight:v.flight,language:v.language,pax:v.pax,bags:v.bags,type:v.type,depAirport:v.depAirport,depIata:v.depIata,arrAirport:v.arrAirport,arrIata:v.arrIata,depCity:v.depCity,arrCity:v.arrCity,depTime:v.depTime,arrTime:v.arrTime,depTerminal:v.depTerminal,arrTerminal:v.arrTerminal}));
+    .map(v=>({id:v.id,client:v.client,phone:v.phone,origin:v.origin,destination:v.destination,pickupTime:v.pickupTime,flight:v.flight,language:v.language,pax:v.pax,bags:v.bags,type:v.type,platform:v.platform||'',status:v.status||'',concluida:v.concluida||false,comissao:v.comissao||0,rowIndex:v.rowIndex||'',depAirport:v.depAirport,depIata:v.depIata,arrAirport:v.arrAirport,arrIata:v.arrIata,depCity:v.depCity,arrCity:v.arrCity,depTime:v.depTime,arrTime:v.arrTime,depTerminal:v.depTerminal,arrTerminal:v.arrTerminal}));
 }
 async function syncViagens(){
   if(!MOTORISTA||!GAS_URL)return;
