@@ -434,7 +434,6 @@ function render(){
         ${(v.concluida||v.status==='CONCLUIDA')?`<span class="dc-act done" style="pointer-events:none">✅ Concluída</span>`:`<button class="dc-act done" id="done-${cardId}" onclick="darBaixa('${v.id||''}','${v.rowIndex||''}','${cardId}')">✅ Dar Baixa</button>`}
       </div>
     </div>`;
-    </div>`;
   });
   main.innerHTML=html;
 }
