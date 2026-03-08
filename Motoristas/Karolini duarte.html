@@ -174,7 +174,7 @@ let SELECTED_DATE = '';
 function todayStr(){return new Date().toLocaleDateString('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'});}
 function dateToISO(d){const p=d.split('/');return p[2]+'-'+p[1]+'-'+p[0];}
 function isoToDate(i){const p=i.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
-function loadDate(d){SELECTED_DATE=d;_lastHash='';syncViagens();}
+function loadDate(d){SELECTED_DATE=d;syncViagens();}
 
 /* ── CLOCK ── */
 function tick(){const n=new Date(),o={timeZone:'Europe/Lisbon'};document.getElementById('clock').textContent=n.toLocaleString('pt-PT',{...o,hour:'2-digit',minute:'2-digit'});}
@@ -313,25 +313,18 @@ async function syncViagens(){
     const r=await fetch(url,{redirect:'follow'});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const newViagens=sanitize(Array.isArray(d)?d:(d.viagens||[]));
-    /* Só re-render se os dados mudaram */
-    const newHash=JSON.stringify(newViagens.map(v=>v.id+v.status+(v.driver||'')));
-    if(newHash===_lastHash && viagens.length){console.log('[HUB] Sem alterações');return;}
-    _lastHash=newHash;
-    viagens=newViagens;
-    /* Guardar cache local */
+    viagens=sanitize(Array.isArray(d)?d:(d.viagens||[]));
+    /* Guardar cache para abertura rápida (válido 60s) */
     try{localStorage.setItem('hub_cache_'+MOTORISTA,JSON.stringify({date:SELECTED_DATE||'hoje',viagens:viagens,ts:Date.now()}));}catch(e){}
     console.log('[HUB] Sync OK:',viagens.length,'viagens para',MOTORISTA);
     render();
   }catch(e){
     console.warn('[HUB] Sync falhou:',e.message);
-    /* Se falhou mas temos cache, não mostrar erro */
     if(!viagens.length){
       document.getElementById('main').innerHTML=`<div class="error-msg">⚠️ Erro: ${e.message}</div>`;
     }
   }
 }
-var _lastHash='';
 
 /* ── RENDER — MESMO VISUAL DO PAINEL PRINCIPAL ── */
 function render(){
@@ -475,18 +468,16 @@ function showNameplate(name){
 }
 
 /* ── INIT ── */
-/* Carregar cache local primeiro (instantâneo) */
+/* Cache só para abertura instantânea (válido 60 segundos) */
 try{
   const cached=JSON.parse(localStorage.getItem('hub_cache_'+MOTORISTA)||'null');
-  if(cached && cached.viagens && cached.viagens.length && (cached.date||'hoje')===(SELECTED_DATE||'hoje')){
+  if(cached && cached.viagens && cached.viagens.length && (Date.now()-cached.ts)<60000 && (cached.date||'hoje')===(SELECTED_DATE||'hoje')){
     viagens=cached.viagens;
     render();
-    console.log('[HUB] Cache carregado:',viagens.length,'viagens');
   }
 }catch(e){}
-/* Depois sincronizar em background */
 syncViagens();
-setInterval(syncViagens,180000); /* 3 min em vez de 2 */
+setInterval(syncViagens,180000);
 </script>
 </body>
 </html>
