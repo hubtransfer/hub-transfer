@@ -314,8 +314,6 @@ async function syncViagens(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     viagens=sanitize(Array.isArray(d)?d:(d.viagens||[]));
-    /* Guardar cache para abertura rápida (válido 60s) */
-    try{localStorage.setItem('hub_cache_'+MOTORISTA,JSON.stringify({date:SELECTED_DATE||'hoje',viagens:viagens,ts:Date.now()}));}catch(e){}
     console.log('[HUB] Sync OK:',viagens.length,'viagens para',MOTORISTA);
     render();
   }catch(e){
@@ -468,14 +466,8 @@ function showNameplate(name){
 }
 
 /* ── INIT ── */
-/* Cache só para abertura instantânea (válido 60 segundos) */
-try{
-  const cached=JSON.parse(localStorage.getItem('hub_cache_'+MOTORISTA)||'null');
-  if(cached && cached.viagens && cached.viagens.length && (Date.now()-cached.ts)<60000 && (cached.date||'hoje')===(SELECTED_DATE||'hoje')){
-    viagens=cached.viagens;
-    render();
-  }
-}catch(e){}
+/* Limpar cache antigo */
+try{localStorage.removeItem('hub_cache_'+MOTORISTA);}catch(e){}
 syncViagens();
 setInterval(syncViagens,180000);
 </script>
