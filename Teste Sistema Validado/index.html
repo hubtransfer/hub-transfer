@@ -1390,7 +1390,7 @@
                 <div class="config-input">
                     <label for="webappUrl">URL do Google Apps Script:</label>
                     <input type="url" id="webappUrl" 
-       value="https://script.google.com/macros/s/AKfycbz6gvBPtqKeVeZI5MgUofsYwhLOewl0iF80P-ikbeaJPDyWdLDj5x5D_h2PUFwWhmaUPA/exec" 
+       value="https://script.google.com/macros/s/AKfycbwgoRcb5ED23dJhPpEvHIscKE7U962_lwMuMBCAcO9KxiNXblKBo8pg3rZeLzPCTyEzug/exec" 
        placeholder="https://script.google.com/macros/s/...">
                 </div>
                 <button type="button" class="btn btn-success" onclick="testConnection()" id="testBtn">
@@ -1892,7 +1892,7 @@
         let totalPages = 1;
 
         // CONFIGURAÇÕES
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz6gvBPtqKeVeZI5MgUofsYwhLOewl0iF80P-ikbeaJPDyWdLDj5x5D_h2PUFwWhmaUPA/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwgoRcb5ED23dJhPpEvHIscKE7U962_lwMuMBCAcO9KxiNXblKBo8pg3rZeLzPCTyEzug/exec';
 const TEST_EMAIL = 'juniorgutierezbega@gmail.com';
 const SPREADSHEET_ID = '15zfdrXZaR49HrVsHzpszLLbqFKCenvMn11IvMkYSMHI';
         
@@ -2757,7 +2757,8 @@ function updateConnectionStatus(connected) {
         }
 
         function updateCalculation() {
-            const pessoas = parseInt(document.getElementById('numeroPessoas').value) || 0;
+            const pessoasRaw = parseInt(document.getElementById('numeroPessoas').value);
+            const pessoas = isNaN(pessoasRaw) ? 0 : pessoasRaw;
             let valorTotal = 0;
             let valorHotel = 0;
             let valorHUB = 0;
@@ -2770,16 +2771,27 @@ function updateConnectionStatus(connected) {
                 document.getElementById('calcTipoServico').textContent = 
                     currentServiceType === 'tour' ? 'Tour Regular' : 'Private Tour';
                 document.getElementById('calcPrecoUnitario').textContent = `€${precoUnitarioAtual}`;
-                document.getElementById('calcPessoas').textContent = pessoas;
+                document.getElementById('calcPessoas').textContent = pessoas || '-';
                 
                 if (currentServiceType === 'tour') {
-                    valorTotal = precoUnitarioAtual * pessoas;
+                    // SÓ calcula se tiver pessoas E preço definido
+                    if (pessoas > 0 && precoUnitarioAtual > 0) {
+                        valorTotal = precoUnitarioAtual * pessoas;
+                    } else if (precoUnitarioAtual > 0 && pessoas === 0) {
+                        // Tour selecionado mas sem pessoas ainda — mostrar preço unitário como referência
+                        valorTotal = precoUnitarioAtual;
+                    }
                     valorHotel = valorTotal * 0.30;
                     comissaoRecepcao = 5.00;
                 } else if (currentServiceType === 'private') {
                     valorTotal = precoUnitarioAtual;
                     valorHotel = valorTotal * 0.30;
                     comissaoRecepcao = 5.00;
+                }
+                
+                // Só atualiza o campo valorTotal se tiver pessoas selecionadas
+                if (pessoas > 0) {
+                    document.getElementById('valorTotal').value = valorTotal.toFixed(2);
                 }
             } else {
                 calcBox.classList.remove('show');
@@ -2794,10 +2806,6 @@ function updateConnectionStatus(connected) {
             document.getElementById('calcHotel').textContent = `€${valorHotel.toFixed(2)}`;
             document.getElementById('calcHUB').textContent = `€${valorHUB.toFixed(2)}`;
             document.getElementById('calcRecepcao').textContent = `€${comissaoRecepcao.toFixed(2)}`;
-            
-            if (currentServiceType !== 'transfer') {
-                document.getElementById('valorTotal').value = valorTotal.toFixed(2);
-            }
         }
 
         function toggleAdminMode() {
@@ -2821,7 +2829,20 @@ function updateConnectionStatus(connected) {
         // FUNÇÕES DOS BOTÕES RÁPIDOS
         // =====================================================
         function setPeople(number) {
-            document.getElementById('numeroPessoas').value = number;
+            let finalNumber = number;
+            
+            // Se clicou em 8+ (o último botão), pedir número exato
+            if (number === 8) {
+                const input = prompt('Quantas pessoas? (8 ou mais):', '8');
+                if (input === null) return; // Cancelou
+                finalNumber = parseInt(input);
+                if (isNaN(finalNumber) || finalNumber < 1) {
+                    showStatus('Número inválido. Digite um número válido.', 'error');
+                    return;
+                }
+            }
+            
+            document.getElementById('numeroPessoas').value = finalNumber;
             document.querySelectorAll('.btn-people').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             updateCalculation();
@@ -3734,8 +3755,9 @@ function parseServiceDate(dateStr) {
             const formData = {
     nomeCliente: document.getElementById('nomeCliente').value.trim(),
     referencia: document.getElementById('referencia').value.trim(),
-    tipoServico: currentServiceType,
+    tipoServico: currentServiceType === 'tour' ? 'Tour Regular' : currentServiceType === 'private' ? 'Private Tour' : 'Transfer',
                 tourSelecionado: document.getElementById('tourSelecionado').value,
+                tourNome: TOURS_DATA[document.getElementById('tourSelecionado').value] ? TOURS_DATA[document.getElementById('tourSelecionado').value].name : '',
                 numeroPessoas: pessoas,
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
                 data: formatDate(document.getElementById('data').value),
