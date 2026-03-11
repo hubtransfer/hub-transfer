@@ -2742,6 +2742,7 @@ function updateConnectionStatus(connected) {
             }
             
             const tourData = TOURS_DATA[selectedOption.value];
+            document.getElementById('destino').value = tourData.name;
             const pessoas = parseInt(document.getElementById('numeroPessoas').value) || 1;
             
             if (tourData.type === 'regular') {
