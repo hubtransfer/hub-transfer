@@ -3734,8 +3734,9 @@ function parseServiceDate(dateStr) {
             const formData = {
     nomeCliente: document.getElementById('nomeCliente').value.trim(),
     referencia: document.getElementById('referencia').value.trim(),
-    tipoServico: currentServiceType,
+    tipoServico: currentServiceType === 'tour' ? 'Tour Regular' : currentServiceType === 'private' ? 'Private Tour' : 'Transfer',
                 tourSelecionado: document.getElementById('tourSelecionado').value,
+                tourNome: TOURS_DATA[document.getElementById('tourSelecionado').value] ? TOURS_DATA[document.getElementById('tourSelecionado').value].name : '',
                 numeroPessoas: pessoas,
                 numeroBagagens: parseInt(document.getElementById('numeroBagagens').value),
                 data: formatDate(document.getElementById('data').value),
