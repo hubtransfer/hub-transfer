@@ -2742,6 +2742,7 @@ function updateConnectionStatus(connected) {
             }
             
             const tourData = TOURS_DATA[selectedOption.value];
+            document.getElementById('destino').value = tourData.name;
             const pessoas = parseInt(document.getElementById('numeroPessoas').value) || 1;
             
             if (tourData.type === 'regular') {
@@ -2835,6 +2836,7 @@ function updateConnectionStatus(connected) {
             
             if (currentServiceType === 'tour' && selectedOption && selectedOption.value) {
                 const tourData = TOURS_DATA[selectedOption.value];
+                document.getElementById('destino').value = tourData.name;
                 if (tourData && tourData.type === 'regular' && pessoas > 0) {
                     const valorTotal = tourData.price * pessoas;
                     document.getElementById('valorTotal').value = valorTotal.toFixed(2);
@@ -2842,6 +2844,7 @@ function updateConnectionStatus(connected) {
                 }
             } else if (currentServiceType === 'private' && selectedOption && selectedOption.value) {
                 const tourData = TOURS_DATA[selectedOption.value];
+                document.getElementById('destino').value = tourData.name;
                 if (tourData && tourData.type === 'private' && pessoas > 0) {
                     const valorTotal = pessoas <= 3 ? tourData.priceSmall : tourData.priceLarge;
                     document.getElementById('valorTotal').value = valorTotal.toFixed(2);
